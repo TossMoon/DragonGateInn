@@ -1,21 +1,12 @@
-import account from './account.js';
+const account = require('./account.js');
 
 
 //分店的账户
  class branchAccount extends account{
-    branchAccount(username,password){
-        this.base=new accountComponent(username,password);
+    constructor(username,password){
+        super(username,password);
     }
-
-    getUsername(){
-        return this.base.getUsername();
-    }
-
-    getPassword(){
-        return this.base.getPassword();
-    }
-    
-    getActiveBool(){
-        return this.base.getActiveBool();
-    }
+ 
 }
+
+module.exports=branchAccount;

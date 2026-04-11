@@ -1,7 +1,9 @@
-import account from '../account/account.js';
+const account = require('../account/account.js');
+const assert = require('assert');
+
 
 class accountManager{
-    accountManager(){
+    constructor(){
         this.accountList=[];
     }
 
@@ -36,7 +38,7 @@ class accountManager{
     }
 
 
-    //禁用账户，被禁用的账户的行为由管理器具体设定
+    //禁用账户
     setDisableAccount(username){
         this.accountList.forEach(account=>{
             if(account.getUsername()===username){
@@ -45,3 +47,5 @@ class accountManager{
         });
     }
 }
+
+module.exports=accountManager;

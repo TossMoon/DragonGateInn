@@ -1,33 +1,30 @@
 "use strict";
 
-var _account = _interopRequireDefault(require("../account/account.js"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
+var account = require('../account/account.js');
+
+var assert = require('assert');
+
 var accountManager =
 /*#__PURE__*/
 function () {
   function accountManager() {
     _classCallCheck(this, accountManager);
-  }
+
+    this.accountList = [];
+  } //添加一个新账户
+
 
   _createClass(accountManager, [{
-    key: "accountManager",
-    value: function accountManager() {
-      this.accountList = [];
-    } //添加一个新账户
-
-  }, {
     key: "addOneNewAccount",
     value: function addOneNewAccount(newAccount) {
       //输入的变量类型应该是account的子类
-      assert(newAccount instanceof _account["default"]); //由于是用数组存储的，不能保证里面元素是唯一的
+      assert(newAccount instanceof account); //由于是用数组存储的，不能保证里面元素是唯一的
       //每次添加新账户的时候需要检查用户名是否已存在
 
       if (this.getOneAccountByUsername(newAccount.getUsername()) != null) {
@@ -57,7 +54,7 @@ function () {
       return this.accountList.find(function (account) {
         return account.getUsername() === username;
       });
-    } //禁用账户，被禁用的账户的行为由管理器具体设定
+    } //禁用账户
 
   }, {
     key: "setDisableAccount",
@@ -72,3 +69,5 @@ function () {
 
   return accountManager;
 }();
+
+module.exports = accountManager;

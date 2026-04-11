@@ -1,7 +1,7 @@
 
 //用于登录的账户
 class account{
-    account(username,password){
+    constructor(username,password){
         this.usernameString=username;
         this.passwordString=password;
         this.activeBool=true;
@@ -24,3 +24,5 @@ class account{
         this.activeBool=false;
     }
 }
+
+module.exports=account;
