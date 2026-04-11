@@ -29,8 +29,8 @@ class account{
     }
 
     //启用账户
-    setActive(){
-        this.activeState.setActive();
+    setEnable(){
+        this.activeState.setEnable();
     }
 }
 

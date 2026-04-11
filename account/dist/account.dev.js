@@ -45,9 +45,9 @@ function () {
     } //启用账户
 
   }, {
-    key: "setActive",
-    value: function setActive() {
-      this.activeState.setActive();
+    key: "setEnable",
+    value: function setEnable() {
+      this.activeState.setEnable();
     }
   }]);
 

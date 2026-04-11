@@ -64,6 +64,16 @@ function () {
           account.setDisable();
         }
       });
+    } //启用账户
+
+  }, {
+    key: "setEnableAccount",
+    value: function setEnableAccount(username) {
+      this.accountList.forEach(function (account) {
+        if (account.getUsername() === username) {
+          account.setEnable();
+        }
+      });
     }
   }]);
 

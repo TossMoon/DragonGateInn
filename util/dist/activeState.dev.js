@@ -6,13 +6,16 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-//标记一个数据是否是启用状态
+var assert = require('assert'); //标记一个数据是否是启用状态
+
+
 var activeState =
 /*#__PURE__*/
 function () {
   function activeState(activeBool) {
     _classCallCheck(this, activeState);
 
+    assert(typeof activeBool === 'boolean');
     this.activeBool = activeBool;
   }
 

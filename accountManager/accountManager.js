@@ -46,6 +46,15 @@ class accountManager{
             }
         });
     }
+
+    //启用账户
+    setEnableAccount(username){
+        this.accountList.forEach(account=>{
+            if(account.getUsername()===username){
+                account.setEnable();
+            }
+        });
+    }
 }
 
 module.exports=accountManager;
