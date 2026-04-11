@@ -6,7 +6,9 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-//用于登录的账户
+var activeState = require('../util/activeState.js'); //用于登录的账户
+
+
 var account =
 /*#__PURE__*/
 function () {
@@ -15,7 +17,7 @@ function () {
 
     this.usernameString = username;
     this.passwordString = password;
-    this.activeBool = true;
+    this.activeState = new activeState(true);
   }
 
   _createClass(account, [{
@@ -27,17 +29,25 @@ function () {
     key: "getPassword",
     value: function getPassword() {
       return this.passwordString;
-    }
+    } //-------------账户状态相关方法-------------
+    //查看账户被禁用的状态
+
   }, {
     key: "getActiveBool",
     value: function getActiveBool() {
-      return this.activeBool;
+      return this.activeState.getActiveBool();
     } //禁用账户，被禁用的账户的行为由管理器具体设定
 
   }, {
     key: "setDisable",
     value: function setDisable() {
-      this.activeBool = false;
+      this.activeState.setDisable();
+    } //启用账户
+
+  }, {
+    key: "setActive",
+    value: function setActive() {
+      this.activeState.setActive();
     }
   }]);
 
