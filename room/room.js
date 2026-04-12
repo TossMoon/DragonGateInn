@@ -1,0 +1,105 @@
+const activeState=require('../util/activeState');
+const assert=require('assert');
+
+//床铺的情况，某种类型的床有几张
+class BedInRoom{
+    constructor(typeString,numInt){
+        //床的类型
+        this.typeString=typeString;
+        //有几张床
+        this.numInt=numInt;
+    }
+
+    getBedType(){
+        return this.typeString;
+    }
+
+    getBedNum(){
+        return this.numInt;
+    }
+
+}
+
+
+//酒店房间的户型
+class RoomLayout{
+    constructor(area,windowBool,bedType){
+        //房间的面积
+        this.areaReal = area;
+        //是否有窗户
+        this.windowBool=windowBool;
+        //房间床铺的情况
+        assert(bedType instanceof BedInRoom);
+        this.BedType=bedType;
+    }
+
+    getArea(){
+        return this.areaReal;
+    }
+
+    getWindowBool(){
+        return this.windowBool;
+    }
+
+    getBedType(){
+        return this.BedType;
+    }
+}
+
+/**
+ * 酒店房间类
+ */
+class room{
+    constructor(id,roomType=new RoomLayout(0,false,new BedInRoom("单人床",1))){
+        //房间编号
+        this.id=id;
+
+        //房间的户型
+        assert(roomType instanceof RoomLayout); 
+        this.roomType=roomType;
+
+        //房间是否可以出租
+        this.activeState=new activeState(true);
+    }
+
+    /**
+     * 获取房间的编号
+     * @returns {string} 房间的编号
+     */
+    getId(){
+        return this.id;
+    }
+
+    /**
+     * 获取房间的户型
+     * @returns {RoomLayout} 房间的户型
+     */
+    getRoomType(){
+        return this.roomType;
+    }
+
+
+    /**
+     * 获取房间是否可以出租
+     * @returns {activeState} 房间的是否可以出租
+     */
+    getActiveState(){
+        return this.activeState;
+    }
+
+    /**
+     * 设置房间为不可出租
+     */
+    setDisable(){
+        this.activeState.setDisable();
+    }
+
+    /**
+     * 设置房间为可出租
+     */
+    setEnable(){
+        this.activeState.setEnable();
+    }
+}
+
+module.exports=room;    

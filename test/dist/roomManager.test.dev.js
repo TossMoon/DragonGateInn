@@ -1,0 +1,21 @@
+"use strict";
+
+var RoomManager = require('../room/RoomManager');
+
+var room = require('../room/room');
+
+var SingletonFactory = require('../util/SingletonFactory.js');
+
+describe("RoomManager", function () {
+  it("创建房间管理器", function () {
+    var roomManager = SingletonFactory.getInstance(RoomManager);
+    expect(roomManager).toBeInstanceOf(RoomManager);
+  });
+  it("添加分店的房间管理类", function () {
+    var roomManager = SingletonFactory.getInstance(RoomManager);
+    roomManager.addNewBranchRoomManager("test");
+    expect(roomManager.getAllRoomManagerList().length).toBe(1);
+    roomManager.getOneRoomManagerByBranchId("test").addRoom(new room("testRoom"));
+    expect(roomManager.getAllRoomList().length).toBe(1);
+  });
+});
