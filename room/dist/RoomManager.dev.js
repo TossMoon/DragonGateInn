@@ -14,11 +14,11 @@ var branchRoomManager = require('./branchRoomManager');
  */
 
 
-var RoomManager =
+var allRoomManager =
 /*#__PURE__*/
 function () {
-  function RoomManager() {
-    _classCallCheck(this, RoomManager);
+  function allRoomManager() {
+    _classCallCheck(this, allRoomManager);
 
     //所有分店的房间管理类列表
 
@@ -34,7 +34,7 @@ function () {
    */
 
 
-  _createClass(RoomManager, [{
+  _createClass(allRoomManager, [{
     key: "addNewBranchRoomManager",
     value: function addNewBranchRoomManager(branchIdString) {
       assert(typeof branchIdString === 'string');
@@ -90,9 +90,47 @@ function () {
         return room.getId() === roomId;
       });
     }
+    /**
+    * 设置房间为空闲
+    * @param {string} roomId 房间的编号
+    */
+
+  }, {
+    key: "setOneRoomEmpty",
+    value: function setOneRoomEmpty(roomId) {
+      assert(typeof roomId === 'string');
+      var targetRoom = this.getOneRoomById(roomId);
+      if (targetRoom) targetRoom.setEmpty();
+    }
+    /**
+     * 获取房间是否为空闲
+     * @param {string} roomId 房间的编号
+     * @returns {boolean} 房间是否为空闲
+     */
+
+  }, {
+    key: "getOneRoomEmpty",
+    value: function getOneRoomEmpty(roomId) {
+      assert(typeof roomId === 'string');
+      var targetRoom = this.getOneRoomById(roomId);
+      if (targetRoom) return targetRoom.getEmpty();
+      return false;
+    }
+    /**
+     * 获取所有空闲房间
+     * @returns {room[]} 所有空闲房间的引用类型对象数组
+     */
+
+  }, {
+    key: "getAllEmptyRoom",
+    value: function getAllEmptyRoom() {
+      return this.roomList.filter(function (room) {
+        return room.getEmpty();
+      });
+    }
   }]);
 
-  return RoomManager;
+  return allRoomManager;
 }();
 
-module.exports = RoomManager;
+module.exports = allRoomManager;

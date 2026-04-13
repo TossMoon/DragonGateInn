@@ -7,7 +7,7 @@ const branchRoomManager=require('./branchRoomManager');
 /**
  * 所有分店的房间管理类
  */
-class RoomManager{
+class allRoomManager{
     constructor(){
         //所有分店的房间管理类列表
         /**
@@ -61,6 +61,37 @@ class RoomManager{
         return this.branchRoomManagerList.flatMap(roomManager=>roomManager.roomList).find(room=>room.getId()===roomId);
     }
 
-    
+      /**
+     * 设置房间为空闲
+     * @param {string} roomId 房间的编号
+     */
+    setOneRoomEmpty(roomId)
+    {
+        assert(typeof roomId==='string');
+        const targetRoom = this.getOneRoomById(roomId);
+        if (targetRoom) targetRoom.setEmpty();
+    }
+
+    /**
+     * 获取房间是否为空闲
+     * @param {string} roomId 房间的编号
+     * @returns {boolean} 房间是否为空闲
+     */
+    getOneRoomEmpty(roomId)
+    {
+        assert(typeof roomId==='string');
+        const targetRoom = this.getOneRoomById(roomId);
+        if (targetRoom) return targetRoom.getEmpty();
+        return false;
+    }
+
+    /**
+     * 获取所有空闲房间
+     * @returns {room[]} 所有空闲房间的引用类型对象数组
+     */
+    getAllEmptyRoom()
+    {
+        return this.roomList.filter(room=>room.getEmpty());
+    }
 }
-module.exports=RoomManager;
+module.exports=allRoomManager;

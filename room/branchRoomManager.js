@@ -71,5 +71,38 @@ class branchRoomManager{
         const targetRoom = this.getOneRoomById(roomId);
         if (targetRoom) targetRoom.setEnable();
     }
+
+    /**
+     * 设置房间为空闲
+     * @param {string} roomId 房间的编号
+     */
+    setOneRoomEmpty(roomId)
+    {
+        assert(typeof roomId==='string');
+        const targetRoom = this.getOneRoomById(roomId);
+        if (targetRoom) targetRoom.setEmpty();
+    }
+
+    /**
+     * 获取房间是否为空闲
+     * @param {string} roomId 房间的编号
+     * @returns {boolean} 房间是否为空闲
+     */
+    getOneRoomEmpty(roomId)
+    {
+        assert(typeof roomId==='string');
+        const targetRoom = this.getOneRoomById(roomId);
+        if (targetRoom) return targetRoom.getEmpty();
+        return false;
+    }
+
+    /**
+     * 获取所有空闲房间
+     * @returns {room[]} 所有空闲房间的引用类型对象数组
+     */
+    getAllEmptyRoom()
+    {
+        return this.roomList.filter(room=>room.getEmpty());
+    }
 }
 module.exports=branchRoomManager;

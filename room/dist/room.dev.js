@@ -21,6 +21,12 @@ function () {
     this.typeString = typeString; //有几张床
 
     this.numInt = numInt;
+    /**
+     * 是否空闲（如果这个房间被出租了，那么这个变量为false）
+     * @type {boolean}
+     */
+
+    this.isEmptyBool = true;
   }
 
   _createClass(BedInRoom, [{
@@ -142,6 +148,25 @@ function () {
     key: "setEnable",
     value: function setEnable() {
       this.activeState.setEnable();
+    }
+    /**
+     * 设置房间为空闲
+     */
+
+  }, {
+    key: "setEmpty",
+    value: function setEmpty() {
+      this.isEmptyBool = true;
+    }
+    /**
+     * 获取房间是否为空闲
+     * @returns {boolean} 房间是否为空闲
+     */
+
+  }, {
+    key: "getEmpty",
+    value: function getEmpty() {
+      return this.isEmptyBool;
     }
   }]);
 
