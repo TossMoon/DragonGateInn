@@ -159,6 +159,16 @@ function () {
       this.isEmptyBool = true;
     }
     /**
+     * 设置房间被占用
+     * @param {boolean} isOccupied 是否被占用
+     */
+
+  }, {
+    key: "setOccupied",
+    value: function setOccupied() {
+      this.isEmptyBool = false;
+    }
+    /**
      * 获取房间是否为空闲
      * @returns {boolean} 房间是否为空闲
      */

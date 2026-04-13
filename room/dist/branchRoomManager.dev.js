@@ -109,6 +109,18 @@ function () {
       if (targetRoom) targetRoom.setEmpty();
     }
     /**
+     * 设置房间被占用
+     * @param {string} roomId 房间的编号
+     */
+
+  }, {
+    key: "setOneRoomOccupied",
+    value: function setOneRoomOccupied(roomId) {
+      assert(typeof roomId === 'string');
+      var targetRoom = this.getOneRoomById(roomId);
+      if (targetRoom) targetRoom.setOccupied();
+    }
+    /**
      * 获取房间是否为空闲
      * @param {string} roomId 房间的编号
      * @returns {boolean} 房间是否为空闲

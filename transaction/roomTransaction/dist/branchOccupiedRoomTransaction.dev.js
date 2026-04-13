@@ -27,22 +27,20 @@ var assert = require('assert');
 var branchRoomTransaction = require('./branchRoomTranaction');
 
 var allRoomManager = require('../../room/allRoomManager');
-
-var room = require('../../room/room');
 /**
- * 分店添加房间事务
+ * 分店占据房间的事务
  */
 
 
-var branchAddRoomTransaction =
+var branchOccupiedRoomTransaction =
 /*#__PURE__*/
 function (_branchRoomTransactio) {
-  _inherits(branchAddRoomTransaction, _branchRoomTransactio);
+  _inherits(branchOccupiedRoomTransaction, _branchRoomTransactio);
 
-  function branchAddRoomTransaction() {
-    _classCallCheck(this, branchAddRoomTransaction);
+  function branchOccupiedRoomTransaction() {
+    _classCallCheck(this, branchOccupiedRoomTransaction);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(branchAddRoomTransaction).call(this));
+    return _possibleConstructorReturn(this, _getPrototypeOf(branchOccupiedRoomTransaction).call(this));
   }
   /**
    * 第一个参数：分店id
@@ -50,7 +48,7 @@ function (_branchRoomTransactio) {
    */
 
 
-  _createClass(branchAddRoomTransaction, [{
+  _createClass(branchOccupiedRoomTransaction, [{
     key: "execute",
     value: function execute() {
       var _get2,
@@ -60,27 +58,27 @@ function (_branchRoomTransactio) {
         args[_key] = arguments[_key];
       }
 
-      (_get2 = _get(_getPrototypeOf(branchAddRoomTransaction.prototype), "execute", this)).call.apply(_get2, [this].concat(args)); //检查分店参数是否符合要求
+      (_get2 = _get(_getPrototypeOf(branchOccupiedRoomTransaction.prototype), "execute", this)).call.apply(_get2, [this].concat(args)); //检查分店参数是否符合要求
 
 
-      assert(this.checkBranchArg(args)); //检查添加的变量是否是房间实例
+      assert(this.checkBranchArg(args)); //检查添加的变量是否是房间id(是否是string类型，是否在管理器中存在)
 
       assert(args.every(function (item, index) {
         if (index > 0) {
-          return item instanceof room;
+          return typeof item === 'string' && _this.getManager(allRoomManager).getOneRoomById(item) !== null;
         }
 
         return true;
       }));
       args.forEach(function (item, index) {
         if (index > 0) {
-          _this.getManager(allRoomManager).getOneRoomManagerByBranchId(args[0]).addRoom(item);
+          _this.getManager(allRoomManager).getOneRoomManagerByBranchId(args[0]).setOneRoomOccupied(item);
         }
       });
     }
   }]);
 
-  return branchAddRoomTransaction;
+  return branchOccupiedRoomTransaction;
 }(branchRoomTransaction);
 
-module.exports = branchAddRoomTransaction;
+module.exports = branchOccupiedRoomTransaction;

@@ -24,63 +24,85 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 var assert = require('assert');
 
-var branchRoomTransaction = require('./branchRoomTranaction');
+var transaction = require('../transaction');
 
 var allRoomManager = require('../../room/allRoomManager');
 
 var room = require('../../room/room');
 /**
- * 分店添加房间事务
+ * 分店可以操作的房间事务
  */
 
 
-var branchAddRoomTransaction =
+var branchRoomTransaction =
 /*#__PURE__*/
-function (_branchRoomTransactio) {
-  _inherits(branchAddRoomTransaction, _branchRoomTransactio);
+function (_transaction) {
+  _inherits(branchRoomTransaction, _transaction);
 
-  function branchAddRoomTransaction() {
-    _classCallCheck(this, branchAddRoomTransaction);
+  function branchRoomTransaction() {
+    _classCallCheck(this, branchRoomTransaction);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(branchAddRoomTransaction).call(this));
+    return _possibleConstructorReturn(this, _getPrototypeOf(branchRoomTransaction).call(this));
   }
   /**
-   * 第一个参数：分店id
-   * 第二个参数：房间信息
+   * 检查分店是否存在,是否存储在全局所有房间管理器中
+   * @param {string} branchId 分店id
+   * @returns {boolean} 如果分店存在则返回true，否则返回false
    */
 
 
-  _createClass(branchAddRoomTransaction, [{
+  _createClass(branchRoomTransaction, [{
+    key: "checkBranchExist",
+    value: function checkBranchExist(branchId) {
+      return this.getManager(allRoomManager).getOneRoomManagerByBranchId(branchId) !== null;
+    }
+    /**
+     * 检查参数是否符合要求，包括参数的数量，参数第一个是否是分店的id
+     * @param {array} args 参数数组
+     * @returns {boolean} 如果参数符合要求则返回true，否则返回false
+     */
+
+  }, {
+    key: "checkBranchArg",
+    value: function checkBranchArg(args) {
+      if (args.length < 2) {
+        return false;
+      }
+
+      if (!args.every(function (item, index) {
+        if (index == 0) {
+          return typeof item === 'string';
+        }
+
+        return true;
+      })) {
+        return false;
+      }
+
+      if (!this.checkBranchExist(args[0])) {
+        return false;
+      }
+
+      return true;
+    }
+    /**
+     * 
+     */
+
+  }, {
     key: "execute",
     value: function execute() {
-      var _get2,
-          _this = this;
+      var _get2;
 
       for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
         args[_key] = arguments[_key];
       }
 
-      (_get2 = _get(_getPrototypeOf(branchAddRoomTransaction.prototype), "execute", this)).call.apply(_get2, [this].concat(args)); //检查分店参数是否符合要求
-
-
-      assert(this.checkBranchArg(args)); //检查添加的变量是否是房间实例
-
-      assert(args.every(function (item, index) {
-        if (index > 0) {
-          return item instanceof room;
-        }
-
-        return true;
-      }));
-      args.forEach(function (item, index) {
-        if (index > 0) {
-          _this.getManager(allRoomManager).getOneRoomManagerByBranchId(args[0]).addRoom(item);
-        }
-      });
+      (_get2 = _get(_getPrototypeOf(branchRoomTransaction.prototype), "execute", this)).call.apply(_get2, [this].concat(args));
     }
   }]);
 
-  return branchAddRoomTransaction;
-}(branchRoomTransaction);
+  return branchRoomTransaction;
+}(transaction);
 
-module.exports = branchAddRoomTransaction;
+module.exports = branchRoomTransaction;

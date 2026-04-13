@@ -24,33 +24,33 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 var assert = require('assert');
 
-var branchRoomTransaction = require('./branchRoomTranaction');
+var transaction = require('../transaction');
 
 var allRoomManager = require('../../room/allRoomManager');
 
 var room = require('../../room/room');
 /**
- * 分店添加房间事务
+ * 分店下架房间事务
  */
 
 
-var branchAddRoomTransaction =
+var branchSetDisableRoomTransaction =
 /*#__PURE__*/
-function (_branchRoomTransactio) {
-  _inherits(branchAddRoomTransaction, _branchRoomTransactio);
+function (_transaction) {
+  _inherits(branchSetDisableRoomTransaction, _transaction);
 
-  function branchAddRoomTransaction() {
-    _classCallCheck(this, branchAddRoomTransaction);
+  function branchSetDisableRoomTransaction() {
+    _classCallCheck(this, branchSetDisableRoomTransaction);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(branchAddRoomTransaction).call(this));
+    return _possibleConstructorReturn(this, _getPrototypeOf(branchSetDisableRoomTransaction).call(this));
   }
   /**
    * 第一个参数：分店id
-   * 第二个参数：房间信息
+   * 第二个参数：房间id
    */
 
 
-  _createClass(branchAddRoomTransaction, [{
+  _createClass(branchSetDisableRoomTransaction, [{
     key: "execute",
     value: function execute() {
       var _get2,
@@ -60,27 +60,25 @@ function (_branchRoomTransactio) {
         args[_key] = arguments[_key];
       }
 
-      (_get2 = _get(_getPrototypeOf(branchAddRoomTransaction.prototype), "execute", this)).call.apply(_get2, [this].concat(args)); //检查分店参数是否符合要求
+      (_get2 = _get(_getPrototypeOf(branchSetDisableRoomTransaction.prototype), "execute", this)).call.apply(_get2, [this].concat(args)); //检查参数是否符合要求
 
 
-      assert(this.checkBranchArg(args)); //检查添加的变量是否是房间实例
-
+      assert(args.length >= 2);
       assert(args.every(function (item, index) {
-        if (index > 0) {
-          return item instanceof room;
-        }
-
-        return true;
+        return index === 0 && typeof item === 'string' || index > 0 && item instanceof room;
       }));
+
+      if (!this.getManager(allRoomManager).getOneRoomManagerByBranchId(args[0])) {
+        throw new Error('分店不存在');
+      }
+
       args.forEach(function (item, index) {
         if (index > 0) {
-          _this.getManager(allRoomManager).getOneRoomManagerByBranchId(args[0]).addRoom(item);
+          _this.getManager(allRoomManager).getOneRoomManagerByBranchId(args[0]).setOneRoomDisable(item);
         }
       });
     }
   }]);
 
-  return branchAddRoomTransaction;
-}(branchRoomTransaction);
-
-module.exports = branchAddRoomTransaction;
+  return branchSetDisableRoomTransaction;
+}(transaction);

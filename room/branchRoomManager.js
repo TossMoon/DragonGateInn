@@ -84,6 +84,17 @@ class branchRoomManager{
     }
 
     /**
+     * 设置房间被占用
+     * @param {string} roomId 房间的编号
+     */
+    setOneRoomOccupied(roomId)
+    {
+        assert(typeof roomId==='string');
+        const targetRoom = this.getOneRoomById(roomId);
+        if (targetRoom) targetRoom.setOccupied();
+    }
+
+    /**
      * 获取房间是否为空闲
      * @param {string} roomId 房间的编号
      * @returns {boolean} 房间是否为空闲
