@@ -63,16 +63,10 @@ function (_branchRoomTransactio) {
 
       assert(this.checkBranchArg(args)); //检查添加的变量是否是房间id(是否是string类型，是否在管理器中存在)
 
-      assert(args.every(function (item, index) {
-        if (index > 0) {
-          return typeof item === 'string' && _this.getManager(allRoomManager).getOneRoomById(item) !== null;
-        }
-
-        return true;
-      }));
+      assert(this.checkRoomIdArg(args));
       args.forEach(function (item, index) {
         if (index > 0) {
-          _this.getManager(allRoomManager).getOneRoomManagerByBranchId(args[0]).setOneRoomDisable(item);
+          _this.getNeedChangeBranchRoomManager(args[0]).setOneRoomDisable(item);
         }
       });
     }

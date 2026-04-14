@@ -1,8 +1,8 @@
-const assert=require('assert'); 
+
 
 const transaction=require('../transaction');
 const allRoomManager=require('../../room/allRoomManager');
-const room=require('../../room/room');
+
 
 /**
  * 分店可以操作的房间事务
@@ -12,6 +12,18 @@ class branchRoomTransaction extends transaction{
         super();
     }
 
+    /**
+     * 检查添加的变量是否是房间id(是否是string类型，是否在管理器中存在)
+     * @returns {boolean} 如果参数符合要求则返回true，否则返回false
+     */
+    checkRoomIdArg(args){
+        return args.every((item,index) => {
+            if(index>0){
+                return typeof item==='string' 
+                    && this.getManager(allRoomManager).getOneRoomById(item) !== null}
+            return true;
+        });
+    }
 
     /**
      * 检查分店是否存在,是否存储在全局所有房间管理器中
@@ -45,6 +57,17 @@ class branchRoomTransaction extends transaction{
         return true;
     }
 
+    /**
+     * 获取分店的房间管理器
+     * @param {string} branchId 分店id
+     * @returns {branchRoomManager} 分店的房间管理器
+     */
+    getNeedChangeBranchRoomManager(branchId)
+    {
+        return this.getManager(allRoomManager)
+            .getOneRoomManagerByBranchId(branchId)
+            
+    }
 
     /**
      * 

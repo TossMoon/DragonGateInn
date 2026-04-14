@@ -2,7 +2,7 @@ const assert=require('assert');
 
 const branchRoomTransaction=require('./branchRoomTranaction');
 const allRoomManager=require('../../room/allRoomManager');
-
+const branchRoomManager=require('../../room/branchRoomManager');
 
 
 /**
@@ -12,6 +12,8 @@ class branchEmptyRoomTransaction extends branchRoomTransaction{
     constructor(){
         super();
     }
+
+
 
     /**
      * 第一个参数：分店id
@@ -24,20 +26,15 @@ class branchEmptyRoomTransaction extends branchRoomTransaction{
         assert(this.checkBranchArg(args));
         
         //检查添加的变量是否是房间id(是否是string类型，是否在管理器中存在)
-        assert(args.every((item,index) => {
-            if(index>0){
-                return typeof item==='string' 
-                    && this.getManager(allRoomManager).getOneRoomById(item) !== null}
-            return true;
-        }));
+        assert(this.checkRoomIdArg(args));
 
         args.forEach((item,index)=>{
             if(index>0){
-                this.getManager(allRoomManager)
-                .getOneRoomManagerByBranchId(args[0])
+                this.getNeedChangeBranchRoomManager(args[0])
                 .setOneRoomEmpty(item);
             }
         });
+        
     }
 }
 

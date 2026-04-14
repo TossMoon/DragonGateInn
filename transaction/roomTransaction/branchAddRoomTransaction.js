@@ -30,9 +30,8 @@ class branchAddRoomTransaction extends branchRoomTransaction{
 
         args.forEach((item,index)=>{
             if(index>0){
-                this.getManager(allRoomManager)
-                .getOneRoomManagerByBranchId(args[0])
-                .addRoom(item);
+                this.getNeedChangeBranchRoomManager(args[0])
+                    .addRoom(item);
             }
         });
     }

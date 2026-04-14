@@ -22,13 +22,9 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
-var assert = require('assert');
-
 var transaction = require('../transaction');
 
 var allRoomManager = require('../../room/allRoomManager');
-
-var room = require('../../room/room');
 /**
  * 分店可以操作的房间事务
  */
@@ -45,13 +41,31 @@ function (_transaction) {
     return _possibleConstructorReturn(this, _getPrototypeOf(branchRoomTransaction).call(this));
   }
   /**
-   * 检查分店是否存在,是否存储在全局所有房间管理器中
-   * @param {string} branchId 分店id
-   * @returns {boolean} 如果分店存在则返回true，否则返回false
+   * 检查添加的变量是否是房间id(是否是string类型，是否在管理器中存在)
+   * @returns {boolean} 如果参数符合要求则返回true，否则返回false
    */
 
 
   _createClass(branchRoomTransaction, [{
+    key: "checkRoomIdArg",
+    value: function checkRoomIdArg(args) {
+      var _this = this;
+
+      return args.every(function (item, index) {
+        if (index > 0) {
+          return typeof item === 'string' && _this.getManager(allRoomManager).getOneRoomById(item) !== null;
+        }
+
+        return true;
+      });
+    }
+    /**
+     * 检查分店是否存在,是否存储在全局所有房间管理器中
+     * @param {string} branchId 分店id
+     * @returns {boolean} 如果分店存在则返回true，否则返回false
+     */
+
+  }, {
     key: "checkBranchExist",
     value: function checkBranchExist(branchId) {
       return this.getManager(allRoomManager).getOneRoomManagerByBranchId(branchId) !== null;
@@ -84,6 +98,17 @@ function (_transaction) {
       }
 
       return true;
+    }
+    /**
+     * 获取分店的房间管理器
+     * @param {string} branchId 分店id
+     * @returns {branchRoomManager} 分店的房间管理器
+     */
+
+  }, {
+    key: "getNeedChangeBranchRoomManager",
+    value: function getNeedChangeBranchRoomManager(branchId) {
+      return this.getManager(allRoomManager).getOneRoomManagerByBranchId(branchId);
     }
     /**
      * 

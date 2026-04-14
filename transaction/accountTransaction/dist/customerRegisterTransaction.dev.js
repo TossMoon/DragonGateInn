@@ -12,10 +12,6 @@ function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) ===
 
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
-function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
-
-function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
-
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
@@ -24,55 +20,45 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 var assert = require('assert');
 
-var branchRoomTransaction = require('./branchRoomTranaction');
+var transaction = require('../transaction');
 
-var allRoomManager = require('../../room/allRoomManager');
+var customerAccount = require('../../account/customerAccount');
+
+var customerAccountManager = require('../../accountManager/customerAccountManager');
 /**
- * 分店占据房间的事务
+ * 客户注册事务
+ * @extends transaction
  */
 
 
-var branchOccupiedRoomTransaction =
+var customerRegisterTransaction =
 /*#__PURE__*/
-function (_branchRoomTransactio) {
-  _inherits(branchOccupiedRoomTransaction, _branchRoomTransactio);
+function (_transaction) {
+  _inherits(customerRegisterTransaction, _transaction);
 
-  function branchOccupiedRoomTransaction() {
-    _classCallCheck(this, branchOccupiedRoomTransaction);
+  function customerRegisterTransaction() {
+    _classCallCheck(this, customerRegisterTransaction);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(branchOccupiedRoomTransaction).call(this));
+    return _possibleConstructorReturn(this, _getPrototypeOf(customerRegisterTransaction).call(this));
   }
-  /**
-   * 第一个参数：分店id
-   * 第二个参数：房间信息
-   */
 
-
-  _createClass(branchOccupiedRoomTransaction, [{
+  _createClass(customerRegisterTransaction, [{
     key: "execute",
     value: function execute() {
-      var _get2,
-          _this = this;
-
       for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
         args[_key] = arguments[_key];
       }
 
-      (_get2 = _get(_getPrototypeOf(branchOccupiedRoomTransaction.prototype), "execute", this)).call.apply(_get2, [this].concat(args)); //检查分店参数是否符合要求
-
-
-      assert(this.checkBranchArg(args)); //检查添加的变量是否是房间id(是否是string类型，是否在管理器中存在)
-
-      assert(this.checkRoomIdArg(args));
-      args.forEach(function (item, index) {
-        if (index > 0) {
-          _this.getNeedChangeBranchRoomManager(args[0]).setOneRoomOccupied(item);
-        }
-      });
+      assert(args.length === 2);
+      assert(args[0] !== null && typeof args[0] === 'string');
+      assert(args[1] !== null && typeof args[1] === 'string');
+      var customerId = args[0],
+          password = args[1];
+      this.getManager(customerAccountManager).addOneNewAccount(new customerAccount(customerId, password));
     }
   }]);
 
-  return branchOccupiedRoomTransaction;
-}(branchRoomTransaction);
+  return customerRegisterTransaction;
+}(transaction);
 
-module.exports = branchOccupiedRoomTransaction;
+module.exports = customerRegisterTransaction;

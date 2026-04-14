@@ -74,7 +74,7 @@ function (_branchRoomTransactio) {
       }));
       args.forEach(function (item, index) {
         if (index > 0) {
-          _this.getManager(allRoomManager).getOneRoomManagerByBranchId(args[0]).addRoom(item);
+          _this.getNeedChangeBranchRoomManager(args[0]).addRoom(item);
         }
       });
     }
