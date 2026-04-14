@@ -12,7 +12,17 @@ class customerAccountManager extends accountManager{
 
     addOneNewAccount(newAccount){
         assert(newAccount instanceof customerAccount);
+
         super.addOneNewAccount(newAccount);
+    }
+
+    /**
+     * 根据顾客的手机号获取顾客账户
+     * @param {string} phoneString 顾客的手机号
+     * @returns {customerAccount} 顾客账户
+     */
+    getCustomAccountByPhoneString(phoneString){
+        return this.accountList.find(account=>account.getPhoneString()===phoneString);
     }
 }
 

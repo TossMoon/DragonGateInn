@@ -4,6 +4,10 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
@@ -14,7 +18,10 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
-var account = require('./account.js'); //顾客的账户
+var account = require('./account.js');
+/**
+ * 顾客的账户
+ */
 
 
 var customerAccount =
@@ -23,10 +30,38 @@ function (_account) {
   _inherits(customerAccount, _account);
 
   function customerAccount(username, password) {
+    var _this;
+
+    var phoneString = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : "";
+
     _classCallCheck(this, customerAccount);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(customerAccount).call(this, username, password));
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(customerAccount).call(this, username, password));
+    _this.phoneString = phoneString;
+    return _this;
   }
+  /**
+   * 设置顾客的手机号
+   * @param {string} phoneString 要设置的手机号
+   */
+
+
+  _createClass(customerAccount, [{
+    key: "setPhoneString",
+    value: function setPhoneString(phoneString) {
+      this.phoneString = phoneString;
+    }
+    /**
+     * 获取顾客的手机号
+     * @returns {string} 顾客的手机号
+     */
+
+  }, {
+    key: "getPhoneString",
+    value: function getPhoneString() {
+      return this.phoneString;
+    }
+  }]);
 
   return customerAccount;
 }(account);

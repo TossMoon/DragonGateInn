@@ -25,6 +25,8 @@ var transaction = require('../transaction');
 var customerAccount = require('../../account/customerAccount');
 
 var customerAccountManager = require('../../accountManager/customerAccountManager');
+
+var accountApplication = require('../../accountManager/accountApplication');
 /**
  * 客户注册事务
  * @extends transaction
@@ -41,6 +43,13 @@ function (_transaction) {
 
     return _possibleConstructorReturn(this, _getPrototypeOf(customerRegisterTransaction).call(this));
   }
+  /**
+   * 执行注册事务
+   * @param {...string} args 注册事务的参数，包括顾客的手机号和密码
+   * @param {...string} args[0] 顾客的手机号
+   * @param {...string} args[1] 顾客的密码
+   */
+
 
   _createClass(customerRegisterTransaction, [{
     key: "execute",
@@ -52,9 +61,14 @@ function (_transaction) {
       assert(args.length === 2);
       assert(args[0] !== null && typeof args[0] === 'string');
       assert(args[1] !== null && typeof args[1] === 'string');
-      var customerId = args[0],
+      var phoneString = args[0],
           password = args[1];
-      this.getManager(customerAccountManager).addOneNewAccount(new customerAccount(customerId, password));
+
+      if (this.getManager(customerAccountManager).getCustomAccountByPhoneString(phoneString) !== undefined) {
+        throw new Error('注册顾客账户时，使用的手机号已存在');
+      }
+
+      this.getManager(customerAccountManager).addOneNewAccount(new customerAccount(this.getManager(accountApplication).getRandomAccount(), password, phoneString));
     }
   }]);
 

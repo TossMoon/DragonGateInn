@@ -14,7 +14,12 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
-var account = require('./account.js'); //分店的账户
+var account = require('./account.js');
+/**
+ * 分店的账户
+ * @extends account
+ */
+//分店的账户
 
 
 var branchAccount =
@@ -23,9 +28,13 @@ function (_account) {
   _inherits(branchAccount, _account);
 
   function branchAccount(username, password) {
+    var _this;
+
     _classCallCheck(this, branchAccount);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(branchAccount).call(this, username, password));
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(branchAccount).call(this, username, password));
+    _this.nameString = '分点名称';
+    return _this;
   }
 
   return branchAccount;

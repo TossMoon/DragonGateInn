@@ -12,10 +12,6 @@ function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) ===
 
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
-function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
-
-function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
-
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
@@ -24,45 +20,40 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 var assert = require('assert');
 
-var accountManager = require('./accountManager.js');
+var headquarterManager = require('../../accountManager/headquarterAccountManager');
 
-var customerAccount = require('../account/customerAccount.js'); //顾客账户的管理器
+var headquarterAccount = require('../../account/headquarterAccount');
 
+var transaction = require('../transaction');
 
-var customerAccountManager =
+var headquarterRegisterTransaction =
 /*#__PURE__*/
-function (_accountManager) {
-  _inherits(customerAccountManager, _accountManager);
+function (_transaction) {
+  _inherits(headquarterRegisterTransaction, _transaction);
 
-  function customerAccountManager() {
-    _classCallCheck(this, customerAccountManager);
+  function headquarterRegisterTransaction() {
+    _classCallCheck(this, headquarterRegisterTransaction);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(customerAccountManager).call(this));
+    return _possibleConstructorReturn(this, _getPrototypeOf(headquarterRegisterTransaction).call(this));
   }
 
-  _createClass(customerAccountManager, [{
-    key: "addOneNewAccount",
-    value: function addOneNewAccount(newAccount) {
-      assert(newAccount instanceof customerAccount);
+  _createClass(headquarterRegisterTransaction, [{
+    key: "execute",
+    value: function execute() {
+      for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+        args[_key] = arguments[_key];
+      }
 
-      _get(_getPrototypeOf(customerAccountManager.prototype), "addOneNewAccount", this).call(this, newAccount);
-    }
-    /**
-     * 根据顾客的手机号获取顾客账户
-     * @param {string} phoneString 顾客的手机号
-     * @returns {customerAccount} 顾客账户
-     */
-
-  }, {
-    key: "getCustomAccountByPhoneString",
-    value: function getCustomAccountByPhoneString(phoneString) {
-      return this.accountList.find(function (account) {
-        return account.getPhoneString() === phoneString;
-      });
+      assert(args.length === 2);
+      assert(args[0] !== null && typeof args[0] === 'string');
+      assert(args[1] !== null && typeof args[1] === 'string');
+      var headquarterId = args[0],
+          password = args[1];
+      this.getManager(headquarterManager).addOneNewAccount(new headquarterAccount(headquarterId, password));
     }
   }]);
 
-  return customerAccountManager;
-}(accountManager);
+  return headquarterRegisterTransaction;
+}(transaction);
 
-module.exports = customerAccountManager;
+module.exports = headquarterRegisterTransaction;
