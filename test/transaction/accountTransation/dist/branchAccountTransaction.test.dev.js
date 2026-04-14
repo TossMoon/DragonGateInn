@@ -1,6 +1,6 @@
 "use strict";
 
-var branchRegisterTransaction = require('../../../transaction/accountTransaction/branchRegisterTransaction');
+var branchRegisterTransaction = require('../../../transaction/accountTransaction/registerTransaction/branchRegisterTransaction');
 
 var SingletonFactory = require('../../../util/SingletonFactory');
 

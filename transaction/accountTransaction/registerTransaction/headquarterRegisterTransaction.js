@@ -1,8 +1,8 @@
 const assert=require('assert');
 
-const headquarterManager=require('../../accountManager/headquarterAccountManager');
-const headquarterAccount=require('../../account/headquarterAccount');
-const transaction=require('../transaction');
+const headquarterManager=require('../../../accountManager/headquarterAccountManager');
+const headquarterAccount=require('../../../account/headquarterAccount');
+const transaction=require('../../transaction');
 
 
 class headquarterRegisterTransaction extends transaction{

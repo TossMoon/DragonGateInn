@@ -1,4 +1,4 @@
-const headquarterRegisterTransaction=require('../../../transaction/accountTransaction/headquarterRegisterTransaction');
+const headquarterRegisterTransaction=require('../../../transaction/accountTransaction/registerTransaction/headquarterRegisterTransaction');
 const SingletonFactory=require('../../../util/SingletonFactory');
 const headquarterAccountManager=require('../../../accountManager/headquarterAccountManager');
 

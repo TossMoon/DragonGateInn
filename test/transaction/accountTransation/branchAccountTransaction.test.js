@@ -1,4 +1,4 @@
-const branchRegisterTransaction=require('../../../transaction/accountTransaction/branchRegisterTransaction');
+const branchRegisterTransaction=require('../../../transaction/accountTransaction/registerTransaction/branchRegisterTransaction');
 const SingletonFactory=require('../../../util/SingletonFactory');
 const branchAccountManager=require('../../../accountManager/branchAccountManager');
 

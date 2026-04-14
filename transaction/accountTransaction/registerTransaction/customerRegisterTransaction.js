@@ -1,9 +1,9 @@
 const assert=require('assert');
 
-const transaction=require('../transaction');
-const customerAccount=require('../../account/customerAccount');
-const customerAccountManager=require('../../accountManager/customerAccountManager');
-const accountApplication=require('../../accountManager/accountApplication');
+const transaction=require('../../transaction');
+const customerAccount=require('../../../account/customerAccount');
+const customerAccountManager=require('../../../accountManager/customerAccountManager');
+const accountApplication=require('../../../accountManager/accountApplication');
 
 /**
  * 客户注册事务

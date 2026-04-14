@@ -1,9 +1,9 @@
 const assert=require('assert');
 
-const branchManager=require('../../accountManager/branchAccountManager');
-const branchAccount=require('../../account/branchAccount');
-const transaction=require('../transaction');
-const accountApplication=require('../../accountManager/accountApplication');
+const branchManager=require('../../../accountManager/branchAccountManager');
+const branchAccount=require('../../../account/branchAccount');
+const transaction=require('../../transaction');
+const accountApplication=require('../../../accountManager/accountApplication');
 
 
 /**

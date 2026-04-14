@@ -1,4 +1,4 @@
-const customerRegisterTransaction=require('../../../transaction/accountTransaction/customerRegisterTransaction');
+const customerRegisterTransaction=require('../../../transaction/accountTransaction/registerTransaction/customerRegisterTransaction');
 const SingletonFactory=require('../../../util/SingletonFactory');
 const customerAccountManager=require('../../../accountManager/customerAccountManager');
 
