@@ -1,6 +1,6 @@
-const customerRegisterTransaction=require('../../../transaction/accountTransaction/registerTransaction/customerRegisterTransaction');
-const SingletonFactory=require('../../../util/SingletonFactory');
-const customerAccountManager=require('../../../accountManager/customerAccountManager');
+const customerRegisterTransaction=require('../../../../transaction/accountTransaction/registerTransaction/customerRegisterTransaction');
+const SingletonFactory=require('../../../../util/SingletonFactory');
+const customerAccountManager=require('../../../../accountManager/customerAccountManager');
 
 describe('客户注册事务',function(){
     it('注册客户',function(){

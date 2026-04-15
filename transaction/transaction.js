@@ -13,7 +13,7 @@ class transaction{
          * 事务发生的时间
          * @type {string}
          */
-        this.date=new Date();
+        this.date=null;
 
 
     }
@@ -22,7 +22,8 @@ class transaction{
      * 执行事务
      */
     execute(...args){
-        
+        // 记录执行时间
+        this.date = new Date();
     }
 
     /**

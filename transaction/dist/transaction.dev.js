@@ -26,7 +26,7 @@ function () {
      * 事务发生的时间
      * @type {string}
      */
-    this.date = new Date();
+    this.date = null;
   }
   /**
    * 执行事务
@@ -35,7 +35,10 @@ function () {
 
   _createClass(transaction, [{
     key: "execute",
-    value: function execute() {}
+    value: function execute() {
+      // 记录执行时间
+      this.date = new Date();
+    }
     /**
      * 获取管理器实例,默认是从单例工厂中取得管理器实例
      * @param {string} managerType 管理器类型

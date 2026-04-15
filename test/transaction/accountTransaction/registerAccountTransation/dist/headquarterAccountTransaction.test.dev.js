@@ -1,10 +1,10 @@
 "use strict";
 
-var headquarterRegisterTransaction = require('../../../transaction/accountTransaction/registerTransaction/headquarterRegisterTransaction');
+var headquarterRegisterTransaction = require('../../../../transaction/accountTransaction/registerTransaction/headquarterRegisterTransaction');
 
-var SingletonFactory = require('../../../util/SingletonFactory');
+var SingletonFactory = require('../../../../util/SingletonFactory');
 
-var headquarterAccountManager = require('../../../accountManager/headquarterAccountManager');
+var headquarterAccountManager = require('../../../../accountManager/headquarterAccountManager');
 
 describe('总部（管理员）账号注册事务', function () {
   it('注册总部账号', function () {

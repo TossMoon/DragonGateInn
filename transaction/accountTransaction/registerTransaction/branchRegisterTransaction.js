@@ -20,6 +20,8 @@ class branchRegisterTransaction extends transaction{
      * @param {...string} args 
      */
     execute(...args){
+        super.execute(...args);
+        
         assert(args.length===0);
 
         const newBranchAccount=

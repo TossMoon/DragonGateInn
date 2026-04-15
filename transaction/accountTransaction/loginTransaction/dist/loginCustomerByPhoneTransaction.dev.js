@@ -24,38 +24,30 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 var assert = require('assert');
 
-var transaction = require('../../transaction');
-
-var customerAccount = require('../../../account/customerAccount');
+var transaction = require('../../../transaction/transaction');
 
 var customerAccountManager = require('../../../accountManager/customerAccountManager');
 
-var accountApplication = require('../../../accountManager/accountApplication');
-/**
- * 客户注册事务
- * @extends transaction
- */
-
-
-var customerRegisterTransaction =
+var loginCustomerByPhoneTransaction =
 /*#__PURE__*/
 function (_transaction) {
-  _inherits(customerRegisterTransaction, _transaction);
+  _inherits(loginCustomerByPhoneTransaction, _transaction);
 
-  function customerRegisterTransaction() {
-    _classCallCheck(this, customerRegisterTransaction);
+  function loginCustomerByPhoneTransaction() {
+    var _this;
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(customerRegisterTransaction).call(this));
+    _classCallCheck(this, loginCustomerByPhoneTransaction);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(loginCustomerByPhoneTransaction).call(this));
+    _this.accountManager = transaction.getManager(customerAccountManager);
+    return _this;
   }
   /**
-   * 执行注册事务
-   * @param {...string} args 注册事务的参数，包括顾客的手机号和密码
-   * @param {...string} args[0] 顾客的手机号
-   * @param {...string} args[1] 顾客的密码
+   * 执行登录事务
    */
 
 
-  _createClass(customerRegisterTransaction, [{
+  _createClass(loginCustomerByPhoneTransaction, [{
     key: "execute",
     value: function execute() {
       var _get2;
@@ -64,25 +56,31 @@ function (_transaction) {
         args[_key] = arguments[_key];
       }
 
-      (_get2 = _get(_getPrototypeOf(customerRegisterTransaction.prototype), "execute", this)).call.apply(_get2, [this].concat(args));
+      (_get2 = _get(_getPrototypeOf(loginCustomerByPhoneTransaction.prototype), "execute", this)).call.apply(_get2, [this].concat(args));
 
-      assert(args.length === 2);
-      assert(args[0] !== null && typeof args[0] === 'string');
-      assert(args[1] !== null && typeof args[1] === 'string');
-      var phoneString = args[0],
+      assert(args.length === 2, '登录事务需要两个参数：用户名和密码');
+      assert(typeof args[0] === 'string', '手机号必须是字符串');
+      assert(typeof args[1] === 'string', '密码必须是字符串');
+      var phone = args[0],
           password = args[1];
+      var account = this.accountManager.getCustomAccountByPhoneString(phone);
 
-      if (transaction.getManager(customerAccountManager).getCustomAccountByPhoneString(phoneString) !== undefined) {
-        throw new Error('注册顾客账户时，使用的手机号已存在');
+      if (!account) {
+        // 绑定手机号的客户不存在
+        return false;
       }
 
-      var newCustomerAccount = new customerAccount(transaction.getManager(accountApplication).getRandomAccount(), password, phoneString);
-      transaction.getManager(customerAccountManager).addOneNewAccount(newCustomerAccount);
-      return newCustomerAccount;
+      if (account.getPassword() !== password) {
+        // 密码错误
+        return false;
+      } // 登录成功
+
+
+      return true;
     }
   }]);
 
-  return customerRegisterTransaction;
+  return loginCustomerByPhoneTransaction;
 }(transaction);
 
-module.exports = customerRegisterTransaction;
+module.exports = loginCustomerByPhoneTransaction;

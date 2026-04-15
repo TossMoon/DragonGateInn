@@ -18,6 +18,8 @@ class DeactivateAccountTransaction extends transaction{
      * @param {...string} args 需要停用的账户ID
      */
     execute(...args){
+        super.execute(...args);
+        
         assert(args.length===1);
         const accountId=args[0];
         this.accountManager.setDisableAccount(accountId);

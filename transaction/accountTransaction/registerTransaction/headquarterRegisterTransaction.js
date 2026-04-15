@@ -12,6 +12,8 @@ class headquarterRegisterTransaction extends transaction{
     }
 
     execute(...args){
+        super.execute(...args);
+        
         assert(args.length===2);
         assert(args[0]!==null && typeof args[0]==='string');
         assert(args[1]!==null && typeof args[1]==='string');

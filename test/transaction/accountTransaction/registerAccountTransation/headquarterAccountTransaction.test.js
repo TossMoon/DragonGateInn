@@ -1,6 +1,6 @@
-const headquarterRegisterTransaction=require('../../../transaction/accountTransaction/registerTransaction/headquarterRegisterTransaction');
-const SingletonFactory=require('../../../util/SingletonFactory');
-const headquarterAccountManager=require('../../../accountManager/headquarterAccountManager');
+const headquarterRegisterTransaction=require('../../../../transaction/accountTransaction/registerTransaction/headquarterRegisterTransaction');
+const SingletonFactory=require('../../../../util/SingletonFactory');
+const headquarterAccountManager=require('../../../../accountManager/headquarterAccountManager');
 
 
 describe('总部（管理员）账号注册事务',function(){

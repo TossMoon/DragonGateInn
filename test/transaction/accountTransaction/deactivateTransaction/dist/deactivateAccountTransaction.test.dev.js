@@ -1,18 +1,18 @@
 "use strict";
 
-var transaction = require('../../../transaction/transaction');
+var transaction = require('../../../../transaction/transaction');
 
-var branchRegisterTransaction = require('../../../transaction/accountTransaction/registerTransaction/branchRegisterTransaction');
+var branchRegisterTransaction = require('../../../../transaction/accountTransaction/registerTransaction/branchRegisterTransaction');
 
-var customerRegisterTransaction = require('../../../transaction/accountTransaction/registerTransaction/customerRegisterTransaction');
+var customerRegisterTransaction = require('../../../../transaction/accountTransaction/registerTransaction/customerRegisterTransaction');
 
-var deactivateBranchTransaction = require('../../../transaction/accountTransaction/deactivateTransaction/deactivateBranchTranaction');
+var deactivateBranchTransaction = require('../../../../transaction/accountTransaction/deactivateTransaction/deactivateBranchTranaction');
 
-var deactivateCustomerTransaction = require('../../../transaction/accountTransaction/deactivateTransaction/deactivateCustomerTransaction');
+var deactivateCustomerTransaction = require('../../../../transaction/accountTransaction/deactivateTransaction/deactivateCustomerTransaction');
 
-var branchAccountManager = require('../../../accountManager/branchAccountManager');
+var branchAccountManager = require('../../../../accountManager/branchAccountManager');
 
-var customerAccountManager = require('../../../accountManager/customerAccountManager');
+var customerAccountManager = require('../../../../accountManager/customerAccountManager');
 
 describe('停用账号事务', function () {
   it('停用分点账号', function () {

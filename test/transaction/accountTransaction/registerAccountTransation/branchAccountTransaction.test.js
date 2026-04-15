@@ -1,6 +1,6 @@
-const branchRegisterTransaction=require('../../../transaction/accountTransaction/registerTransaction/branchRegisterTransaction');
-const SingletonFactory=require('../../../util/SingletonFactory');
-const branchAccountManager=require('../../../accountManager/branchAccountManager');
+const branchRegisterTransaction=require('../../../../transaction/accountTransaction/registerTransaction/branchRegisterTransaction');
+const SingletonFactory=require('../../../../util/SingletonFactory');
+const branchAccountManager=require('../../../../accountManager/branchAccountManager');
 
 
 describe('分点账号注册事务',function(){
