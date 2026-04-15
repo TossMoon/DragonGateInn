@@ -20,7 +20,7 @@ class branchRoomTransaction extends transaction{
         return args.every((item,index) => {
             if(index>0){
                 return typeof item==='string' 
-                    && this.getManager(allRoomManager).getOneRoomById(item) !== null}
+                    && transaction.getManager(allRoomManager).getOneRoomById(item) !== null}
             return true;
         });
     }
@@ -31,7 +31,7 @@ class branchRoomTransaction extends transaction{
      * @returns {boolean} 如果分店存在则返回true，否则返回false
      */
     checkBranchExist(branchId){
-        return this.getManager(allRoomManager).getOneRoomManagerByBranchId(branchId) !== null;
+        return transaction.getManager(allRoomManager).getOneRoomManagerByBranchId(branchId) !== null;
     }
 
     /**
@@ -64,7 +64,7 @@ class branchRoomTransaction extends transaction{
      */
     getNeedChangeBranchRoomManager(branchId)
     {
-        return this.getManager(allRoomManager)
+        return transaction.getManager(allRoomManager)
             .getOneRoomManagerByBranchId(branchId)
             
     }

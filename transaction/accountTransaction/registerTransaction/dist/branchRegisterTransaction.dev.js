@@ -53,7 +53,9 @@ function (_transaction) {
     key: "execute",
     value: function execute() {
       assert(arguments.length === 0);
-      this.getManager(branchManager).addOneNewAccount(new branchAccount(this.getManager(accountApplication).getRandomAccount(), this.getManager(accountApplication).getInitPassword()));
+      var newBranchAccount = new branchAccount(transaction.getManager(accountApplication).getRandomAccount(), transaction.getManager(accountApplication).getInitPassword());
+      transaction.getManager(branchManager).addOneNewAccount(newBranchAccount);
+      return newBranchAccount;
     }
   }]);
 

@@ -42,7 +42,7 @@ function () {
      * @returns {object} 管理器实例
      */
 
-  }, {
+  }], [{
     key: "getManager",
     value: function getManager(managerType) {
       return SingletonFactory.getInstance(managerType);

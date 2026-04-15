@@ -17,9 +17,15 @@ class headquarterRegisterTransaction extends transaction{
         assert(args[1]!==null && typeof args[1]==='string');
         
         const [headquarterId,password]=args;
-        this.getManager(headquarterManager)
+
+        const newHeadquarterAccount=
+            new headquarterAccount(headquarterId,password);
+        
+        transaction.getManager(headquarterManager)
             .addOneNewAccount(
-                new headquarterAccount(headquarterId,password));
+                newHeadquarterAccount);
+
+        return newHeadquarterAccount;
     }
 }
 module.exports=headquarterRegisterTransaction;

@@ -49,11 +49,9 @@ function (_transaction) {
   _createClass(branchRoomTransaction, [{
     key: "checkRoomIdArg",
     value: function checkRoomIdArg(args) {
-      var _this = this;
-
       return args.every(function (item, index) {
         if (index > 0) {
-          return typeof item === 'string' && _this.getManager(allRoomManager).getOneRoomById(item) !== null;
+          return typeof item === 'string' && transaction.getManager(allRoomManager).getOneRoomById(item) !== null;
         }
 
         return true;
@@ -68,7 +66,7 @@ function (_transaction) {
   }, {
     key: "checkBranchExist",
     value: function checkBranchExist(branchId) {
-      return this.getManager(allRoomManager).getOneRoomManagerByBranchId(branchId) !== null;
+      return transaction.getManager(allRoomManager).getOneRoomManagerByBranchId(branchId) !== null;
     }
     /**
      * 检查参数是否符合要求，包括参数的数量，参数第一个是否是分店的id
@@ -108,7 +106,7 @@ function (_transaction) {
   }, {
     key: "getNeedChangeBranchRoomManager",
     value: function getNeedChangeBranchRoomManager(branchId) {
-      return this.getManager(allRoomManager).getOneRoomManagerByBranchId(branchId);
+      return transaction.getManager(allRoomManager).getOneRoomManagerByBranchId(branchId);
     }
     /**
      * 

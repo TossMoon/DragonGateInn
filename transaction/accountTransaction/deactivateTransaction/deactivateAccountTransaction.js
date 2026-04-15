@@ -1,0 +1,27 @@
+const assert=require('assert');
+
+const transaction=require('../../transaction');
+const accountManager=require('../../../accountManager/accountManager');
+
+/**
+ * 账户停用事务
+ */
+class DeactivateAccountTransaction extends transaction{
+    constructor(curAccountManager){
+        super();
+        assert(curAccountManager instanceof accountManager);
+        this.accountManager=curAccountManager;
+    }
+
+    /**
+     * 执行停用账户事务
+     * @param {...string} args 需要停用的账户ID
+     */
+    execute(...args){
+        assert(args.length===1);
+        const accountId=args[0];
+        this.accountManager.setDisableAccount(accountId);
+    }
+}
+
+module.exports=DeactivateAccountTransaction;

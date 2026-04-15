@@ -30,7 +30,7 @@ class transaction{
      * @param {string} managerType 管理器类型
      * @returns {object} 管理器实例
      */
-    getManager(managerType){
+    static getManager(managerType){
         return SingletonFactory.getInstance(managerType);
     }
 }

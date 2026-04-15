@@ -96,12 +96,25 @@ class MessageManager{
         }
         this.messageMap.get(messageName).remove(observer);
     }
+    
+    /**
+     * 移除所有观察者
+     * @param {string} messageName 消息名称
+     */
+    removeAllObserve(messageName){
+        assert(messageName!==null && typeof messageName==='string');
+
+        if(this.messageMap.has(messageName)===false){
+            return;
+        }
+        this.messageMap.get(messageName).clear();
+    }
 
     /**
      * 触发所有观察者
-     * @param {...string} args 观察者触发时的参数
+     * @param {string} messageName 消息名称
      */
-    notifyAll(messageName,...args){
+    notifyAll(messageName){
         assert(messageName!==null && typeof messageName==='string');
 
         if(this.messageMap.has(messageName)===false){

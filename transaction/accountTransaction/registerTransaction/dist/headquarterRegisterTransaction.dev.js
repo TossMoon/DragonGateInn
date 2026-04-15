@@ -49,7 +49,9 @@ function (_transaction) {
       assert(args[1] !== null && typeof args[1] === 'string');
       var headquarterId = args[0],
           password = args[1];
-      this.getManager(headquarterManager).addOneNewAccount(new headquarterAccount(headquarterId, password));
+      var newHeadquarterAccount = new headquarterAccount(headquarterId, password);
+      transaction.getManager(headquarterManager).addOneNewAccount(newHeadquarterAccount);
+      return newHeadquarterAccount;
     }
   }]);
 

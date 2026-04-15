@@ -20,59 +20,45 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 var assert = require('assert');
 
-var transaction = require('../transaction');
+var transaction = require('../../transaction');
 
-var customerAccount = require('../../account/customerAccount');
-
-var customerAccountManager = require('../../accountManager/customerAccountManager');
-
-var accountApplication = require('../../accountManager/accountApplication');
+var accountManager = require('../../../accountManager/accountManager');
 /**
- * 客户注册事务
- * @extends transaction
+ * 账户停用事务
  */
 
 
-var customerRegisterTransaction =
+var DeactivateAccountTransaction =
 /*#__PURE__*/
 function (_transaction) {
-  _inherits(customerRegisterTransaction, _transaction);
+  _inherits(DeactivateAccountTransaction, _transaction);
 
-  function customerRegisterTransaction() {
-    _classCallCheck(this, customerRegisterTransaction);
+  function DeactivateAccountTransaction(curAccountManager) {
+    var _this;
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(customerRegisterTransaction).call(this));
+    _classCallCheck(this, DeactivateAccountTransaction);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(DeactivateAccountTransaction).call(this));
+    assert(curAccountManager instanceof accountManager);
+    _this.accountManager = curAccountManager;
+    return _this;
   }
   /**
-   * 执行注册事务
-   * @param {...string} args 注册事务的参数，包括顾客的手机号和密码
-   * @param {...string} args[0] 顾客的手机号
-   * @param {...string} args[1] 顾客的密码
+   * 执行停用账户事务
+   * @param {...string} args 需要停用的账户ID
    */
 
 
-  _createClass(customerRegisterTransaction, [{
+  _createClass(DeactivateAccountTransaction, [{
     key: "execute",
     value: function execute() {
-      for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
-        args[_key] = arguments[_key];
-      }
-
-      assert(args.length === 2);
-      assert(args[0] !== null && typeof args[0] === 'string');
-      assert(args[1] !== null && typeof args[1] === 'string');
-      var phoneString = args[0],
-          password = args[1];
-
-      if (transaction.getManager(customerAccountManager).getCustomAccountByPhoneString(phoneString) !== undefined) {
-        throw new Error('注册顾客账户时，使用的手机号已存在');
-      }
-
-      transaction.getManager(customerAccountManager).addOneNewAccount(new customerAccount(transaction.getManager(accountApplication).getRandomAccount(), password, phoneString));
+      assert(arguments.length === 1);
+      var accountId = arguments.length <= 0 ? undefined : arguments[0];
+      this.accountManager.setDisableAccount(accountId);
     }
   }]);
 
-  return customerRegisterTransaction;
+  return DeactivateAccountTransaction;
 }(transaction);
 
-module.exports = customerRegisterTransaction;
+module.exports = DeactivateAccountTransaction;

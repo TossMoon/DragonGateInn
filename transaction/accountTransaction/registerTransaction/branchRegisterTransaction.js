@@ -22,9 +22,13 @@ class branchRegisterTransaction extends transaction{
     execute(...args){
         assert(args.length===0);
 
-        this.getManager(branchManager).addOneNewAccount(
-            new branchAccount(this.getManager(accountApplication).getRandomAccount()
-                ,this.getManager(accountApplication).getInitPassword()));
+        const newBranchAccount=
+            new branchAccount(transaction.getManager(accountApplication).getRandomAccount()
+                ,transaction.getManager(accountApplication).getInitPassword());
+        transaction.getManager(branchManager).addOneNewAccount(
+            newBranchAccount);
+
+        return newBranchAccount;
 
     }
 }

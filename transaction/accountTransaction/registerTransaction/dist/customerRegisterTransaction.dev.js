@@ -64,11 +64,13 @@ function (_transaction) {
       var phoneString = args[0],
           password = args[1];
 
-      if (this.getManager(customerAccountManager).getCustomAccountByPhoneString(phoneString) !== undefined) {
+      if (transaction.getManager(customerAccountManager).getCustomAccountByPhoneString(phoneString) !== undefined) {
         throw new Error('注册顾客账户时，使用的手机号已存在');
       }
 
-      this.getManager(customerAccountManager).addOneNewAccount(new customerAccount(this.getManager(accountApplication).getRandomAccount(), password, phoneString));
+      var newCustomerAccount = new customerAccount(transaction.getManager(accountApplication).getRandomAccount(), password, phoneString);
+      transaction.getManager(customerAccountManager).addOneNewAccount(newCustomerAccount);
+      return newCustomerAccount;
     }
   }]);
 
