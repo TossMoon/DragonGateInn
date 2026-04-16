@@ -4,17 +4,16 @@ const assert=require('assert');
  * 观察者
  */
 class Observer{
-    constructor(func,...args){
+    constructor(func){
         this.func=func;
-        this.args=args;
     }
 
     /**
      * 触发观察者
      */
-    notify(){
+    notify(...args){
         assert(this.func!==null && typeof this.func==='function');
-        this.func(...this.args);
+        this.func(...args);
     }
 }
 
@@ -54,8 +53,8 @@ class ObserverList{
     /**
      * 触发所有观察者
      */
-    notifyAll(){
-        this.observers.forEach(observer=>observer.notify());
+    notifyAll(...args){
+        this.observers.forEach(observer=>observer.notify(...args)); 
     }
 }
 /**
@@ -68,11 +67,32 @@ class MessageManager{
     }
 
     /**
+     * 注册消息
+     * @param {string} messageName 消息名称
+     */
+    registerMessage(messageName){
+        assert(messageName!==null && typeof messageName==='string');
+
+        if(this.messageMap.has(messageName)===false){
+            this.messageMap.set(messageName,new ObserverList());
+        }
+    }
+
+    /**
+     * 添加观察者
+     * @param {string} messageName 消息名称
+     * @param {function} fun 观察者函数
+     */
+    addObserver(messageName,fun){
+        this.registerObserverByObject(messageName,new Observer(fun));
+    }
+
+    /**
      * 注册观察者
      * @param {string} messageName 消息名称
      * @param {Observer} observer 观察者
      */
-    registerObserver(messageName,observer){
+    registerObserverByObject(messageName,observer){
         assert(messageName!==null && typeof messageName==='string');
         assert(observer!==null && observer instanceof Observer);
 
@@ -81,13 +101,22 @@ class MessageManager{
         }
         this.messageMap.get(messageName).push(observer);
     }
+    
+    /**
+     * 移除观察者
+     * @param {string} messageName 消息名称
+     * @param {function} func 观察者函数
+     */
+    removeObserver(messageName,func){
+        this.removeObserverByObject(messageName,new Observer(func));
+    }
 
     /**
      * 移除观察者
      * @param {string} messageName 消息名称
      * @param {Observer} observer 观察者
      */
-    removeObserver(messageName,observer){
+    removeObserverByObject(messageName,observer){
         assert(messageName!==null && typeof messageName==='string');
         assert(observer!==null && observer instanceof Observer);
 
@@ -113,13 +142,16 @@ class MessageManager{
     /**
      * 触发所有观察者
      * @param {string} messageName 消息名称
+     * @param {...*} args 观察者函数参数
      */
-    notifyAll(messageName){
+    notifyAll(messageName,...args){
         assert(messageName!==null && typeof messageName==='string');
 
         if(this.messageMap.has(messageName)===false){
             return;
         }
-        this.messageMap.get(messageName).notifyAll();
+        this.messageMap.get(messageName).notifyAll(...args);
     }
 }
+
+module.exports.MessageManager=MessageManager;

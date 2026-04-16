@@ -10,6 +10,14 @@ class loginCustomerByPhoneTransaction extends transaction{
     }
 
     /**
+     * 检查密码是否正确
+     */
+    checkPassword(account,password){
+        return account.getPassword()===password;
+    }
+
+
+    /**
      * 执行登录事务
      */
     execute(...args){
@@ -25,7 +33,7 @@ class loginCustomerByPhoneTransaction extends transaction{
             // 绑定手机号的客户不存在
            return false;
        }
-       if(account.getPassword()!==password){
+       if(!this.checkPassword(account,password)){
             // 密码错误
            return false;
        }

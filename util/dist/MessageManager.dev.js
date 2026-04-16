@@ -1,13 +1,5 @@
 "use strict";
 
-function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
-
-function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
-
-function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
-
-function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
-
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -27,12 +19,6 @@ function () {
     _classCallCheck(this, Observer);
 
     this.func = func;
-
-    for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-      args[_key - 1] = arguments[_key];
-    }
-
-    this.args = args;
   }
   /**
    * 触发观察者
@@ -43,7 +29,7 @@ function () {
     key: "notify",
     value: function notify() {
       assert(this.func !== null && typeof this.func === 'function');
-      this.func.apply(this, _toConsumableArray(this.args));
+      this.func.apply(this, arguments);
     }
   }]);
 
@@ -101,8 +87,12 @@ function () {
   }, {
     key: "notifyAll",
     value: function notifyAll() {
+      for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+        args[_key] = arguments[_key];
+      }
+
       this.observers.forEach(function (observer) {
-        return observer.notify();
+        return observer.notify.apply(observer, args);
       });
     }
   }]);
@@ -124,15 +114,40 @@ function () {
     this.messageMap = new Map();
   }
   /**
-   * 注册观察者
+   * 注册消息
    * @param {string} messageName 消息名称
-   * @param {Observer} observer 观察者
    */
 
 
   _createClass(MessageManager, [{
-    key: "registerObserver",
-    value: function registerObserver(messageName, observer) {
+    key: "registerMessage",
+    value: function registerMessage(messageName) {
+      assert(messageName !== null && typeof messageName === 'string');
+
+      if (this.messageMap.has(messageName) === false) {
+        this.messageMap.set(messageName, new ObserverList());
+      }
+    }
+    /**
+     * 添加观察者
+     * @param {string} messageName 消息名称
+     * @param {function} fun 观察者函数
+     */
+
+  }, {
+    key: "addObserver",
+    value: function addObserver(messageName, fun) {
+      this.registerObserverByObject(messageName, new Observer(fun));
+    }
+    /**
+     * 注册观察者
+     * @param {string} messageName 消息名称
+     * @param {Observer} observer 观察者
+     */
+
+  }, {
+    key: "registerObserverByObject",
+    value: function registerObserverByObject(messageName, observer) {
       assert(messageName !== null && typeof messageName === 'string');
       assert(observer !== null && observer instanceof Observer);
 
@@ -145,12 +160,23 @@ function () {
     /**
      * 移除观察者
      * @param {string} messageName 消息名称
-     * @param {Observer} observer 观察者
+     * @param {function} func 观察者函数
      */
 
   }, {
     key: "removeObserver",
-    value: function removeObserver(messageName, observer) {
+    value: function removeObserver(messageName, func) {
+      this.removeObserverByObject(messageName, new Observer(func));
+    }
+    /**
+     * 移除观察者
+     * @param {string} messageName 消息名称
+     * @param {Observer} observer 观察者
+     */
+
+  }, {
+    key: "removeObserverByObject",
+    value: function removeObserverByObject(messageName, observer) {
       assert(messageName !== null && typeof messageName === 'string');
       assert(observer !== null && observer instanceof Observer);
 
@@ -179,20 +205,29 @@ function () {
     /**
      * 触发所有观察者
      * @param {string} messageName 消息名称
+     * @param {...*} args 观察者函数参数
      */
 
   }, {
     key: "notifyAll",
     value: function notifyAll(messageName) {
+      var _this$messageMap$get;
+
       assert(messageName !== null && typeof messageName === 'string');
 
       if (this.messageMap.has(messageName) === false) {
         return;
       }
 
-      this.messageMap.get(messageName).notifyAll();
+      for (var _len2 = arguments.length, args = new Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+        args[_key2 - 1] = arguments[_key2];
+      }
+
+      (_this$messageMap$get = this.messageMap.get(messageName)).notifyAll.apply(_this$messageMap$get, args);
     }
   }]);
 
   return MessageManager;
 }();
+
+module.exports.MessageManager = MessageManager;

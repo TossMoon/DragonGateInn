@@ -41,11 +41,20 @@ function (_transaction) {
     return _this;
   }
   /**
-   * 执行登录事务
+   * 检查密码是否正确
    */
 
 
   _createClass(loginAccountTransaction, [{
+    key: "checkPassword",
+    value: function checkPassword(account, password) {
+      return account.getPassword() === password;
+    }
+    /**
+     * 执行登录事务
+     */
+
+  }, {
     key: "execute",
     value: function execute() {
       var _get2;
@@ -68,7 +77,7 @@ function (_transaction) {
         return false;
       }
 
-      if (account.getPassword() !== password) {
+      if (!this.checkPassword(account, password)) {
         // 密码错误
         return false;
       } // 登录成功

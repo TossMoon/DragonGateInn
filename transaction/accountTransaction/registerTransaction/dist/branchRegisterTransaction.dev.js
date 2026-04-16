@@ -31,6 +31,8 @@ var branchAccount = require('../../../account/branchAccount');
 var transaction = require('../../transaction');
 
 var accountApplication = require('../../../accountManager/accountApplication');
+
+var allRoomManager = require('../../../room/allRoomManager');
 /**
  * 进行注册分店账号的事务
  * @extends transaction
@@ -64,9 +66,13 @@ function (_transaction) {
 
       (_get2 = _get(_getPrototypeOf(branchRegisterTransaction.prototype), "execute", this)).call.apply(_get2, [this].concat(args));
 
-      assert(args.length === 0);
+      assert(args.length === 0); //添加这个分点的账户 到分店账号管理器
+
       var newBranchAccount = new branchAccount(transaction.getManager(accountApplication).getRandomAccount(), transaction.getManager(accountApplication).getInitPassword());
-      transaction.getManager(branchManager).addOneNewAccount(newBranchAccount);
+      transaction.getManager(branchManager).addOneNewAccount(newBranchAccount); //为这个分点增加一个房间管理器
+
+      transaction.getManager(allRoomManager).addNewBranchRoomManager(newBranchAccount.getUsername()); // 返回新申请的分店账号
+
       return newBranchAccount;
     }
   }]);
