@@ -5,7 +5,7 @@ const branchAccount=require('../../../account/branchAccount');
 const transaction=require('../../transaction');
 const accountApplication=require('../../../accountManager/accountApplication');
 const allRoomManager=require('../../../branchResource/room/allRoomManager');
-
+const allReservationManager=require('../../../branchResource/reservation/allReservationManager');
 /**
  * 进行注册分店账号的事务
  * @extends transaction
@@ -34,6 +34,9 @@ class branchRegisterTransaction extends transaction{
 
         //为这个分点增加一个房间管理器
         transaction.getManager(allRoomManager).addNewBranchManager(newBranchAccount.getID());
+
+        //为这个分点增加一个预约管理器
+        transaction.getManager(allReservationManager).addNewBranchManager(newBranchAccount.getID());
 
         // 返回新申请的分店账号
         return newBranchAccount;

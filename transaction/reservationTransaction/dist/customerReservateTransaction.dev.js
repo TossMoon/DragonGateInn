@@ -24,28 +24,43 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 var transaction = require('../transaction');
 
-var roomLayout = require('../../branchResource/room/room');
+var _require = require('../../branchResource/room/room'),
+    RoomLayout = _require.RoomLayout,
+    BedInRoom = _require.BedInRoom;
 
 var customerManager = require('../../accountManager/customerAccountManager');
 
 var branchManager = require('../../accountManager/branchAccountManager');
+
+var _require2 = require('../../branchResource/reservation/reservation'),
+    reservationFactory = _require2.reservationFactory;
+
+var branchReservationManager = require('../../branchResource/reservation/branchReservationManager');
+
+var allReservationManager = require('../../branchResource/reservation/allReservationManager');
 /**
  * 顾客的预订房间事务
  */
 
 
-var CustomerReservateTransaction =
+var customerReservateTransaction =
 /*#__PURE__*/
 function (_transaction) {
-  _inherits(CustomerReservateTransaction, _transaction);
+  _inherits(customerReservateTransaction, _transaction);
 
-  function CustomerReservateTransaction() {
-    _classCallCheck(this, CustomerReservateTransaction);
+  function customerReservateTransaction() {
+    _classCallCheck(this, customerReservateTransaction);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(CustomerReservateTransaction).call(this));
+    return _possibleConstructorReturn(this, _getPrototypeOf(customerReservateTransaction).call(this));
   }
+  /**
+   * 执行预订房间事务
+   * @param {...any} args 顾客的预订房间事务的参数
+   * @returns {any} 预约订单
+   */
 
-  _createClass(CustomerReservateTransaction, [{
+
+  _createClass(customerReservateTransaction, [{
     key: "execute",
     value: function execute() {
       var _get2;
@@ -54,7 +69,7 @@ function (_transaction) {
         args[_key] = arguments[_key];
       }
 
-      (_get2 = _get(_getPrototypeOf(CustomerReservateTransaction.prototype), "execute", this)).call.apply(_get2, [this].concat(args)); // 执行预订房间事务
+      (_get2 = _get(_getPrototypeOf(customerReservateTransaction.prototype), "execute", this)).call.apply(_get2, [this].concat(args)); // 执行预订房间事务
 
 
       var customerId = args[0],
@@ -74,9 +89,21 @@ function (_transaction) {
         return this.packageResult(false, null, "分支不存在");
       }
 
-      var requireRoomLayout = new roomLayout(roomLayout.area, roomLayout.windowBool, roomLayout.bedType);
+      if (transaction.getManager(allReservationManager).getOneManagerByBranchId(branchId) === undefined) {
+        return this.packageResult(false, null, "该分店对应的预定管理器不存在");
+      } //根据输入的数据创建房间布局
+
+
+      var requireRoomLayout = new RoomLayout(roomLayout.area, roomLayout.windowBool, new BedInRoom(roomLayout.typeString, roomLayout.numId)); //创建预约订单
+
+      var newReservation = reservationFactory(customerId, branchId, requireRoomLayout); //向分店预约管理类添加预约订单
+
+      transaction.getManager(allReservationManager).getOneManagerByBranchId(branchId).addNewReservation(newReservation);
+      return this.packageResult(true, newReservation, "预订成功");
     }
   }]);
 
-  return CustomerReservateTransaction;
+  return customerReservateTransaction;
 }(transaction);
+
+module.exports = customerReservateTransaction;

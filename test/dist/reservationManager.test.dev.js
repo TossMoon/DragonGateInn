@@ -24,7 +24,6 @@ describe('allReservationManager', function () {
 
     var newBranchManager = curAllReservationManager.getOneManagerByBranchId('branch1');
     var newReservation = reservationFactory('1001', 'branch1', new RoomLayout(24, true, new BedInRoom("单人床", 1)));
-    console.log(newReservation);
     newBranchManager.addNewReservation(newReservation);
     expect(newBranchManager.getOneObjectById(newReservation.getId())).toBe(newReservation);
     /**

@@ -33,6 +33,8 @@ var transaction = require('../../transaction');
 var accountApplication = require('../../../accountManager/accountApplication');
 
 var allRoomManager = require('../../../branchResource/room/allRoomManager');
+
+var allReservationManager = require('../../../branchResource/reservation/allReservationManager');
 /**
  * 进行注册分店账号的事务
  * @extends transaction
@@ -71,7 +73,9 @@ function (_transaction) {
       var newBranchAccount = new branchAccount(transaction.getManager(accountApplication).getRandomAccount(), transaction.getManager(accountApplication).getInitPassword());
       transaction.getManager(branchManager).addOneNewAccount(newBranchAccount); //为这个分点增加一个房间管理器
 
-      transaction.getManager(allRoomManager).addNewBranchManager(newBranchAccount.getID()); // 返回新申请的分店账号
+      transaction.getManager(allRoomManager).addNewBranchManager(newBranchAccount.getID()); //为这个分点增加一个预约管理器
+
+      transaction.getManager(allReservationManager).addNewBranchManager(newBranchAccount.getID()); // 返回新申请的分店账号
 
       return newBranchAccount;
     }

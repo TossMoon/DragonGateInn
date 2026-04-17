@@ -1,18 +1,25 @@
 const transaction=require('../transaction')
 
-const roomLayout=require('../../branchResource/room/room');
+const {RoomLayout,BedInRoom}=require('../../branchResource/room/room');
 const customerManager=require('../../accountManager/customerAccountManager')
 const branchManager=require('../../accountManager/branchAccountManager')
 
+const {reservationFactory}=require('../../branchResource/reservation/reservation');
+const branchReservationManager=require('../../branchResource/reservation/branchReservationManager');
+const allReservationManager = require('../../branchResource/reservation/allReservationManager');
 /**
  * 顾客的预订房间事务
  */
-class CustomerReservateTransaction extends transaction{
+class customerReservateTransaction extends transaction{
     constructor(){
         super()
     }
 
-
+    /**
+     * 执行预订房间事务
+     * @param {...any} args 顾客的预订房间事务的参数
+     * @returns {any} 预约订单
+     */
     execute(...args){
         super.execute(...args);
         // 执行预订房间事务
@@ -30,7 +37,25 @@ class CustomerReservateTransaction extends transaction{
             return this.packageResult(false,null,"分支不存在");
         }
 
-        const requireRoomLayout=new roomLayout(roomLayout.area,roomLayout.windowBool,roomLayout.bedType);
-        
+        if(transaction.getManager(allReservationManager)
+            .getOneManagerByBranchId(branchId)===undefined){
+            return this.packageResult(false,null,"该分店对应的预定管理器不存在");
+        }
+
+        //根据输入的数据创建房间布局
+        const requireRoomLayout=new RoomLayout(roomLayout.area,roomLayout.windowBool,
+            new BedInRoom(roomLayout.typeString,roomLayout.numId));
+
+        //创建预约订单
+        const newReservation=reservationFactory(customerId,branchId,requireRoomLayout);
+
+        //向分店预约管理类添加预约订单
+        transaction.getManager(allReservationManager)
+            .getOneManagerByBranchId(branchId)
+            .addNewReservation(newReservation);
+            
+        return this.packageResult(true,newReservation,"预订成功");
     }
 }
+
+module.exports=customerReservateTransaction;
