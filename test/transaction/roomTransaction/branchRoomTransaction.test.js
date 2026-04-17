@@ -3,9 +3,9 @@ const branchDisableRoomTransaction=require('../../../transaction/roomTransaction
 const branchOccupiedRoomTransaction=require('../../../transaction/roomTransaction/branchOccupiedRoomTransaction');
 const branchEmptyRoomTransaction=require('../../../transaction/roomTransaction/branchEmptyRoomTranscation');
 
-const { room } = require('../../../room/room');
+const { room } = require('../../../branchResource/room/room');
 const SingletonFactory = require('../../../util/SingletonFactory');
-const allRoomManager=require('../../../room/allRoomManager');
+const allRoomManager=require('../../../branchResource/room/allRoomManager');
 
 
 
@@ -15,10 +15,10 @@ describe('分店可以进行的房间事务',()=>{
         const newRoom=new room('1002');
         
 
-        SingletonFactory.getInstance(allRoomManager).addNewBranchRoomManager('test02');
+        SingletonFactory.getInstance(allRoomManager).addNewBranchManager('test02');
         transaction.execute('test02',newRoom);
 
-        expect(SingletonFactory.getInstance(allRoomManager).getAllRoomList().length).toBe(1);
+        expect(SingletonFactory.getInstance(allRoomManager).getAllObjectList().length).toBe(1);
 
         expect(SingletonFactory.getInstance(allRoomManager)
                 .getOneRoomById('1002'))
@@ -30,10 +30,10 @@ describe('分店可以进行的房间事务',()=>{
         const newRoom='1002';
         
 
-        SingletonFactory.getInstance(allRoomManager).addNewBranchRoomManager('test02');
+        SingletonFactory.getInstance(allRoomManager).addNewBranchManager('test02');
         transaction.execute('test02',newRoom);
 
-        expect(SingletonFactory.getInstance(allRoomManager).getAllRoomList().length).toBe(1);
+        expect(SingletonFactory.getInstance(allRoomManager).getAllObjectList().length).toBe(1);
 
         expect(SingletonFactory.getInstance(allRoomManager)
                 .getOneRoomById(newRoom)
@@ -47,10 +47,10 @@ describe('分店可以进行的房间事务',()=>{
         const newRoom='1002';
         
 
-        SingletonFactory.getInstance(allRoomManager).addNewBranchRoomManager('test02');
+        SingletonFactory.getInstance(allRoomManager).addNewBranchManager('test02');
         occupiedTransaction.execute('test02',newRoom);
 
-        expect(SingletonFactory.getInstance(allRoomManager).getAllRoomList().length).toBe(1);
+        expect(SingletonFactory.getInstance(allRoomManager).getAllObjectList().length).toBe(1);
 
         expect(SingletonFactory.getInstance(allRoomManager)
                 .getOneRoomById(newRoom)

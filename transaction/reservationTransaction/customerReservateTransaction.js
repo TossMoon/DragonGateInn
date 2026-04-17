@@ -1,6 +1,6 @@
 const transaction=require('../transaction')
 
-const roomLayout=require('../../room/room');
+const roomLayout=require('../../branchResource/room/room');
 const customerManager=require('../../accountManager/customerAccountManager')
 const branchManager=require('../../accountManager/branchAccountManager')
 
@@ -20,17 +20,17 @@ class CustomerReservateTransaction extends transaction{
 
         // 检查顾客是否存在
         const customer=transaction.getManager(customerManager).getOneAccountByID(customerId);
-        if(!customer){
-            throw new Error("顾客不存在");
+        if(customer==undefined){
+            return this.packageResult(false,null,"顾客不存在");
         }
 
         // 检查分支是否存在
         const branch=transaction.getManager(branchManager).getOneAccountByID(branchId);
-        if(!branch){
-            throw new Error("分支不存在");
+        if(branch==undefined){
+            return this.packageResult(false,null,"分支不存在");
         }
 
         const requireRoomLayout=new roomLayout(roomLayout.area,roomLayout.windowBool,roomLayout.bedType);
-
+        
     }
 }

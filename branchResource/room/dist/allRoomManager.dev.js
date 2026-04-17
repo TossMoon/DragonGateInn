@@ -22,72 +22,64 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
-var assert = require('assert');
+var branchRoomManager = require('./branchRoomManager');
 
-var branchRoomTransaction = require('./branchRoomTranaction');
-
-var allRoomManager = require('../../branchResource/room/allRoomManager');
-
-var _require = require('../../branchResource/room/room'),
-    room = _require.room;
+var _require = require('../template/allBranchManager'),
+    allBranchManager = _require.allBranchManager;
 /**
- * 分店添加房间事务
+ * 所有分店的房间管理类
  */
 
 
-var branchAddRoomTransaction =
+var allRoomManager =
 /*#__PURE__*/
-function (_branchRoomTransactio) {
-  _inherits(branchAddRoomTransaction, _branchRoomTransactio);
+function (_allBranchManager) {
+  _inherits(allRoomManager, _allBranchManager);
 
-  function branchAddRoomTransaction() {
-    _classCallCheck(this, branchAddRoomTransaction);
+  function allRoomManager() {
+    _classCallCheck(this, allRoomManager);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(branchAddRoomTransaction).call(this));
+    return _possibleConstructorReturn(this, _getPrototypeOf(allRoomManager).call(this));
   }
   /**
-   * 第一个参数：分店id
-   * 第二个参数：房间信息
+   * 添加分店的房间管理类
+   * @param {string} branchIdString 分店的编号
    */
 
 
-  _createClass(branchAddRoomTransaction, [{
-    key: "execute",
-    value: function execute() {
-      var _get2,
-          _this = this;
+  _createClass(allRoomManager, [{
+    key: "addNewBranchManager",
+    value: function addNewBranchManager(branchIdString) {
+      _get(_getPrototypeOf(allRoomManager.prototype), "addNewBranchManager", this).call(this, new branchRoomManager(branchIdString));
+    }
+    /**
+     * 根据房间编号返回房间的引用类型对象
+     * @param {string} roomId 房间的编号
+     * @returns {room} 房间的引用类型对象
+     */
 
-      for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
-        args[_key] = arguments[_key];
-      }
-
-      (_get2 = _get(_getPrototypeOf(branchAddRoomTransaction.prototype), "execute", this)).call.apply(_get2, [this].concat(args)); //检查分店参数是否符合要求
-
-
-      assert(this.checkBranchArg(args));
-
-      if (!this.checkBranchExist(args[0])) {
-        return this.packageResult(false, null, "分店不存在");
-      } //检查添加的变量是否是房间实例
-
-
-      assert(args.every(function (item, index) {
-        if (index > 0) {
-          return item instanceof room;
-        }
-
-        return true;
-      }));
-      args.forEach(function (item, index) {
-        if (index > 0) {
-          _this.getNeedChangeBranchRoomManager(args[0]).addRoom(item);
-        }
+  }, {
+    key: "getOneRoomById",
+    value: function getOneRoomById(roomId) {
+      return _get(_getPrototypeOf(allRoomManager.prototype), "getAllObjectList", this).call(this).find(function (room) {
+        return room.getId() === roomId;
       });
-      return this.packageResult(true, null, "房间添加成功");
+    }
+    /**
+     * 获取所有空闲房间
+     * @returns {room[]} 所有空闲房间的引用类型对象数组
+     */
+
+  }, {
+    key: "getAllEmptyRoom",
+    value: function getAllEmptyRoom() {
+      return _get(_getPrototypeOf(allRoomManager.prototype), "getAllObjectList", this).call(this).filter(function (room) {
+        return room.getEmpty();
+      });
     }
   }]);
 
-  return branchAddRoomTransaction;
-}(branchRoomTransaction);
+  return allRoomManager;
+}(allBranchManager);
 
-module.exports = branchAddRoomTransaction;
+module.exports = allRoomManager;

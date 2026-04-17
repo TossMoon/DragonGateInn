@@ -1,5 +1,5 @@
 const SingletonFactory=require('../util/SingletonFactory');
-
+const assert=require('assert');
 /**
  * 事务类
  * 管理系统内所有用户可以进行的改变系统状态的行为，

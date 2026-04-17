@@ -6,7 +6,7 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-var activeState = require('../util/activeState');
+var activeState = require('../../util/activeState');
 
 var assert = require('assert'); //床铺的情况，某种类型的床有几张
 

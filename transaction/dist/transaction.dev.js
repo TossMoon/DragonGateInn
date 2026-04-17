@@ -7,6 +7,8 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
 var SingletonFactory = require('../util/SingletonFactory');
+
+var assert = require('assert');
 /**
  * 事务类
  * 管理系统内所有用户可以进行的改变系统状态的行为，

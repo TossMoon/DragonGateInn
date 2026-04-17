@@ -1,7 +1,7 @@
 const assert=require('assert'); 
 
 const branchRoomTransaction=require('./branchRoomTranaction');
-const allRoomManager=require('../../room/allRoomManager');
+const allRoomManager=require('../../branchResource/room/allRoomManager');
 
 
 

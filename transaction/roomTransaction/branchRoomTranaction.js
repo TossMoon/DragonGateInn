@@ -1,7 +1,7 @@
 
 
 const transaction=require('../transaction');
-const allRoomManager=require('../../room/allRoomManager');
+const allRoomManager=require('../../branchResource/room/allRoomManager');
 
 
 /**
@@ -31,7 +31,7 @@ class branchRoomTransaction extends transaction{
      * @returns {boolean} 如果分店存在则返回true，否则返回false
      */
     checkBranchExist(branchId){
-        return transaction.getManager(allRoomManager).getOneRoomManagerByBranchId(branchId) !== null;
+        return transaction.getManager(allRoomManager).getOneManagerByBranchId(branchId) !== null;
     }
 
     /**
@@ -63,7 +63,7 @@ class branchRoomTransaction extends transaction{
     getNeedChangeBranchRoomManager(branchId)
     {
         return transaction.getManager(allRoomManager)
-            .getOneRoomManagerByBranchId(branchId)
+            .getOneManagerByBranchId(branchId)
             
     }
 

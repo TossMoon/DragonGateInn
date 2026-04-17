@@ -24,7 +24,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 var transaction = require('../transaction');
 
-var allRoomManager = require('../../room/allRoomManager');
+var allRoomManager = require('../../branchResource/room/allRoomManager');
 /**
  * 分店可以操作的房间事务
  */
@@ -66,7 +66,7 @@ function (_transaction) {
   }, {
     key: "checkBranchExist",
     value: function checkBranchExist(branchId) {
-      return transaction.getManager(allRoomManager).getOneRoomManagerByBranchId(branchId) !== null;
+      return transaction.getManager(allRoomManager).getOneManagerByBranchId(branchId) !== null;
     }
     /**
      * 检查参数是否符合要求，包括参数的数量，参数第一个是否是分店的id
@@ -102,7 +102,7 @@ function (_transaction) {
   }, {
     key: "getNeedChangeBranchRoomManager",
     value: function getNeedChangeBranchRoomManager(branchId) {
-      return transaction.getManager(allRoomManager).getOneRoomManagerByBranchId(branchId);
+      return transaction.getManager(allRoomManager).getOneManagerByBranchId(branchId);
     }
     /**
      * 

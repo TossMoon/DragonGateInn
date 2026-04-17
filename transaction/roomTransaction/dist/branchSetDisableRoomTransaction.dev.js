@@ -68,13 +68,13 @@ function (_transaction) {
         return index === 0 && typeof item === 'string' || index > 0 && item instanceof room;
       }));
 
-      if (!this.getManager(allRoomManager).getOneRoomManagerByBranchId(args[0])) {
+      if (!this.getManager(allRoomManager).getOneManagerByBranchId(args[0])) {
         throw new Error('分店不存在');
       }
 
       args.forEach(function (item, index) {
         if (index > 0) {
-          _this.getManager(allRoomManager).getOneRoomManagerByBranchId(args[0]).setOneRoomDisable(item);
+          _this.getManager(allRoomManager).getOneManagerByBranchId(args[0]).setOneRoomDisable(item);
         }
       });
     }

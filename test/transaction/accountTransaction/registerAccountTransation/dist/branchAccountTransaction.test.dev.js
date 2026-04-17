@@ -6,7 +6,7 @@ var SingletonFactory = require('../../../../util/SingletonFactory');
 
 var branchAccountManager = require('../../../../accountManager/branchAccountManager');
 
-var allRoomManager = require('../../../../room/allRoomManager');
+var allRoomManager = require('../../../../branchResource/room/allRoomManager');
 
 describe('分点账号注册事务', function () {
   it('注册分点账号', function () {
@@ -14,6 +14,6 @@ describe('分点账号注册事务', function () {
     var newBranchAccount = transaction.execute();
     expect(SingletonFactory.getInstance(branchAccountManager).getOneAccountByID(newBranchAccount.getID())).toBeDefined(); // 检查房间管理器是否添加成功
 
-    expect(SingletonFactory.getInstance(allRoomManager).getOneRoomManagerByBranchId(newBranchAccount.getID())).toBeDefined();
+    expect(SingletonFactory.getInstance(allRoomManager).getOneManagerByBranchId(newBranchAccount.getID())).toBeDefined();
   });
 });

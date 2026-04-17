@@ -1,5 +1,5 @@
-const allRoomManager=require('../room/allRoomManager.js');
-const { room } = require('../room/room.js');
+const allRoomManager=require('../branchResource/room/allRoomManager.js');
+const { room } = require('../branchResource/room/room.js');
 const SingletonFactory = require('../util/SingletonFactory.js');
 
 describe("RoomManager",()=>{
@@ -12,11 +12,11 @@ describe("RoomManager",()=>{
         const roomManager=SingletonFactory.getInstance(allRoomManager);
 
 
-        roomManager.addNewBranchRoomManager("test");
-        expect(roomManager.getAllRoomManagerList().length).toBe(1);
+        roomManager.addNewBranchManager("test");
+        expect(roomManager.getAllManagers().length).toBe(1);
 
-        roomManager.getOneRoomManagerByBranchId("test").addRoom(new room("testRoom"));
-        expect(roomManager.getAllRoomList().length).toBe(1);
+        roomManager.getOneManagerByBranchId("test").addRoom(new room("testRoom"));
+        expect(roomManager.getAllObjectList().length).toBe(1);
 
     });
 

@@ -1,4 +1,4 @@
-const activeState=require('../util/activeState');
+const activeState=require('../../util/activeState');
 const assert=require('assert');
 
 //床铺的情况，某种类型的床有几张

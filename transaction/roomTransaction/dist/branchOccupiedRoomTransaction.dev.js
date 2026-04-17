@@ -26,7 +26,7 @@ var assert = require('assert');
 
 var branchRoomTransaction = require('./branchRoomTranaction');
 
-var allRoomManager = require('../../room/allRoomManager');
+var allRoomManager = require('../../branchResource/room/allRoomManager');
 /**
  * 分店占据房间的事务
  */

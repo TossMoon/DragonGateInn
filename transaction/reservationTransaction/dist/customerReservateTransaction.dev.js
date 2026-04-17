@@ -24,7 +24,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 var transaction = require('../transaction');
 
-var roomLayout = require('../../room/room');
+var roomLayout = require('../../branchResource/room/room');
 
 var customerManager = require('../../accountManager/customerAccountManager');
 
@@ -63,15 +63,15 @@ function (_transaction) {
 
       var customer = transaction.getManager(customerManager).getOneAccountByID(customerId);
 
-      if (!customer) {
-        throw new Error("顾客不存在");
+      if (customer == undefined) {
+        return this.packageResult(false, null, "顾客不存在");
       } // 检查分支是否存在
 
 
       var branch = transaction.getManager(branchManager).getOneAccountByID(branchId);
 
-      if (!branch) {
-        throw new Error("分支不存在");
+      if (branch == undefined) {
+        return this.packageResult(false, null, "分支不存在");
       }
 
       var requireRoomLayout = new roomLayout(roomLayout.area, roomLayout.windowBool, roomLayout.bedType);

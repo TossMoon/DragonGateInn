@@ -35,8 +35,8 @@ function () {
 
 
   _createClass(allRoomManager, [{
-    key: "addNewBranchRoomManager",
-    value: function addNewBranchRoomManager(branchIdString) {
+    key: "addNewBranchManager",
+    value: function addNewBranchManager(branchIdString) {
       assert(typeof branchIdString === 'string');
       this.branchRoomManagerList.push(new branchRoomManager(branchIdString));
     }
@@ -47,8 +47,8 @@ function () {
      */
 
   }, {
-    key: "getOneRoomManagerByBranchId",
-    value: function getOneRoomManagerByBranchId(branchIdString) {
+    key: "getOneManagerByBranchId",
+    value: function getOneManagerByBranchId(branchIdString) {
       return this.branchRoomManagerList.find(function (roomManager) {
         return roomManager.branchIdString === branchIdString;
       });
@@ -59,8 +59,8 @@ function () {
      */
 
   }, {
-    key: "getAllRoomManagerList",
-    value: function getAllRoomManagerList() {
+    key: "getAllManagerList",
+    value: function getAllManagerList() {
       return this.branchRoomManagerList;
     }
     /**
@@ -69,8 +69,8 @@ function () {
      */
 
   }, {
-    key: "getAllRoomList",
-    value: function getAllRoomList() {
+    key: "getAllObjectList",
+    value: function getAllObjectList() {
       return this.branchRoomManagerList.flatMap(function (roomManager) {
         return roomManager.roomList;
       });

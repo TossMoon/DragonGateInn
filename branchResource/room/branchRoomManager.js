@@ -1,23 +1,14 @@
 const assert=require('assert');
 
+const { branchManager } = require('../template/allBranchManager');
 const { room } = require('./room');
 
 //管理单个分店的房间
-class branchRoomManager{
+class branchRoomManager extends branchManager{
     constructor(branchIdString){
-        //该分店的编号
-        /**
-         * 该分店的编号
-         * @type {string}
-         */
-        this.branchIdString=branchIdString;
+        super(branchIdString);
 
-        //房间列表
-        /**
-         * 房间列表
-         * @type {room[]}
-         */
-        this.roomList=[];
+        
     }
 
     /**
@@ -32,16 +23,9 @@ class branchRoomManager{
             throw new Error("房间编号已存在");
         }
         
-        this.roomList.push(newRoom);
+        this.addObject(newRoom);
     }
 
-    /**
-     * 返回所有房间
-     * @returns {room[]} 所有房间的引用类型对象数组
-     */
-    getAllRoomList(){
-        return this.roomList;
-    }
 
     /**
      * 根据房间编号返回房间的引用类型对象
@@ -49,7 +33,7 @@ class branchRoomManager{
      * @returns {room} 房间的引用类型对象
      */
     getOneRoomById(roomId){
-        return this.roomList.find(room=>room.getId()===roomId);
+        return super.getOneObjectById(roomId);
     }
 
     /**
@@ -113,7 +97,7 @@ class branchRoomManager{
      */
     getAllEmptyRoom()
     {
-        return this.roomList.filter(room=>room.getEmpty());
+        return this.objectList.filter(room=>room.getEmpty());
     }
 }
 module.exports=branchRoomManager;
