@@ -23,6 +23,10 @@ class branchOccupiedRoomTransaction extends branchRoomTransaction{
         //检查分店参数是否符合要求
         assert(this.checkBranchArg(args));
         
+        if(!this.checkBranchExist(args[0])){
+            return this.packageResult(false,null,"分店不存在");
+        }
+        
         //检查添加的变量是否是房间id(是否是string类型，是否在管理器中存在)
         assert(this.checkRoomIdArg(args));
 
@@ -32,6 +36,8 @@ class branchOccupiedRoomTransaction extends branchRoomTransaction{
                     .setOneRoomOccupied(item);
             }
         });
+        
+        return this.packageResult(true,null,"房间占据成功");
     }
 }
 

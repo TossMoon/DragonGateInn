@@ -8,7 +8,8 @@ var branchOccupiedRoomTransaction = require('../../../transaction/roomTransactio
 
 var branchEmptyRoomTransaction = require('../../../transaction/roomTransaction/branchEmptyRoomTranscation');
 
-var room = require('../../../room/room');
+var _require = require('../../../room/room'),
+    room = _require.room;
 
 var SingletonFactory = require('../../../util/SingletonFactory');
 

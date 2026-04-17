@@ -31,14 +31,14 @@ class loginCustomerByPhoneTransaction extends transaction{
        const account=this.accountManager.getCustomAccountByPhoneString(phone);
        if(!account){
             // 绑定手机号的客户不存在
-           return false;
+           return this.packageResult(false,null,"绑定手机号的客户不存在");
        }
        if(!this.checkPassword(account,password)){
             // 密码错误
-           return false;
+           return this.packageResult(false,null,"密码错误");
        }
        // 登录成功
-       return true;
+       return this.packageResult(true,account,"登录成功");
     }
 }
 module.exports=loginCustomerByPhoneTransaction;

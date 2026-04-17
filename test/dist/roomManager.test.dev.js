@@ -2,7 +2,8 @@
 
 var allRoomManager = require('../room/allRoomManager.js');
 
-var room = require('../room/room');
+var _require = require('../room/room.js'),
+    room = _require.room;
 
 var SingletonFactory = require('../util/SingletonFactory.js');
 

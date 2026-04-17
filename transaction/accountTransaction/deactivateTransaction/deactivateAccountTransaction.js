@@ -22,7 +22,14 @@ class DeactivateAccountTransaction extends transaction{
         
         assert(args.length===1);
         const accountId=args[0];
+
+        if(!this.accountManager.getOneAccountByID(accountId)){
+            return this.packageResult(false,null,"账户不存在");
+        }
+
         this.accountManager.setDisableAccount(accountId);
+
+        return this.packageResult(true,null,"账户停用成功");
     }
 }
 

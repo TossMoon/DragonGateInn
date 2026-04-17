@@ -19,6 +19,19 @@ class transaction{
     }
 
     /**
+     * 包装事务执行结果
+     * @param {boolean} isSuccess 是否成功
+     * @param {*} resultContent 执行结果
+     * @param {string} message 执行结果的提示信息
+     * @returns {transactionResult} 事务执行结果对象
+     */
+    packageResult(isSuccess,resultContent,message){
+        assert(typeof isSuccess === 'boolean',"isSuccess is not boolean");
+     
+        return new transactionResult(isSuccess,resultContent,message);
+    }
+
+    /**
      * 执行事务
      */
     execute(...args){
@@ -33,6 +46,17 @@ class transaction{
      */
     static getManager(managerType){
         return SingletonFactory.getInstance(managerType);
+    }
+}
+
+/**
+ * 事务执行结果类
+ */
+class transactionResult{
+    constructor(isSuccess,resultContent,message){
+        this.successBool=isSuccess;
+        this.resultContent=resultContent;
+        this.message=message;
     }
 }
 

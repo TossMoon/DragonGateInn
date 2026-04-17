@@ -8,7 +8,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 var assert = require('assert');
 
-var room = require('./room'); //管理单个分店的房间
+var _require = require('./room'),
+    room = _require.room; //管理单个分店的房间
 
 
 var branchRoomManager =

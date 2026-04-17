@@ -1,5 +1,5 @@
 const allRoomManager=require('../room/allRoomManager.js');
-const room=require('../room/room');
+const { room } = require('../room/room.js');
 const SingletonFactory = require('../util/SingletonFactory.js');
 
 describe("RoomManager",()=>{

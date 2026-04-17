@@ -29,11 +29,25 @@ function () {
     this.date = null;
   }
   /**
-   * 执行事务
+   * 包装事务执行结果
+   * @param {boolean} isSuccess 是否成功
+   * @param {*} resultContent 执行结果
+   * @param {string} message 执行结果的提示信息
+   * @returns {transactionResult} 事务执行结果对象
    */
 
 
   _createClass(transaction, [{
+    key: "packageResult",
+    value: function packageResult(isSuccess, resultContent, message) {
+      assert(typeof isSuccess === 'boolean', "isSuccess is not boolean");
+      return new transactionResult(isSuccess, resultContent, message);
+    }
+    /**
+     * 执行事务
+     */
+
+  }, {
     key: "execute",
     value: function execute() {
       // 记录执行时间
@@ -54,5 +68,17 @@ function () {
 
   return transaction;
 }();
+/**
+ * 事务执行结果类
+ */
+
+
+var transactionResult = function transactionResult(isSuccess, resultContent, message) {
+  _classCallCheck(this, transactionResult);
+
+  this.successBool = isSuccess;
+  this.resultContent = resultContent;
+  this.message = message;
+};
 
 module.exports = transaction;

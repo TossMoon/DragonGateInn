@@ -57,7 +57,7 @@ function () {
     this.windowBool = windowBool; //房间床铺的情况
 
     assert(bedType instanceof BedInRoom);
-    this.BedType = bedType;
+    this.bedType = bedType;
   }
 
   _createClass(RoomLayout, [{
@@ -73,7 +73,7 @@ function () {
   }, {
     key: "getBedType",
     value: function getBedType() {
-      return this.BedType;
+      return this.bedType;
     }
   }]);
 
@@ -183,4 +183,5 @@ function () {
   return room;
 }();
 
-module.exports = room;
+module.exports.room = room;
+module.exports.RoomLayout = RoomLayout;

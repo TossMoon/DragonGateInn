@@ -1,6 +1,6 @@
 const assert=require('assert');
 
-const room=require('./room');
+const { room } = require('./room');
 
 //管理单个分店的房间
 class branchRoomManager{

@@ -3,7 +3,7 @@ const branchDisableRoomTransaction=require('../../../transaction/roomTransaction
 const branchOccupiedRoomTransaction=require('../../../transaction/roomTransaction/branchOccupiedRoomTransaction');
 const branchEmptyRoomTransaction=require('../../../transaction/roomTransaction/branchEmptyRoomTranscation');
 
-const room=require('../../../room/room');
+const { room } = require('../../../room/room');
 const SingletonFactory = require('../../../util/SingletonFactory');
 const allRoomManager=require('../../../room/allRoomManager');
 

@@ -51,9 +51,7 @@ class branchRoomTransaction extends transaction{
             return false;
         }
 
-        if(!this.checkBranchExist(args[0])){
-            return false;
-        }
+        
         return true;
     }
 

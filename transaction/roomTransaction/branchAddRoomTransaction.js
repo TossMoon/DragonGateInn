@@ -2,7 +2,7 @@ const assert=require('assert');
 
 const branchRoomTransaction=require('./branchRoomTranaction');
 const allRoomManager=require('../../room/allRoomManager');
-const room=require('../../room/room');
+const { room } = require('../../room/room');
 
 /**
  * 分店添加房间事务
@@ -21,6 +21,10 @@ class branchAddRoomTransaction extends branchRoomTransaction{
 
         //检查分店参数是否符合要求
         assert(this.checkBranchArg(args));
+
+        if(!this.checkBranchExist(args[0])){
+            return this.packageResult(false,null,"分店不存在");
+        }
         
         //检查添加的变量是否是房间实例
         assert(args.every((item,index) => {
@@ -34,6 +38,8 @@ class branchAddRoomTransaction extends branchRoomTransaction{
                     .addRoom(item);
             }
         });
+
+        return this.packageResult(true,null,"房间添加成功");
     }
 }
 

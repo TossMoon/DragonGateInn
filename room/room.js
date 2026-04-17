@@ -36,7 +36,7 @@ class RoomLayout{
         this.windowBool=windowBool;
         //房间床铺的情况
         assert(bedType instanceof BedInRoom);
-        this.BedType=bedType;
+        this.bedType=bedType;
     }
 
     getArea(){
@@ -48,7 +48,7 @@ class RoomLayout{
     }
 
     getBedType(){
-        return this.BedType;
+        return this.bedType;
     }
 }
 
@@ -132,4 +132,5 @@ class room{
     }
 }
 
-module.exports=room;    
+module.exports.room=room;   
+module.exports.RoomLayout=RoomLayout;

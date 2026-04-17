@@ -30,14 +30,14 @@ class loginAccountTransaction extends transaction{
        const account=this.accountManager.getOneAccountByID(username);
        if(!account){
             // 用户名不存在
-           return false;
+           return this.packageResult(false,null,"用户名不存在");
        }
        if(!this.checkPassword(account,password)){
             // 密码错误
-           return false;
+           return this.packageResult(false,null,"密码错误");
        }
        // 登录成功
-       return true;
+       return this.packageResult(true,account,"登录成功");
     }
 }
 module.exports=loginAccountTransaction;

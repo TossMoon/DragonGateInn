@@ -28,7 +28,8 @@ var branchRoomTransaction = require('./branchRoomTranaction');
 
 var allRoomManager = require('../../room/allRoomManager');
 
-var room = require('../../room/room');
+var _require = require('../../room/room'),
+    room = _require.room;
 /**
  * 分店添加房间事务
  */
@@ -63,7 +64,12 @@ function (_branchRoomTransactio) {
       (_get2 = _get(_getPrototypeOf(branchAddRoomTransaction.prototype), "execute", this)).call.apply(_get2, [this].concat(args)); //检查分店参数是否符合要求
 
 
-      assert(this.checkBranchArg(args)); //检查添加的变量是否是房间实例
+      assert(this.checkBranchArg(args));
+
+      if (!this.checkBranchExist(args[0])) {
+        return this.packageResult(false, null, "分店不存在");
+      } //检查添加的变量是否是房间实例
+
 
       assert(args.every(function (item, index) {
         if (index > 0) {
@@ -77,6 +83,7 @@ function (_branchRoomTransactio) {
           _this.getNeedChangeBranchRoomManager(args[0]).addRoom(item);
         }
       });
+      return this.packageResult(true, null, "房间添加成功");
     }
   }]);
 
