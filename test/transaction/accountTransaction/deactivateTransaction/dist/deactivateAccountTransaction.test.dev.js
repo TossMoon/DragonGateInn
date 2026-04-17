@@ -19,7 +19,7 @@ describe('停用账号事务', function () {
     var curBranchRegisterTransaction = new branchRegisterTransaction();
     var branchAccount = curBranchRegisterTransaction.execute();
     var curDeactivateAccountTransaction = new deactivateBranchTransaction();
-    curDeactivateAccountTransaction.execute(branchAccount.getUsername());
+    curDeactivateAccountTransaction.execute(branchAccount.getID());
     expect(transaction.getManager(branchAccountManager).getActiveAccountList().includes(branchAccount)).toBe(false);
   });
   it('停用客户账号', function () {
@@ -27,7 +27,7 @@ describe('停用账号事务', function () {
     curCustomerRegisterTransaction.execute('13801234517', '123456');
     var customerAccount = transaction.getManager(customerAccountManager).getCustomAccountByPhoneString('13801234517');
     var curDeactivateAccountTransaction = new deactivateCustomerTransaction();
-    curDeactivateAccountTransaction.execute(customerAccount.getUsername());
+    curDeactivateAccountTransaction.execute(customerAccount.getID());
     expect(transaction.getManager(customerAccountManager).getActiveAccountList().includes(customerAccount)).toBe(false);
   });
 });

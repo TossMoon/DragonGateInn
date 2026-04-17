@@ -9,10 +9,10 @@ describe('分点账号注册事务',function(){
         const newBranchAccount=transaction.execute();
 
         expect(SingletonFactory.getInstance(branchAccountManager)
-            .getOneAccountByUsername(newBranchAccount.getUsername())).toBeDefined();
+            .getOneAccountByID(newBranchAccount.getID())).toBeDefined();
         
         // 检查房间管理器是否添加成功
         expect(SingletonFactory.getInstance(allRoomManager)
-            .getOneRoomManagerByBranchId(newBranchAccount.getUsername())).toBeDefined();
+            .getOneRoomManagerByBranchId(newBranchAccount.getID())).toBeDefined();
     })
 })

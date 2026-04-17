@@ -18,7 +18,7 @@ describe('停用账号事务',()=>{
 
 
         const curDeactivateAccountTransaction=new deactivateBranchTransaction();
-        curDeactivateAccountTransaction.execute(branchAccount.getUsername());
+        curDeactivateAccountTransaction.execute(branchAccount.getID());
         expect(transaction.getManager(branchAccountManager).getActiveAccountList().includes(branchAccount)).toBe(false);
     });
 
@@ -28,7 +28,7 @@ describe('停用账号事务',()=>{
         const customerAccount=transaction.getManager(customerAccountManager).getCustomAccountByPhoneString('13801234517');
 
         const curDeactivateAccountTransaction=new deactivateCustomerTransaction();
-        curDeactivateAccountTransaction.execute(customerAccount.getUsername());
+        curDeactivateAccountTransaction.execute(customerAccount.getID());
         expect(transaction.getManager(customerAccountManager).getActiveAccountList().includes(customerAccount)).toBe(false);
 
     });

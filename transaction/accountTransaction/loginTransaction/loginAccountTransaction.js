@@ -27,7 +27,7 @@ class loginAccountTransaction extends transaction{
        assert(typeof args[1]==='string','密码必须是字符串');
        const [username,password]=args;
       
-       const account=this.accountManager.getOneAccountByUsername(username);
+       const account=this.accountManager.getOneAccountByID(username);
        if(!account){
             // 用户名不存在
            return false;

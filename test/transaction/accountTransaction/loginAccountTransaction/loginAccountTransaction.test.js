@@ -19,7 +19,7 @@ describe('客户登录事务',function(){
         const account= registerTransaction.execute('138000000000','123456');
 
         let curTransaction=new loginAccountTransaction();
-        expect(curTransaction.execute(account.getUsername(),account.getPassword())).toBe(true);
+        expect(curTransaction.execute(account.getID(),account.getPassword())).toBe(true);
 
     });
 
@@ -36,7 +36,7 @@ describe('客户登录事务',function(){
         const account= registerTransaction.execute();
 
         let curTransaction=new loginBranchTransaction();
-        expect(curTransaction.execute(account.getUsername(),account.getPassword())).toBe(true);
+        expect(curTransaction.execute(account.getID(),account.getPassword())).toBe(true);
     })
 
     it('登录总部账号',function(){
@@ -44,6 +44,6 @@ describe('客户登录事务',function(){
         const account= registerTransaction.execute('100000000000','123456');
 
         let curTransaction=new loginHeadquarterTransaction();
-        expect(curTransaction.execute(account.getUsername(),account.getPassword())).toBe(true);
+        expect(curTransaction.execute(account.getID(),account.getPassword())).toBe(true);
     })
 });

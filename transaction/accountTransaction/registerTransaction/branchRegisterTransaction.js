@@ -24,7 +24,7 @@ class branchRegisterTransaction extends transaction{
         
         assert(args.length===0);
 
-        //添加这个分点的账户 到分店账号管理器
+        //添加这个分店的账户 到分店账号管理器
      
         const newBranchAccount=
             new branchAccount(transaction.getManager(accountApplication).getRandomAccount()
@@ -33,7 +33,7 @@ class branchRegisterTransaction extends transaction{
             newBranchAccount);
 
         //为这个分点增加一个房间管理器
-        transaction.getManager(allRoomManager).addNewBranchRoomManager(newBranchAccount.getUsername());
+        transaction.getManager(allRoomManager).addNewBranchRoomManager(newBranchAccount.getID());
 
         // 返回新申请的分店账号
         return newBranchAccount;

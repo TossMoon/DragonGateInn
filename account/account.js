@@ -2,14 +2,14 @@ const activeState = require('../util/activeState.js');
 
 //用于登录的账户
 class account{
-    constructor(username,password){
-        this.usernameString=username;
+    constructor(id,password){
+        this.idString=id;
         this.passwordString=password;
         this.activeState=new activeState(true);
     }
 
-    getUsername(){
-        return this.usernameString;
+    getID(){
+        return this.idString;
     }
 
     getPassword(){

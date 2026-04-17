@@ -12,18 +12,18 @@ var activeState = require('../util/activeState.js'); //用于登录的账户
 var account =
 /*#__PURE__*/
 function () {
-  function account(username, password) {
+  function account(id, password) {
     _classCallCheck(this, account);
 
-    this.usernameString = username;
+    this.idString = id;
     this.passwordString = password;
     this.activeState = new activeState(true);
   }
 
   _createClass(account, [{
-    key: "getUsername",
-    value: function getUsername() {
-      return this.usernameString;
+    key: "getID",
+    value: function getID() {
+      return this.idString;
     }
   }, {
     key: "getPassword",

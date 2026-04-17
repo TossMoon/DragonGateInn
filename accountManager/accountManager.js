@@ -14,7 +14,7 @@ class accountManager{
 
         //由于是用数组存储的，不能保证里面元素是唯一的
         //每次添加新账户的时候需要检查用户名是否已存在
-        if(this.getOneAccountByUsername(newAccount.getUsername())!=null){
+        if(this.getOneAccountByID(newAccount.getID())!=null){
             throw new Error("用户名已存在");
         }
         this.accountList.push(newAccount);
@@ -33,24 +33,24 @@ class accountManager{
     }
 
     //根据用户名（也就是账户ID）返回账户的引用类型对象
-    getOneAccountByUsername(username){
-        return this.accountList.find(account=>account.getUsername()===username);
+    getOneAccountByID(id){
+        return this.accountList.find(account=>account.getID()===id);
     }
 
 
     //禁用账户
-    setDisableAccount(username){
+    setDisableAccount(id){
         this.accountList.forEach(account=>{
-            if(account.getUsername()===username){
+            if(account.getID()===id){
                 account.setDisable();
             }
         });
     }
 
     //启用账户
-    setEnableAccount(username){
+    setEnableAccount(id){
         this.accountList.forEach(account=>{
-            if(account.getUsername()===username){
+            if(account.getID()===id){
                 account.setEnable();
             }
         });

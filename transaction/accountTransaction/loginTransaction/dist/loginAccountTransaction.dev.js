@@ -70,7 +70,7 @@ function (_transaction) {
       assert(typeof args[1] === 'string', '密码必须是字符串');
       var username = args[0],
           password = args[1];
-      var account = this.accountManager.getOneAccountByUsername(username);
+      var account = this.accountManager.getOneAccountByID(username);
 
       if (!account) {
         // 用户名不存在

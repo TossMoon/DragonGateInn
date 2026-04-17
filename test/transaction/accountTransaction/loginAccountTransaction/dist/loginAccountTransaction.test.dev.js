@@ -25,7 +25,7 @@ describe('客户登录事务', function () {
     var registerTransaction = new customerRegisterTransaction();
     var account = registerTransaction.execute('138000000000', '123456');
     var curTransaction = new loginAccountTransaction();
-    expect(curTransaction.execute(account.getUsername(), account.getPassword())).toBe(true);
+    expect(curTransaction.execute(account.getID(), account.getPassword())).toBe(true);
   });
   it('登录客户通过手机号', function () {
     var registerTransaction = new customerRegisterTransaction();
@@ -37,12 +37,12 @@ describe('客户登录事务', function () {
     var registerTransaction = new branchRegisterTransaction();
     var account = registerTransaction.execute();
     var curTransaction = new loginBranchTransaction();
-    expect(curTransaction.execute(account.getUsername(), account.getPassword())).toBe(true);
+    expect(curTransaction.execute(account.getID(), account.getPassword())).toBe(true);
   });
   it('登录总部账号', function () {
     var registerTransaction = new headquarterRegisterTransaction();
     var account = registerTransaction.execute('100000000000', '123456');
     var curTransaction = new loginHeadquarterTransaction();
-    expect(curTransaction.execute(account.getUsername(), account.getPassword())).toBe(true);
+    expect(curTransaction.execute(account.getID(), account.getPassword())).toBe(true);
   });
 });

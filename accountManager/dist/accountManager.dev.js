@@ -27,7 +27,7 @@ function () {
       assert(newAccount instanceof account); //由于是用数组存储的，不能保证里面元素是唯一的
       //每次添加新账户的时候需要检查用户名是否已存在
 
-      if (this.getOneAccountByUsername(newAccount.getUsername()) != null) {
+      if (this.getOneAccountByID(newAccount.getID()) != null) {
         throw new Error("用户名已存在");
       }
 
@@ -49,18 +49,18 @@ function () {
     } //根据用户名（也就是账户ID）返回账户的引用类型对象
 
   }, {
-    key: "getOneAccountByUsername",
-    value: function getOneAccountByUsername(username) {
+    key: "getOneAccountByID",
+    value: function getOneAccountByID(id) {
       return this.accountList.find(function (account) {
-        return account.getUsername() === username;
+        return account.getID() === id;
       });
     } //禁用账户
 
   }, {
     key: "setDisableAccount",
-    value: function setDisableAccount(username) {
+    value: function setDisableAccount(id) {
       this.accountList.forEach(function (account) {
-        if (account.getUsername() === username) {
+        if (account.getID() === id) {
           account.setDisable();
         }
       });
@@ -68,9 +68,9 @@ function () {
 
   }, {
     key: "setEnableAccount",
-    value: function setEnableAccount(username) {
+    value: function setEnableAccount(id) {
       this.accountList.forEach(function (account) {
-        if (account.getUsername() === username) {
+        if (account.getID() === id) {
           account.setEnable();
         }
       });
