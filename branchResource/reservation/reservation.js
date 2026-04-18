@@ -161,5 +161,4 @@ function reservationFactory(customerIdString,branchIdString,roomLayout){
 
 module.exports.reservationState=reservationState;
 module.exports.reservation=reservation;
-module.exports.reservationState=reservationState;
 module.exports.reservationFactory=reservationFactory;

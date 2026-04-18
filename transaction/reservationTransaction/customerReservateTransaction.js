@@ -5,10 +5,9 @@ const customerManager=require('../../accountManager/customerAccountManager')
 const branchManager=require('../../accountManager/branchAccountManager')
 
 const {reservationFactory}=require('../../branchResource/reservation/reservation');
-const branchReservationManager=require('../../branchResource/reservation/branchReservationManager');
 const allReservationManager = require('../../branchResource/reservation/allReservationManager');
 /**
- * 顾客的预订房间事务
+ * 顾客预订房间的事务
  */
 class customerReservateTransaction extends transaction{
     constructor(){

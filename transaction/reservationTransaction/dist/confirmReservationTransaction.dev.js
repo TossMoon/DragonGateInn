@@ -22,43 +22,34 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
+var assert = require('assert');
+
 var transaction = require('../transaction');
-
-var _require = require('../../branchResource/room/room'),
-    RoomLayout = _require.RoomLayout,
-    BedInRoom = _require.BedInRoom;
-
-var customerManager = require('../../accountManager/customerAccountManager');
-
-var branchManager = require('../../accountManager/branchAccountManager');
-
-var _require2 = require('../../branchResource/reservation/reservation'),
-    reservationFactory = _require2.reservationFactory;
 
 var allReservationManager = require('../../branchResource/reservation/allReservationManager');
 /**
- * 顾客预订房间的事务
+ * 顾客确认预约订单的事务
  */
 
 
-var customerReservateTransaction =
+var confirmReservationTransaction =
 /*#__PURE__*/
 function (_transaction) {
-  _inherits(customerReservateTransaction, _transaction);
+  _inherits(confirmReservationTransaction, _transaction);
 
-  function customerReservateTransaction() {
-    _classCallCheck(this, customerReservateTransaction);
+  function confirmReservationTransaction() {
+    _classCallCheck(this, confirmReservationTransaction);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(customerReservateTransaction).call(this));
+    return _possibleConstructorReturn(this, _getPrototypeOf(confirmReservationTransaction).call(this));
   }
   /**
-   * 执行预订房间事务
-   * @param {...any} args 顾客的预订房间事务的参数
-   * @returns {any} 预约订单
+   * 执行确认预约订单事务
+   * @param {...any} args 确认预约订单事务的参数
+   * @returns {any} 确认结果
    */
 
 
-  _createClass(customerReservateTransaction, [{
+  _createClass(confirmReservationTransaction, [{
     key: "execute",
     value: function execute() {
       var _get2;
@@ -67,41 +58,27 @@ function (_transaction) {
         args[_key] = arguments[_key];
       }
 
-      (_get2 = _get(_getPrototypeOf(customerReservateTransaction.prototype), "execute", this)).call.apply(_get2, [this].concat(args)); // 执行预订房间事务
+      (_get2 = _get(_getPrototypeOf(confirmReservationTransaction.prototype), "execute", this)).call.apply(_get2, [this].concat(args)); // 执行确认预约订单事务
 
 
-      var customerId = args[0],
-          branchId = args[1],
-          roomLayout = args[2]; // 检查顾客是否存在
+      var reservationId = args[0];
+      assert(typeof reservationId === "string", "预约订单ID必须是字符串"); // 检查预约订单是否存在
 
-      var customer = transaction.getManager(customerManager).getOneAccountByID(customerId);
+      var reservation = transaction.getManager(allReservationManager).getAllObjectList().find(function (reservation) {
+        return reservation.getId() == reservationId;
+      });
 
-      if (customer == undefined) {
-        return this.packageResult(false, null, "顾客不存在");
-      } // 检查分支是否存在
-
-
-      var branch = transaction.getManager(branchManager).getOneAccountByID(branchId);
-
-      if (branch == undefined) {
-        return this.packageResult(false, null, "分支不存在");
-      }
-
-      if (transaction.getManager(allReservationManager).getOneManagerByBranchId(branchId) === undefined) {
-        return this.packageResult(false, null, "该分店对应的预定管理器不存在");
-      } //根据输入的数据创建房间布局
+      if (reservation == undefined) {
+        return this.packageResult(false, null, "预约订单不存在");
+      } // 确认预约订单
 
 
-      var requireRoomLayout = new RoomLayout(roomLayout.area, roomLayout.windowBool, new BedInRoom(roomLayout.typeString, roomLayout.numId)); //创建预约订单
-
-      var newReservation = reservationFactory(customerId, branchId, requireRoomLayout); //向分店预约管理类添加预约订单
-
-      transaction.getManager(allReservationManager).getOneManagerByBranchId(branchId).addNewReservation(newReservation);
-      return this.packageResult(true, newReservation, "预订成功");
+      reservation.confirm();
+      return this.packageResult(true, null, "确认成功");
     }
   }]);
 
-  return customerReservateTransaction;
+  return confirmReservationTransaction;
 }(transaction);
 
-module.exports = customerReservateTransaction;
+module.exports = confirmReservationTransaction;
