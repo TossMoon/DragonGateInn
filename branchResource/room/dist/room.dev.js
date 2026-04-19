@@ -90,9 +90,13 @@ function () {
     this.id = id; //房间的户型
 
     assert(roomType instanceof RoomLayout);
-    this.roomType = roomType; //房间是否可以出租
+    this.roomType = roomType; //房间是否可以出租，是否被下架
 
-    this.activeState = new activeState(true);
+    this.activeState = new activeState(true); //房间是否为空闲
+
+    this.isEmptyBool = true; //房间的价格
+
+    this.priceReal = 0;
   }
   /**
    * 获取房间的编号
@@ -171,6 +175,26 @@ function () {
     key: "getEmpty",
     value: function getEmpty() {
       return this.isEmptyBool;
+    }
+    /**
+     * 获取房间的价格
+     * @returns {number} 房间的的价格
+     */
+
+  }, {
+    key: "getPrice",
+    value: function getPrice() {
+      return this.priceReal;
+    }
+    /**
+     * 设置房间的价格
+     * @param {number} price 房间的的价格
+     */
+
+  }, {
+    key: "setPrice",
+    value: function setPrice(price) {
+      this.priceReal = price;
     }
   }]);
 

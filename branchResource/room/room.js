@@ -59,8 +59,14 @@ class room{
         assert(roomType instanceof RoomLayout); 
         this.roomType=roomType;
 
-        //房间是否可以出租
+        //房间是否可以出租，是否被下架
         this.activeState=new activeState(true);
+
+        //房间是否为空闲
+        this.isEmptyBool=true;
+
+        //房间的价格
+        this.priceReal=0;
     }
 
     /**
@@ -124,6 +130,22 @@ class room{
     getEmpty()
     {
         return this.isEmptyBool;
+    }
+
+    /**
+     * 获取房间的价格
+     * @returns {number} 房间的的价格
+     */
+    getPrice(){
+        return this.priceReal;
+    }
+
+    /**
+     * 设置房间的价格
+     * @param {number} price 房间的的价格
+     */
+    setPrice(price){
+        this.priceReal=price;
     }
 }
 
