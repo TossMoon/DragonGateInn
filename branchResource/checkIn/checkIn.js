@@ -31,6 +31,11 @@ class checkIn{
         this.reservationId=null;
 
         /**
+         * 入住订单所属的店的编号
+         */
+        this.branchId=null;
+
+        /**
          * 入住的日期
          */
         this.checkInDate=new Date();
@@ -56,7 +61,7 @@ class checkIn{
         this.consumeNumber=0;
     }
 
-    getId(){
+    getID(){
         return this.Id;
     }
 
@@ -65,10 +70,16 @@ class checkIn{
      * @param {string} roomId 入住房间的编号
      * @param {person} person 入住人员的真实信息
      */
-    setCheckInData(roomId,persons,connectReservationId=null){
+    setCheckInData(branchId,roomId,persons,connectReservationId=null){
+        this.branchId=branchId;
         this.roomId=roomId;
         this.personList=persons;
         this.reservationId=connectReservationId;
+    }
+
+    getBranchId()
+    {
+        return this.branchId;
     }
 
     setRoomId(roomId){
@@ -127,7 +138,8 @@ const randomCheckInIdGenerator=new randomGenerator();
  * @param {string} connectReservationId 入住订单的编号,可以为空，表示这个顾客没有预约直接到酒店里入住
  * @returns {checkIn} 入住订单对象
  */
-function checkInFactory(roomId,persons,connectReservationId=null){
+function checkInFactory(branchId,roomId,persons,connectReservationId=null){
+    assert(branchId!==null,'branchId is null');
     assert(roomId!==null,'roomId is null');
     assert(persons instanceof Array,'person is not a person array');
 
@@ -136,7 +148,7 @@ function checkInFactory(roomId,persons,connectReservationId=null){
     });
 
     const newCheckIn=new checkIn(randomCheckInIdGenerator.generateId());
-    newCheckIn.setCheckInData(roomId,persons,connectReservationId);
+    newCheckIn.setCheckInData(branchId,roomId,persons,connectReservationId);
     return newCheckIn;
 }
 

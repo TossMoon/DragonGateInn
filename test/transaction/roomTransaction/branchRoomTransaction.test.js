@@ -21,7 +21,7 @@ describe('分店可以进行的房间事务',()=>{
         expect(SingletonFactory.getInstance(allRoomManager).getAllObjectList().length).toBe(1);
 
         expect(SingletonFactory.getInstance(allRoomManager)
-                .getOneRoomById('1002'))
+                .getOneRoomById('test02','1002'))
                 .toBe(newRoom);
     });
 
@@ -36,7 +36,7 @@ describe('分店可以进行的房间事务',()=>{
         expect(SingletonFactory.getInstance(allRoomManager).getAllObjectList().length).toBe(1);
 
         expect(SingletonFactory.getInstance(allRoomManager)
-                .getOneRoomById(newRoom)
+                .getOneRoomById('test02',newRoom)
                 .getActiveState()
                 .getActiveBool())
                 .toBe(false);
@@ -53,14 +53,14 @@ describe('分店可以进行的房间事务',()=>{
         expect(SingletonFactory.getInstance(allRoomManager).getAllObjectList().length).toBe(1);
 
         expect(SingletonFactory.getInstance(allRoomManager)
-                .getOneRoomById(newRoom)
+                .getOneRoomById('test02',newRoom)
                 .getEmpty())
                 .toBe(false);
 
         const emptyTransaction=new branchEmptyRoomTransaction();
         emptyTransaction.execute('test02',newRoom);
         expect(SingletonFactory.getInstance(allRoomManager)
-                .getOneRoomById(newRoom)
+                .getOneRoomById('test02',newRoom)
                 .getEmpty())
                 .toBe(true);
     });

@@ -18,12 +18,12 @@ describe('allReservationManager',()=>{
         const newReservation=reservationFactory('1001','branch1',new RoomLayout(24,true,new BedInRoom("单人床",1)));
         
         newBranchManager.addNewReservation(newReservation);
-        expect(newBranchManager.getOneObjectById(newReservation.getId())).toBe(newReservation);
+        expect(newBranchManager.getOneObjectById(newReservation.getID())).toBe(newReservation);
 
         /**
          * 测试确认预约订单
          */
-        newBranchManager.setConfirmedState(newReservation.getId());
+        newBranchManager.setConfirmedState(newReservation.getID());
         expect(newReservation.getState()).toBe(reservationState.state.confirmed);
     });
 });

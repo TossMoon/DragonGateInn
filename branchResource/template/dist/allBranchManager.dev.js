@@ -52,7 +52,7 @@ function () {
     key: "getOneObjectById",
     value: function getOneObjectById(objectIdString) {
       return this.objectList.find(function (object) {
-        return object.getId() === objectIdString;
+        return object.getID() === objectIdString;
       });
     }
   }]);
@@ -117,6 +117,21 @@ function () {
     value: function getAllObjectList() {
       return this.branchManagerList.flatMap(function (manager) {
         return manager.getAllObjectList();
+      });
+    }
+    /**
+     * 根据对象编号返回对象的引用类型对象
+     * @param {string} objectIdString 对象的编号
+     * @returns {*} 对象的引用类型对象
+     */
+
+  }, {
+    key: "getOneObjectById",
+    value: function getOneObjectById(objectIdString) {
+      return this.branchManagerList.flatMap(function (manager) {
+        return manager.getAllObjectList();
+      }).find(function (object) {
+        return object.getID() === objectIdString;
       });
     }
   }]);

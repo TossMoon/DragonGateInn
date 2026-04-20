@@ -54,16 +54,15 @@ function (_allBranchManager) {
     }
     /**
      * 根据房间编号返回房间的引用类型对象
+     * @param {string} branchId 分店的编号
      * @param {string} roomId 房间的编号
      * @returns {room} 房间的引用类型对象
      */
 
   }, {
     key: "getOneRoomById",
-    value: function getOneRoomById(roomId) {
-      return _get(_getPrototypeOf(allRoomManager.prototype), "getAllObjectList", this).call(this).find(function (room) {
-        return room.getId() === roomId;
-      });
+    value: function getOneRoomById(branchId, roomId) {
+      return _get(_getPrototypeOf(allRoomManager.prototype), "getOneManagerByBranchId", this).call(this, branchId).getOneRoomById(roomId);
     }
     /**
      * 获取所有空闲房间

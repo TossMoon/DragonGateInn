@@ -12,10 +12,6 @@ function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) ===
 
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
-function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
-
-function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
-
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
@@ -26,59 +22,47 @@ var assert = require('assert');
 
 var transaction = require('../transaction');
 
-var allReservationManager = require('../../branchResource/reservation/allReservationManager');
-/**
- * 顾客确认预约订单的事务
- */
+var allCheckInManager = require('../../branchResource/checkIn/allCheckInManager');
 
-
-var confirmReservationTransaction =
+var checkoutTransaction =
 /*#__PURE__*/
 function (_transaction) {
-  _inherits(confirmReservationTransaction, _transaction);
+  _inherits(checkoutTransaction, _transaction);
 
-  function confirmReservationTransaction() {
-    _classCallCheck(this, confirmReservationTransaction);
+  function checkoutTransaction() {
+    _classCallCheck(this, checkoutTransaction);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(confirmReservationTransaction).call(this));
+    return _possibleConstructorReturn(this, _getPrototypeOf(checkoutTransaction).call(this));
   }
   /**
-   * 执行确认预约订单事务
-   * @param {...any} args 确认预约订单事务的参数
-   * @returns {any} 确认结果
-   */
+  * 执行入住订单确认
+  * @param {string} checkInId 入住订单的编号
+  * @returns {object} 包含是否成功、入住订单、提示信息的对象
+  */
 
 
-  _createClass(confirmReservationTransaction, [{
+  _createClass(checkoutTransaction, [{
     key: "execute",
     value: function execute() {
-      var _get2;
+      assert(arguments.length == 1, "参数数量错误");
+      var checkInId = arguments.length <= 0 ? undefined : arguments[0];
+      var curCheckIn = transaction.getManager(allCheckInManager).getOneObjectById(checkInId);
 
-      for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
-        args[_key] = arguments[_key];
+      if (curCheckIn == undefined) {
+        return this.packageResult(false, null, "入住订单不存在");
       }
 
-      (_get2 = _get(_getPrototypeOf(confirmReservationTransaction.prototype), "execute", this)).call.apply(_get2, [this].concat(args)); // 执行确认预约订单事务
+      if (curCheckIn.getIsCheckedOut() == true) {
+        return this.packageResult(false, null, "入住订单已退房");
+      } // 设置退房日期为当前时间
 
 
-      var reservationId = args[0];
-      assert(typeof reservationId === "string", "预约订单ID必须是字符串"); // 检查预约订单是否存在
-
-      var reservation = transaction.getManager(allReservationManager).getAllObjectList().find(function (reservation) {
-        return reservation.getID() == reservationId;
-      });
-
-      if (reservation == undefined) {
-        return this.packageResult(false, null, "预约订单不存在");
-      } // 确认预约订单
-
-
-      reservation.confirm();
-      return this.packageResult(true, null, "确认成功");
+      curCheckIn.setCheckOutDateAsNow();
+      return this.packageResult(true, curCheckIn, "入住订单退房成功");
     }
   }]);
 
-  return confirmReservationTransaction;
+  return checkoutTransaction;
 }(transaction);
 
-module.exports = confirmReservationTransaction;
+module.exports = checkoutTransaction;

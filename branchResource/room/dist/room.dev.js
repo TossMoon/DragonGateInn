@@ -105,8 +105,8 @@ function () {
 
 
   _createClass(room, [{
-    key: "getId",
-    value: function getId() {
+    key: "getID",
+    value: function getID() {
       return this.id;
     }
     /**

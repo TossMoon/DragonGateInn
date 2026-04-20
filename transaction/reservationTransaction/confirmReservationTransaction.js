@@ -27,7 +27,7 @@ class confirmReservationTransaction extends transaction{
         // 检查预约订单是否存在
         const reservation=transaction.getManager(allReservationManager)
             .getAllObjectList()
-            .find(reservation=>reservation.getId()==reservationId);
+            .find(reservation=>reservation.getID()==reservationId);
 
         if(reservation==undefined){
             return this.packageResult(false,null,"预约订单不存在");

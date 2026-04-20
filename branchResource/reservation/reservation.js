@@ -80,7 +80,7 @@ class reservation{
      * 返回预约订单的编号
      * @returns {string} 预约订单的编号
      */
-    getId(){
+    getID(){
         return this.reservationIdString;
     }
 

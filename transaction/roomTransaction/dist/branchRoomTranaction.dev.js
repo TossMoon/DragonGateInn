@@ -51,7 +51,7 @@ function (_transaction) {
     value: function checkRoomIdArg(args) {
       return args.every(function (item, index) {
         if (index > 0) {
-          return typeof item === 'string' && transaction.getManager(allRoomManager).getOneRoomById(item) !== null;
+          return typeof item === 'string' && transaction.getManager(allRoomManager).getOneRoomById(args[0], item) !== null;
         }
 
         return true;

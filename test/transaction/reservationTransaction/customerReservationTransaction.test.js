@@ -40,9 +40,9 @@ describe('顾客的预订房间事务',()=>{
 
         
         let newCustomerCancelTransaction=new cancelReservationTransaction();
-        newCustomerCancelTransaction.execute(reservation.getId());
+        newCustomerCancelTransaction.execute(reservation.getID());
         expect(SingletonFactory.getInstance(allReservationManager).getAllObjectList()
-            .find(object=>object.getId()==reservation.getId())  
+            .find(object=>object.getID()==reservation.getID())  
             .getState())
             .toBe(reservationState.state.canceled);
     })
@@ -62,9 +62,9 @@ describe('顾客的预订房间事务',()=>{
 
         
         let newCustomerConfirmTransaction=new confirmReservationTransaction();
-        newCustomerConfirmTransaction.execute(reservation.getId());
+        newCustomerConfirmTransaction.execute(reservation.getID());
         expect(SingletonFactory.getInstance(allReservationManager).getAllObjectList()
-            .find(object=>object.getId()==reservation.getId())  
+            .find(object=>object.getID()==reservation.getID())  
             .getState())
             .toBe(reservationState.state.confirmed);
     })

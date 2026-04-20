@@ -114,8 +114,8 @@ function () {
 
 
   _createClass(reservation, [{
-    key: "getId",
-    value: function getId() {
+    key: "getID",
+    value: function getID() {
       return this.reservationIdString;
     }
     /**

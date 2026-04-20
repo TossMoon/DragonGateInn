@@ -1,5 +1,3 @@
-
-
 const transaction=require('../transaction');
 const allRoomManager=require('../../branchResource/room/allRoomManager');
 
@@ -20,7 +18,7 @@ class branchRoomTransaction extends transaction{
         return args.every((item,index) => {
             if(index>0){
                 return typeof item==='string' 
-                    && transaction.getManager(allRoomManager).getOneRoomById(item) !== null}
+                    && transaction.getManager(allRoomManager).getOneRoomById(args[0],item) !== null}
             return true;
         });
     }
@@ -50,8 +48,6 @@ class branchRoomTransaction extends transaction{
                 })){
             return false;
         }
-
-        
         return true;
     }
 

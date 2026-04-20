@@ -30,7 +30,7 @@ class branchManager{
      * @returns {*} 对象的引用类型对象
      */
     getOneObjectById(objectIdString){
-        return this.objectList.find(object=>object.getId()===objectIdString);
+        return this.objectList.find(object=>object.getID()===objectIdString);
     }
 
 }
@@ -75,6 +75,15 @@ class allBranchManager{
      */
     getAllObjectList(){
         return this.branchManagerList.flatMap(manager=>manager.getAllObjectList());
+    }
+    /**
+     * 根据对象编号返回对象的引用类型对象
+     * @param {string} objectIdString 对象的编号
+     * @returns {*} 对象的引用类型对象
+     */
+    getOneObjectById(objectIdString){
+        return this.branchManagerList.flatMap(manager=>manager.getAllObjectList())
+            .find(object=>object.getID()===objectIdString);
     }
 }
 

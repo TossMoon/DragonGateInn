@@ -19,11 +19,12 @@ class allRoomManager extends allBranchManager{
 
     /**
      * 根据房间编号返回房间的引用类型对象
+     * @param {string} branchId 分店的编号
      * @param {string} roomId 房间的编号
      * @returns {room} 房间的引用类型对象
      */
-    getOneRoomById(roomId){
-        return super.getAllObjectList().find(room=>room.getId()===roomId);
+    getOneRoomById(branchId,roomId){
+        return super.getOneManagerByBranchId(branchId).getOneRoomById(roomId);
     }
 
 

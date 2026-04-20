@@ -52,7 +52,7 @@ function (_branchManager) {
     value: function addRoom(newRoom) {
       assert(newRoom instanceof room); //检查房间编号是否已存在
 
-      if (this.getOneRoomById(newRoom.getId()) != null) {
+      if (this.getOneRoomById(newRoom.getID()) != null) {
         throw new Error("房间编号已存在");
       }
 

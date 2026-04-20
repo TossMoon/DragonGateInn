@@ -22,7 +22,7 @@ describe('分店可以进行的房间事务', function () {
     SingletonFactory.getInstance(allRoomManager).addNewBranchManager('test02');
     transaction.execute('test02', newRoom);
     expect(SingletonFactory.getInstance(allRoomManager).getAllObjectList().length).toBe(1);
-    expect(SingletonFactory.getInstance(allRoomManager).getOneRoomById('1002')).toBe(newRoom);
+    expect(SingletonFactory.getInstance(allRoomManager).getOneRoomById('test02', '1002')).toBe(newRoom);
   });
   it('下架房间', function () {
     var transaction = new branchDisableRoomTransaction();
@@ -30,7 +30,7 @@ describe('分店可以进行的房间事务', function () {
     SingletonFactory.getInstance(allRoomManager).addNewBranchManager('test02');
     transaction.execute('test02', newRoom);
     expect(SingletonFactory.getInstance(allRoomManager).getAllObjectList().length).toBe(1);
-    expect(SingletonFactory.getInstance(allRoomManager).getOneRoomById(newRoom).getActiveState().getActiveBool()).toBe(false);
+    expect(SingletonFactory.getInstance(allRoomManager).getOneRoomById('test02', newRoom).getActiveState().getActiveBool()).toBe(false);
   });
   it('占据空闲房间，释放被占据的房间', function () {
     var occupiedTransaction = new branchOccupiedRoomTransaction();
@@ -38,9 +38,9 @@ describe('分店可以进行的房间事务', function () {
     SingletonFactory.getInstance(allRoomManager).addNewBranchManager('test02');
     occupiedTransaction.execute('test02', newRoom);
     expect(SingletonFactory.getInstance(allRoomManager).getAllObjectList().length).toBe(1);
-    expect(SingletonFactory.getInstance(allRoomManager).getOneRoomById(newRoom).getEmpty()).toBe(false);
+    expect(SingletonFactory.getInstance(allRoomManager).getOneRoomById('test02', newRoom).getEmpty()).toBe(false);
     var emptyTransaction = new branchEmptyRoomTransaction();
     emptyTransaction.execute('test02', newRoom);
-    expect(SingletonFactory.getInstance(allRoomManager).getOneRoomById(newRoom).getEmpty()).toBe(true);
+    expect(SingletonFactory.getInstance(allRoomManager).getOneRoomById('test02', newRoom).getEmpty()).toBe(true);
   });
 });

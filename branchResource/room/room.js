@@ -73,7 +73,7 @@ class room{
      * 获取房间的编号
      * @returns {string} 房间的编号
      */
-    getId(){
+    getID(){
         return this.id;
     }
 

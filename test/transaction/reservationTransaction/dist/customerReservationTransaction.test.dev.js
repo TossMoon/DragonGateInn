@@ -51,9 +51,9 @@ describe('顾客的预订房间事务', function () {
       }
     }).resultContent;
     var newCustomerCancelTransaction = new cancelReservationTransaction();
-    newCustomerCancelTransaction.execute(reservation.getId());
+    newCustomerCancelTransaction.execute(reservation.getID());
     expect(SingletonFactory.getInstance(allReservationManager).getAllObjectList().find(function (object) {
-      return object.getId() == reservation.getId();
+      return object.getID() == reservation.getID();
     }).getState()).toBe(reservationState.state.canceled);
   });
   it('确认预约订单事务的执行', function () {
@@ -73,9 +73,9 @@ describe('顾客的预订房间事务', function () {
       }
     }).resultContent;
     var newCustomerConfirmTransaction = new confirmReservationTransaction();
-    newCustomerConfirmTransaction.execute(reservation.getId());
+    newCustomerConfirmTransaction.execute(reservation.getID());
     expect(SingletonFactory.getInstance(allReservationManager).getAllObjectList().find(function (object) {
-      return object.getId() == reservation.getId();
+      return object.getID() == reservation.getID();
     }).getState()).toBe(reservationState.state.confirmed);
   });
 });

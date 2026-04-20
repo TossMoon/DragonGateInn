@@ -45,6 +45,11 @@ function () {
 
     this.reservationId = null;
     /**
+     * 入住订单所属的店的编号
+     */
+
+    this.branchId = null;
+    /**
      * 入住的日期
      */
 
@@ -72,8 +77,8 @@ function () {
   }
 
   _createClass(checkIn, [{
-    key: "getId",
-    value: function getId() {
+    key: "getID",
+    value: function getID() {
       return this.Id;
     }
     /**
@@ -84,11 +89,17 @@ function () {
 
   }, {
     key: "setCheckInData",
-    value: function setCheckInData(roomId, persons) {
-      var connectReservationId = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+    value: function setCheckInData(branchId, roomId, persons) {
+      var connectReservationId = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
+      this.branchId = branchId;
       this.roomId = roomId;
       this.personList = persons;
       this.reservationId = connectReservationId;
+    }
+  }, {
+    key: "getBranchId",
+    value: function getBranchId() {
+      return this.branchId;
     }
   }, {
     key: "setRoomId",
@@ -162,15 +173,16 @@ var randomCheckInIdGenerator = new randomGenerator();
  * @returns {checkIn} 入住订单对象
  */
 
-function checkInFactory(roomId, persons) {
-  var connectReservationId = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+function checkInFactory(branchId, roomId, persons) {
+  var connectReservationId = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
+  assert(branchId !== null, 'branchId is null');
   assert(roomId !== null, 'roomId is null');
   assert(persons instanceof Array, 'person is not a person array');
   persons.forEach(function (item) {
     assert(item instanceof person, 'person is not a person');
   });
   var newCheckIn = new checkIn(randomCheckInIdGenerator.generateId());
-  newCheckIn.setCheckInData(roomId, persons, connectReservationId);
+  newCheckIn.setCheckInData(branchId, roomId, persons, connectReservationId);
   return newCheckIn;
 }
 

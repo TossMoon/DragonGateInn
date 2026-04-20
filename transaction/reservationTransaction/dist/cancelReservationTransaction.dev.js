@@ -24,42 +24,32 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 var assert = require('assert');
 
-var branchManager = require('../../../accountManager/branchAccountManager');
+var transaction = require('../transaction');
 
-var branchAccount = require('../../../account/branchAccount');
-
-var transaction = require('../../transaction');
-
-var accountApplication = require('../../../accountManager/accountApplication');
-
-var allRoomManager = require('../../../branchResource/room/allRoomManager');
-
-var allReservationManager = require('../../../branchResource/reservation/allReservationManager');
-
-var allCheckInManager = require('../../../branchResource/checkIn/allCheckInManager');
+var allReservationManager = require('../../branchResource/reservation/allReservationManager');
 /**
- * 进行注册分店账号的事务
- * @extends transaction
+ * 顾客取消房间的事务
  */
 
 
-var branchRegisterTransaction =
+var concelReservationTransaction =
 /*#__PURE__*/
 function (_transaction) {
-  _inherits(branchRegisterTransaction, _transaction);
+  _inherits(concelReservationTransaction, _transaction);
 
-  function branchRegisterTransaction() {
-    _classCallCheck(this, branchRegisterTransaction);
+  function concelReservationTransaction() {
+    _classCallCheck(this, concelReservationTransaction);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(branchRegisterTransaction).call(this));
+    return _possibleConstructorReturn(this, _getPrototypeOf(concelReservationTransaction).call(this));
   }
   /**
-   * 获取一个分店账号
-   * @param {...string} args 
+   * 执行取消房间事务
+   * @param {...any} args 顾客的取消房间事务的参数
+   * @returns {any} 取消结果
    */
 
 
-  _createClass(branchRegisterTransaction, [{
+  _createClass(concelReservationTransaction, [{
     key: "execute",
     value: function execute() {
       var _get2;
@@ -68,24 +58,26 @@ function (_transaction) {
         args[_key] = arguments[_key];
       }
 
-      (_get2 = _get(_getPrototypeOf(branchRegisterTransaction.prototype), "execute", this)).call.apply(_get2, [this].concat(args));
+      (_get2 = _get(_getPrototypeOf(concelReservationTransaction.prototype), "execute", this)).call.apply(_get2, [this].concat(args)); // 执行取消房间事务
 
-      assert(args.length === 0); //添加这个分店的账户 到分店账号管理器
 
-      var newBranchAccount = new branchAccount(transaction.getManager(accountApplication).getRandomAccount(), transaction.getManager(accountApplication).getInitPassword());
-      transaction.getManager(branchManager).addOneNewAccount(newBranchAccount); //为这个分点增加一个房间管理器
+      var reservationId = args[0];
+      assert(typeof reservationId === "string", "预约订单ID必须是字符串"); // 检查预约订单是否存在
 
-      transaction.getManager(allRoomManager).addNewBranchManager(newBranchAccount.getID()); //为这个分点增加一个预约管理器
+      var reservation = transaction.getManager(allReservationManager).getAllObjectList().find(function (reservation) {
+        return reservation.getID() == reservationId;
+      });
 
-      transaction.getManager(allReservationManager).addNewBranchManager(newBranchAccount.getID()); //为这个分点增加一个入住登记管理器
+      if (reservation == undefined) {
+        return this.packageResult(false, null, "预约订单不存在");
+      }
 
-      transaction.getManager(allCheckInManager).addNewBranchManager(newBranchAccount.getID()); // 返回新申请的分店账号
-
-      return newBranchAccount;
+      reservation.cancel();
+      return this.packageResult(true, null, "取消成功");
     }
   }]);
 
-  return branchRegisterTransaction;
+  return concelReservationTransaction;
 }(transaction);
 
-module.exports = branchRegisterTransaction;
+module.exports = concelReservationTransaction;
