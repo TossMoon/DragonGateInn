@@ -98,6 +98,10 @@ class checkIn{
         return this.personList;
     }
 
+    getReservationId(){
+        return this.reservationId;
+    }
+
     /**
      * 入住人员的消费记录在其入住记录上
      */

@@ -55,7 +55,7 @@ class reservation{
          */
         this.reservationIdString=reservationIdString;
 
-        this.createReservationData=new Date();
+        this.createReservationDate=new Date();
         
         /**
          * 预约订单的状态,创建预约之后，默认就是pending
@@ -112,6 +112,10 @@ class reservation{
      */
     getRoomLayout(){
         return this.roomLayout;
+    }
+
+    getcreateReservationDate(){
+        return this.createReservationDate;
     }
 
     /**

@@ -1,0 +1,268 @@
+const assert = require('assert');
+
+
+const branchAccount = require('../../account/branchAccount');
+const customerAccount = require('../../account/customerAccount');
+const headquarterAccount = require('../../account/headquarterAccount');
+
+const {checkIn,person,checkInFactory}=require('../../branchResource/checkIn/checkIn');
+const {reservationState,reservation,reservationFactory}=require('../../branchResource/reservation/reservation');
+const {room,RoomLayout,BedInRoom}=require('../../branchResource/room/room');
+const activeState = require('../../util/activeState');
+
+class convertTypeToDBRow{
+    constructor(options = {}) {
+        this.converters = new Map();
+        this.flattenArrays = options.flattenArrays ;
+        this.dateFormat = options.dateFormat || 'datetime';
+        this._registerDefaultConverters();
+    }
+
+    /**
+     * 注册默认的转换器,都是项目里需要使用的，
+     * 作为数据库里的一行里的几个字段的数据类型
+     */
+    _registerDefaultConverters() {
+        this.registerConverter(activeState, (instance) => {
+            return instance.getActiveBool() ? 1 : 0;
+        });
+
+        this.registerConverter(person, (instance) => {
+            return {
+                name: instance.name,
+                identityCard: instance.identityCard
+            };
+        });
+
+        this.registerConverter(BedInRoom, (instance) => {
+            return {
+                typeString: instance.typeString,
+                numInt: instance.numInt
+            };
+        });
+
+        this.registerConverter(RoomLayout, (instance) => {
+            return {
+                areaReal: instance.areaReal,
+                windowBool: instance.windowBool ? 1 : 0,
+                bedType: this.convertToDBRow(instance.bedType)
+            };
+        });
+
+        this.registerConverter(reservationState, (instance) => {
+            return instance.getState();
+        });
+    }
+
+
+    /**
+     * 注册类对应的构造数据库中表的各个字段
+     * @param {function} classType 要构造的类型
+     * @param {function} converterFn 将类型里面各个成员变量构造成对象
+     */
+    registerConverter(classType, converterFn) {
+        assert(typeof classType === 'function', 'classType must be a constructor function');
+        assert(typeof converterFn === 'function', 'converterFn must be a function');
+        this.converters.set(classType, converterFn);
+    }
+
+    /**
+     * 对通用类型（也就是没有在这文件里预先定义的类）
+     * 将类实例转换为数据库中的一行的行
+     * @param {Object} instance - 类的实例
+     * @returns {Object} 数据库中的一行的行
+     */
+    convertToDBRow(instance) {
+        if (instance === null || instance === undefined) {
+            return null;
+        }
+
+        if (this.converters.has(instance.constructor)) {
+
+            const result = this.converters.get(instance.constructor)(instance);
+            if (result instanceof Object && !(result instanceof Date) && !Array.isArray(result)) {
+                return this._flattenObject(result);
+            }
+            return result;
+        }
+
+        if (instance instanceof Date) {
+            return this._formatDate(instance);
+        }
+
+        if (Array.isArray(instance)) {
+            return this._convertArray(instance);
+        }
+
+        if (instance instanceof Object) {
+            return this._convertComplexObject(instance);
+        }
+
+        return instance;
+    }
+
+    /**
+     * 将数组转换为数据库中的一行的字段
+     * @param {Array} arr - 数组
+     * @returns {Array} 数据库中的一行的字段
+     */
+    _convertArray(arr) {
+        if (!this.flattenArrays) {
+            return JSON.stringify(arr);
+        }
+        return arr.map(item => this.convertToDBRow(item));
+    }
+
+    /**
+     * 将对象转换为数据库中的一行的字段
+     * @param {Object} obj - 对象
+     * @returns {Object} 数据库中的一行的字段
+     */
+    _convertComplexObject(obj) {
+        const result = {};
+
+        Object.keys(obj)
+            .filter(key => key !== 'constructor')
+            .forEach(key => {
+                result[key] = this.convertToDBRow(obj[key]);
+            });
+
+        return result;
+    }
+    /**
+     * 将嵌套的对象展开，转换为字段前的前缀
+     * @param {Object} obj - 对象
+     * @returns {Object} 数据库中的一行的字段
+     */
+    _flattenObject(obj, prefix = '') {
+        const result = {};
+        for (const [key, value] of Object.entries(obj)) {
+
+            const newKey = prefix ? `${prefix}_${key}` : key;
+
+            if (Array.isArray(value)) {
+                result[newKey] = this._convertArray(value);
+            } 
+            else if (value instanceof Date) {
+                result[newKey] = this._formatDate(value);
+            } 
+            else if (value instanceof Object && !this.converters.has(value.constructor)) {
+                Object.assign(result, this._flattenObject(value, newKey));
+            } 
+            else {
+                result[newKey] = value;
+            }
+        }
+        return result;
+    }
+
+    /**
+     * 将日期转换为数据库中的一行的字段
+     * @param {Date} date - 日期
+     * @returns {string} 数据库中的一行的字段
+     */
+    _formatDate(date) {
+        if (this.dateFormat === 'timestamp') {
+            return date.getTime();
+        } else if (this.dateFormat === 'date') {
+            return date.toISOString().split('T')[0];
+        } else if (this.dateFormat === 'datetime') {
+            return date.toISOString();
+        }
+        return date;
+    }
+
+
+//--------------基本类型----------------
+//都是项目里需要作为一行存入数据库的类型
+    convertBranchAccount(curInstance){
+        assert(curInstance instanceof branchAccount);
+        const result = {
+            id: curInstance.getID(),
+            password: curInstance.getPassword()
+        };
+        return this._flattenObject(result);
+    }
+
+    convertHeadquarterAccount(curInstance){
+        assert(curInstance instanceof headquarterAccount);
+        const result = {
+            id: curInstance.getID(),
+            password: curInstance.getPassword()
+        };
+        return this._flattenObject(result);
+    }
+
+    convertCustomerAccount(curInstance){
+        assert(curInstance instanceof customerAccount);
+        const result = {
+            id: curInstance.getID(),
+            password: curInstance.getPassword(),
+            phone: curInstance.getPhoneString()
+        };
+        return this._flattenObject(result);
+    }
+
+    convertCheckIn(curInstance){
+        assert(curInstance instanceof checkIn);
+        const result = {
+            id: curInstance.getID(),
+            branchId: curInstance.getBranchId(),
+            roomId: curInstance.getRoomId(),
+            checkInDate: curInstance.getCheckInDate(),
+            checkOutDate: curInstance.getCheckOutDate(),
+            person: this.convertToDBRow(curInstance.getPerson()),
+            reservationId: curInstance.getReservationId(),
+            consumeNumber: curInstance.getConsumeNumber(),
+        };
+        return this._flattenObject(result);
+    }
+
+    convertReservation(curInstance){
+        assert(curInstance instanceof reservation);
+        const result = {
+            id: curInstance.getID(),
+            branchId: curInstance.getBranchId(),
+            customerId: curInstance.getCustomerId(),
+            roomLayout: this.convertToDBRow(curInstance.getRoomLayout()),
+            createReservationDate: curInstance.getcreateReservationDate(),
+            state: this.convertToDBRow(curInstance.getState()),
+        };
+        return this._flattenObject(result);
+    }
+
+    convertRoom(curInstance){
+        assert(curInstance instanceof room);
+        const result = {
+            id: curInstance.getID(),
+            roomType: this.convertToDBRow(curInstance.getRoomType()),
+            activeState: this.convertToDBRow(curInstance.getActiveState()),
+            isEmptyBool: curInstance.getEmpty() ? 1 : 0,
+            priceReal: curInstance.getPrice(),
+        };
+        return this._flattenObject(result);
+    }
+
+//-------------------------------------------------------
+
+    //外部可以使用的接口
+    convert(instance) {
+        if (instance instanceof branchAccount) {
+            return this.convertBranchAccount(instance);
+        } else if (instance instanceof headquarterAccount) {
+            return this.convertHeadquarterAccount(instance);
+        } else if (instance instanceof customerAccount) {
+            return this.convertCustomerAccount(instance);
+        } else if (instance instanceof checkIn) {
+            return this.convertCheckIn(instance);
+        } else if (instance instanceof reservation) {
+            return this.convertReservation(instance);
+        } else if (instance instanceof room) {
+            return this.convertRoom(instance);
+        } else {
+            throw new Error(`Unsupported type: ${instance.constructor.name}`);
+        }
+    }
+}
+
+module.exports = convertTypeToDBRow;
