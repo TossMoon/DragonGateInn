@@ -2,6 +2,11 @@ const assert=require('assert');
 const { RoomLayout } = require('../room/room');
 const randomGenerator=require('../../util/randomIdGenerator');
 
+
+/**
+ * 预约订单的编号生成器
+ */
+const randomReservationIdGenerator=new randomGenerator();
 /**
  * 预约订单的状态类
  */
@@ -20,6 +25,21 @@ class reservationState{
      */
     getState(){
         return this.state;
+    }
+
+    setState(stateString){
+        if(stateString ==="pending"){
+            this.state=reservationState.state.pending;
+        }
+        else if(stateString ==="confirmed"){
+            this.state=reservationState.state.confirmed;
+        }
+        else if(stateString ==="canceled"){
+            this.state=reservationState.state.canceled;
+        }
+        else{
+            throw new Error("预约订单的状态错误");
+        }
     }
 
     /**
@@ -54,6 +74,8 @@ class reservation{
          * 预约订单的编号
          */
         this.reservationIdString=reservationIdString;
+        //如果从数据库中读取数据的预约订单的编号，就占用这个编号
+        randomReservationIdGenerator.occupyId(this.reservationIdString);
 
         this.createReservationDate=new Date();
         
@@ -149,7 +171,6 @@ class reservation{
     }
 }
 
-const randomReservationIdGenerator=new randomGenerator();
 /**
  * 预约订单的工厂函数   
  * @param {string} customerIdString 预约订单的顾客的编号

@@ -18,9 +18,21 @@ class convertTypeToDBRow{
         this._registerDefaultConverters();
     }
 
+      /**
+     * 注册类对应的构造数据库中表的各个字段
+     * @param {function} classType 要构造的类型
+     * @param {function} converterFn 将类型里面各个成员变量构造成对象
+     */
+    registerConverter(classType, converterFn) {
+        assert(typeof classType === 'function', 'classType must be a constructor function');
+        assert(typeof converterFn === 'function', 'converterFn must be a function');
+        this.converters.set(classType, converterFn);
+    }
+
+
     /**
      * 注册默认的转换器,都是项目里需要使用的，
-     * 作为数据库里的一行里的几个字段的数据类型
+     * 作为数据库里的一行里的字段的数据类型
      */
     _registerDefaultConverters() {
         this.registerConverter(activeState, (instance) => {
@@ -57,14 +69,16 @@ class convertTypeToDBRow{
         this.registerConverter(branchAccount,(instance)=>{
             return{
                 id: instance.getID(),
-                password: instance.getPassword()
+                password: instance.getPassword(),
+                activeState: this.convertToDBRow(instance.getActiveState())
             };
         });
 
         this.registerConverter(headquarterAccount,(instance)=>{
             return{
                 id: instance.getID(),
-                password: instance.getPassword()
+                password: instance.getPassword(),
+                activeState: this.convertToDBRow(instance.getActiveState())
             };
         });
 
@@ -72,7 +86,8 @@ class convertTypeToDBRow{
             return{
                 id: instance.getID(),
                 password: instance.getPassword(),
-                phone: instance.getPhoneString()
+                phone: instance.getPhoneString(),
+                activeState: this.convertToDBRow(instance.getActiveState())
             };
         });
 
@@ -96,7 +111,7 @@ class convertTypeToDBRow{
             customerId: instance.getCustomerId(),
             roomLayout: this.convertToDBRow(instance.getRoomLayout()),
             createReservationDate: instance.getcreateReservationDate(),
-            state: this.convertToDBRow(instance.getState()),
+            reservationState: this.convertToDBRow(instance.getState()),
             };
         });
 
@@ -113,17 +128,7 @@ class convertTypeToDBRow{
     }
 
 
-    /**
-     * 注册类对应的构造数据库中表的各个字段
-     * @param {function} classType 要构造的类型
-     * @param {function} converterFn 将类型里面各个成员变量构造成对象
-     */
-    registerConverter(classType, converterFn) {
-        assert(typeof classType === 'function', 'classType must be a constructor function');
-        assert(typeof converterFn === 'function', 'converterFn must be a function');
-        this.converters.set(classType, converterFn);
-    }
-
+  
     /**
      * 对通用类型（也就是没有在这文件里预先定义的类）
      * 将类实例转换为数据库中的一行的行

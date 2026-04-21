@@ -13,6 +13,14 @@ const activeState = require('../../util/activeState');
 const convertManager = new convertTypeToDBRow();
 
 describe('convertTypeToDBRow',()=>{
+    it('should register activeState converter',()=>{
+
+        const newActiveState = new activeState(true);
+        const dbRow = convertManager.convert(newActiveState);
+        expect(dbRow).toEqual(1);
+    })
+
+
     it('should convert branch account to db row',()=>{
        const newBranchAccount = new branchAccount('101','123456');
        const dbRow = convertManager.convert(newBranchAccount);
@@ -20,6 +28,7 @@ describe('convertTypeToDBRow',()=>{
        expect(dbRow).toEqual({
            id: '101',
            password: '123456',
+           activeState: 1,
        });
     });
     it('should convert headquarter account to db row',()=>{
@@ -29,6 +38,7 @@ describe('convertTypeToDBRow',()=>{
        expect(dbRow).toEqual({
            id: '101',
            password: '123456',
+           activeState: 1,
        });
     });
     it('should convert customer account to db row',()=>{
@@ -39,6 +49,7 @@ describe('convertTypeToDBRow',()=>{
            id: '101',
            password: '123456',
            phone: '13800000000',
+           activeState: 1,
        });
     });
 
@@ -72,7 +83,7 @@ describe('convertTypeToDBRow',()=>{
             roomLayout_bedType_numInt: 1,
             roomLayout_bedType_typeString: "单人床",
             roomLayout_windowBool: 1,
-            state: "pending",
+            reservationState: "pending",
        });
     });
 

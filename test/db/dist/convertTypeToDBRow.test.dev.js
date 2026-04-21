@@ -27,6 +27,11 @@ var activeState = require('../../util/activeState');
 
 var convertManager = new convertTypeToDBRow();
 describe('convertTypeToDBRow', function () {
+  it('should register activeState converter', function () {
+    var newActiveState = new activeState(true);
+    var dbRow = convertManager.convert(newActiveState);
+    expect(dbRow).toEqual(1);
+  });
   it('should convert branch account to db row', function () {
     var newBranchAccount = new branchAccount('101', '123456');
     var dbRow = convertManager.convert(newBranchAccount);
