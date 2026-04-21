@@ -52,6 +52,64 @@ class convertTypeToDBRow{
         this.registerConverter(reservationState, (instance) => {
             return instance.getState();
         });
+
+
+        this.registerConverter(branchAccount,(instance)=>{
+            return{
+                id: instance.getID(),
+                password: instance.getPassword()
+            };
+        });
+
+        this.registerConverter(headquarterAccount,(instance)=>{
+            return{
+                id: instance.getID(),
+                password: instance.getPassword()
+            };
+        });
+
+        this.registerConverter(customerAccount,(instance)=>{
+            return{
+                id: instance.getID(),
+                password: instance.getPassword(),
+                phone: instance.getPhoneString()
+            };
+        });
+
+        this.registerConverter(checkIn,(instance)=>{
+             return {
+            id: instance.getID(),
+            branchId: instance.getBranchId(),
+            roomId: instance.getRoomId(),
+            checkInDate: instance.getCheckInDate(),
+            checkOutDate: instance.getCheckOutDate(),
+            person: this.convertToDBRow(instance.getPerson()),
+            reservationId: instance.getReservationId(),
+            consumeNumber: instance.getConsumeNumber(),
+        };
+        });
+
+        this.registerConverter(reservation,(instance)=>{
+             return {
+            id: instance.getID(),
+            branchId: instance.getBranchId(),
+            customerId: instance.getCustomerId(),
+            roomLayout: this.convertToDBRow(instance.getRoomLayout()),
+            createReservationDate: instance.getcreateReservationDate(),
+            state: this.convertToDBRow(instance.getState()),
+            };
+        });
+
+        this.registerConverter(room,(instance)=>{
+            return {
+            id: instance.getID(),
+            roomType: this.convertToDBRow(instance.getRoomType()),
+            activeState: this.convertToDBRow(instance.getActiveState()),
+            isEmptyBool: instance.getEmpty() ? 1 : 0,
+            priceReal: instance.getPrice(),
+        };
+        
+        });
     }
 
 
@@ -172,96 +230,9 @@ class convertTypeToDBRow{
         return date;
     }
 
-
-//--------------基本类型----------------
-//都是项目里需要作为一行存入数据库的类型
-    convertBranchAccount(curInstance){
-        assert(curInstance instanceof branchAccount);
-        const result = {
-            id: curInstance.getID(),
-            password: curInstance.getPassword()
-        };
-        return this._flattenObject(result);
-    }
-
-    convertHeadquarterAccount(curInstance){
-        assert(curInstance instanceof headquarterAccount);
-        const result = {
-            id: curInstance.getID(),
-            password: curInstance.getPassword()
-        };
-        return this._flattenObject(result);
-    }
-
-    convertCustomerAccount(curInstance){
-        assert(curInstance instanceof customerAccount);
-        const result = {
-            id: curInstance.getID(),
-            password: curInstance.getPassword(),
-            phone: curInstance.getPhoneString()
-        };
-        return this._flattenObject(result);
-    }
-
-    convertCheckIn(curInstance){
-        assert(curInstance instanceof checkIn);
-        const result = {
-            id: curInstance.getID(),
-            branchId: curInstance.getBranchId(),
-            roomId: curInstance.getRoomId(),
-            checkInDate: curInstance.getCheckInDate(),
-            checkOutDate: curInstance.getCheckOutDate(),
-            person: this.convertToDBRow(curInstance.getPerson()),
-            reservationId: curInstance.getReservationId(),
-            consumeNumber: curInstance.getConsumeNumber(),
-        };
-        return this._flattenObject(result);
-    }
-
-    convertReservation(curInstance){
-        assert(curInstance instanceof reservation);
-        const result = {
-            id: curInstance.getID(),
-            branchId: curInstance.getBranchId(),
-            customerId: curInstance.getCustomerId(),
-            roomLayout: this.convertToDBRow(curInstance.getRoomLayout()),
-            createReservationDate: curInstance.getcreateReservationDate(),
-            state: this.convertToDBRow(curInstance.getState()),
-        };
-        return this._flattenObject(result);
-    }
-
-    convertRoom(curInstance){
-        assert(curInstance instanceof room);
-        const result = {
-            id: curInstance.getID(),
-            roomType: this.convertToDBRow(curInstance.getRoomType()),
-            activeState: this.convertToDBRow(curInstance.getActiveState()),
-            isEmptyBool: curInstance.getEmpty() ? 1 : 0,
-            priceReal: curInstance.getPrice(),
-        };
-        return this._flattenObject(result);
-    }
-
-//-------------------------------------------------------
-
     //外部可以使用的接口
     convert(instance) {
-        if (instance instanceof branchAccount) {
-            return this.convertBranchAccount(instance);
-        } else if (instance instanceof headquarterAccount) {
-            return this.convertHeadquarterAccount(instance);
-        } else if (instance instanceof customerAccount) {
-            return this.convertCustomerAccount(instance);
-        } else if (instance instanceof checkIn) {
-            return this.convertCheckIn(instance);
-        } else if (instance instanceof reservation) {
-            return this.convertReservation(instance);
-        } else if (instance instanceof room) {
-            return this.convertRoom(instance);
-        } else {
-            throw new Error(`Unsupported type: ${instance.constructor.name}`);
-        }
+        return this.convertToDBRow(instance);
     }
 }
 
