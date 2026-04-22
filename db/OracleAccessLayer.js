@@ -227,17 +227,45 @@ class OracleAccessLayer extends DatabaseAccessLayer {
 
     /**
      * 创建表
-     * @param {string} tableName - 表名
-     * @param {Array} columns - 列信息数组
+     * @param {string} tableName - 表名或完整的SQL语句
+     * @param {Array} columns - 列信息数组（可选）
      * @returns {Promise} 创建结果
      */
     async createTable(tableName, columns) {
         try {
             await this.ensureConnection();
-            console.log(`创建表${tableName}，列信息:`, columns);
             
-            const sql = `CREATE TABLE ${tableName} (${columns.map(col => `${col.name} ${col.type}`).join(', ')})`;
+            let sql;
+            if (columns) {
+                // 如果提供了列信息，构建SQL语句
+                console.log(`创建表${tableName}，列信息:`, columns);
+                sql = `CREATE TABLE ${tableName} (${columns.map(col => `${col.name} ${col.type}`).join(', ')})`;
+            } else {
+                // 如果没有提供列信息，tableName参数应该是完整的SQL语句
+                console.log('执行创建表的SQL语句');
+                sql = tableName;
+            }
+            
             await this.connection.execute(sql, { autoCommit: true });
+            return true;
+        } catch (error) {
+            console.error('创建表失败:', error);
+            throw error;
+        }
+    }
+
+
+
+    /**
+     * 用SQL语句创建表
+     * @param {string} sql - 创建表的SQL语句
+     * @returns {Promise} 创建结果
+     */
+    async createTableBySQL(sql){
+        try {
+            await this.ensureConnection();
+            console.log(`执行创建表的SQL语句:`, sql);
+            await this.connection.execute(sql, [], { autoCommit: true });
             return true;
         } catch (error) {
             console.error('创建表失败:', error);

@@ -83,6 +83,15 @@ class DatabaseAccessLayer {
     async createTable(tableName, columns) {
         throw new Error('子类必须实现createTable方法');
     }
+
+    /**
+     * 用SQL语句创建表
+     * @param {string} sql - 创建表的SQL语句
+     * @returns {Promise} 创建结果
+     */
+    async createTableBySQL(sql){
+        throw new Error('子类必须实现createTableBySQL方法');
+    }
 }
 
 module.exports = DatabaseAccessLayer;

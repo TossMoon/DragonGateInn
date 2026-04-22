@@ -1,19 +1,56 @@
 const assert=require('assert');
-const {accountClassTableConfig}=require('../classTableConfig');
+const {accountClassTableConfigs,getBranchResourceTableConfig}=require('../classTableConfig');
 
 const SingletonFactory=require('../../../util/SingletonFactory');
 
 const globalDatabaseAccessLayer = require('../../DatabaseConnection/DatabaeseConnect');
 
 const branchResourceManagers=require('../../branchResource/branchResourceManagers');
+
+const createTableSQLConfig=require('./createTableSQLconfig');
+
+const convertTypeToDBRow=require('../../../db/ConvertTypBetweenDBRow/convertTypeToDBRow');
+const curConvertTypeToDBRow=new convertTypeToDBRow();
+
+const account = require('../../../account/account');
 /**
  * 数据变更记录类
  */
 class recordDataChange{
-    constructor(tableName,changeType,changeDataId){
-        this.tableName=tableName;
+    constructor(changeType,changeData){
         this.changeType=changeType;
-        this.changeDataId=changeDataId;
+        this.changeData=changeData;
+    }
+
+    /**
+     * 获取变更记录是否为账号变更
+     */
+    getIsAccount()
+    {
+        return this.changeData instanceof account;
+    }
+    /**
+     * 获取变更的类型对应的表配置
+     */
+    getConfig(){
+        if(this.getIsAccount()){
+            return accountClassTableConfigs.find(config=> this.changeData instanceof config.type);
+        }
+        return getBranchResourceTableConfig.find(config=> this.changeData instanceof config.type);
+    }
+
+    /**
+     * 获取变更记录的数据库行数据
+     */
+    getChangeDatabase(){
+        return curConvertTypeToDBRow.convert(this.changeData);
+    }
+
+    /**
+     * 获取变更记录的条件
+     */
+    getCondition(){
+        return { ID: this.changeData.getID() };
     }
 
 }
@@ -26,30 +63,53 @@ class recordDataChangeManager{
         this.changeList=[];
     }
 
+
     addChange(change){
-        
         this.changeList.push(change);
     }
 
-    changeTableId(tableName,manager,id)
-    {
-        const data=SingletonFactory.getInstance(manager).getOneObjectById(id);
-        if(data){
-            
+    async createBranchResourceTable(change){
+        const configs = createTableSQLConfig(change.changeData.getID());
+        for (const config of configs) {
+            try {
+                await globalDatabaseAccessLayer.createTableBySQL(config.sql);
+            } catch (error) {
+                console.error(`创建表 ${config.tableName} 失败:`, error.message);
+            }
         }
     }
+
     /**
      * 执行数据变更
      */
-    changeDatabase(){
-        this.changeList.forEach(change=>{
-            if(change.changeType=='add'){
-                globalDatabaseAccessLayer.insertRow(change.tableName,change.changeDataId);
+    async changeDatabase(){
+        for (const change of this.changeList) {
+            if(change.changeType=='insert'){
+                await globalDatabaseAccessLayer.insertData(
+                    change.getConfig().tableName,
+                    change.getChangeDatabase()
+                );
             }else if(change.changeType=='update'){
-                globalDatabaseAccessLayer.updateRow(change.tableName,change.changeDataId);
+                await globalDatabaseAccessLayer.updateData(
+                    change.getConfig().tableName,
+                    change.getChangeDatabase(),
+                    change.getCondition()
+                );
             }else if(change.changeType=='delete'){
-                globalDatabaseAccessLayer.deleteRow(change.tableName,change.changeDataId);
+                await globalDatabaseAccessLayer.deleteData(
+                    change.getConfig().tableName,
+                    change.getCondition()
+                );
             }
-        })
+            else if(change.changeType=='createBranchResourceTable'){
+                await this.createBranchResourceTable(change);
+            }
+        }
+        this.changeList=[];
     }
+}
+
+module.exports={
+    recordDataChange,
+    recordDataChangeManager
 }
