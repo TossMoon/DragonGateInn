@@ -95,17 +95,19 @@ class OracleAccessLayer extends DatabaseAccessLayer {
     /**
      * 从表中读取所有行数据
      * @param {string} tableName - 表名
-     * @returns {Promise<Array>} 行数据数组
+     * @returns {Promise<Array>} 行数据数组，每行数据为列名和值一一对应的对象
      */
     async getTableAllRows(tableName) {
         try {
             await this.ensureConnection();
             console.log(`获取表${tableName}的所有行数据`);
             const result = await this.connection.execute(
-                `SELECT * FROM ${tableName}`
+                `SELECT * FROM ${tableName}`,
+                [],
+                { outFormat: oracledb.OUT_FORMAT_OBJECT }
             );
 
-            return result.rows;
+            return result.rows || [];
         } catch (error) {
             console.error('获取表行数据失败:', error);
             throw error;

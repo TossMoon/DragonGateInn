@@ -28,29 +28,29 @@ class convertDBRowToType{
     _registerDefaultConverters() {
        this.registerConverter('activeState',(obj)=>{
             return new activeState(
-                obj.activeState==1?true:false
+                obj.ACTIVESTATE==1?true:false
             )
        })
 
        this.registerConverter('person',(obj)=>{
             return new person(
-                obj.name,
-                obj.identityCard
+                obj.NAME,
+                obj.IDENTITYCARD
             );
        })
 
        this.registerConverter('bedType',(obj)=>{
             return new BedInRoom(
-                obj.typeString,
-                obj.numInt
+                obj.TYPESTRING,
+                obj.NUMINT
             );
        })
 
        this.registerConverter('roomLayout',(obj)=>{
             return new RoomLayout(
-                obj.areaReal,
-                obj.windowBool==1?true:false, 
-                this.convertToType('bedType',obj.bedType)
+                obj.AREAREAL,
+                obj.WINDOWBOOL==1?true:false, 
+                this.convertToType('bedType',obj.BEDTYPE)
             );
        })
 
@@ -62,10 +62,10 @@ class convertDBRowToType{
 
        this.registerConverter('branchAccount',(obj)=>{
             const result=new branchAccount(
-               obj.id,
-               obj.password
+               obj.ID,
+               obj.PASSWORD
             );
-            if (obj.activeState == 1) {
+            if (obj.ACTIVESTATE == 1) {
                 result.setEnable();
             } else {
                 result.setDisable();
@@ -75,11 +75,11 @@ class convertDBRowToType{
 
        this.registerConverter('customerAccount',(obj)=>{
             const result=new customerAccount(
-               obj.id,
-               obj.password,
-               obj.phone
+               obj.ID,
+               obj.PASSWORD,
+               obj.PHONE
             );
-            if (obj.activeState == 1) {
+            if (obj.ACTIVESTATE == 1) {
                 result.setEnable();
             } else {
                 result.setDisable();
@@ -89,10 +89,10 @@ class convertDBRowToType{
 
        this.registerConverter('headquarterAccount',(obj)=>{
             const result= new headquarterAccount(
-               obj.id,
-               obj.password
+               obj.ID,
+               obj.PASSWORD
             );
-            if (obj.activeState == 1) {
+            if (obj.ACTIVESTATE == 1) {
                 result.setEnable();
             } else {
                 result.setDisable();
@@ -101,44 +101,44 @@ class convertDBRowToType{
        })
 
        this.registerConverter('checkIn',(obj)=>{
-            const result = new checkIn(obj.id);
+            const result = new checkIn(obj.ID);
             result.setCheckInData(
-               obj.branchId,
-               obj.roomId,
-               this.arrayConverter('person',obj.person),
-               obj.reservationId
+               obj.BRANCHID,
+               obj.ROOMID,
+               this.arrayConverter('person',obj.PERSON),
+               obj.RESERVATIONID
             );
-            result.checkInDate = this.DateConverter(obj.checkInDate);
-            result.checkOutDate = obj.checkOutDate? this.DateConverter(obj.checkOutDate):null;
-            result.consumeNumber = obj.consumeNumber;
+            result.checkInDate = this.DateConverter(obj.CHECKINDATE);
+            result.checkOutDate = obj.CHECKOUTDATE? this.DateConverter(obj.CHECKOUTDATE):null;
+            result.consumeNumber = obj.CONSUMENUMBER;
             return result;
        })
 
        this.registerConverter('reservation',(obj)=>{
-            const result = new reservation(obj.id);
+            const result = new reservation(obj.ID);
             result.setReservationData(
-               obj.customerId,
-               obj.branchId,
-               this.convertToType('roomLayout',obj.roomLayout)
+               obj.CUSTOMERID,
+               obj.BRANCHID,
+               this.convertToType('roomLayout',obj.ROOMLAYOUT)
             );
-            result.state = this.convertToType('reservationState',obj.reservationState);
-            result.createReservationDate = this.DateConverter(obj.createReservationDate);
-            result.roomLayout =this.convertToType('roomLayout',obj.roomLayout);
+            result.state = this.convertToType('reservationState',obj.RESERVATIONSTATE);
+            result.createReservationDate = this.DateConverter(obj.CREATERESERVATIONDATE);
+            result.roomLayout =this.convertToType('roomLayout',obj.ROOMLAYOUT);
             return result;
        })
 
        this.registerConverter('room',(obj)=>{
             const result = new room(
-               obj.id,
-               this.convertToType('roomLayout',obj.roomLayout)
+               obj.ID,
+               this.convertToType('roomLayout',obj.ROOMLAYOUT)
             );
-            if (obj.activeState == 1) {
+            if (obj.ACTIVESTATE == 1) {
                 result.setEnable();
             } else {
                 result.setDisable();
             }
-            result.isEmptyBool = (obj.isEmptyBool || obj.isEmpty) == 1?true:false;
-            result.priceReal = obj.priceReal;
+            result.isEmptyBool = (obj.ISEMPTYBOOL == 1 || obj.ISEMPTY) == 1?true:false;
+            result.priceReal = obj.PRICEREAL;
             return result;
        })
     }

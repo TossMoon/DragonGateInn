@@ -1,4 +1,4 @@
-const convertTypeToDBRow = require('../../db/InvertTypBetweenDBRow/convertTypeToDBRow');
+const convertTypeToDBRow = require('../../db/ConvertTypBetweenDBRow/convertTypeToDBRow');
 
 
 const branchAccount = require('../../account/branchAccount');
@@ -26,9 +26,9 @@ describe('convertTypeToDBRow',()=>{
        const dbRow = convertManager.convert(newBranchAccount);
        
        expect(dbRow).toEqual({
-           id: '101',
-           password: '123456',
-           activeState: 1,
+           ID: '101',
+           PASSWORD: '123456',
+           ACTIVESTATE: 1,
        });
     });
     it('should convert headquarter account to db row',()=>{
@@ -36,9 +36,9 @@ describe('convertTypeToDBRow',()=>{
        const dbRow = convertManager.convert(newHeadquarterAccount);
        
        expect(dbRow).toEqual({
-           id: '101',
-           password: '123456',
-           activeState: 1,
+           ID: '101',
+           PASSWORD: '123456',
+           ACTIVESTATE: 1,
        });
     });
     it('should convert customer account to db row',()=>{
@@ -46,10 +46,10 @@ describe('convertTypeToDBRow',()=>{
        const dbRow = convertManager.convert(newCustomerAccount);
        
        expect(dbRow).toEqual({
-           id: '101',
-           password: '123456',
-           phone: '13800000000',
-           activeState: 1,
+           ID: '101',
+           PASSWORD: '123456',
+           PHONE: '13800000000',
+           ACTIVESTATE: 1,
        });
     });
 
@@ -58,14 +58,14 @@ describe('convertTypeToDBRow',()=>{
        const dbRow = convertManager.convert(newCheckIn);
        
        expect(dbRow).toEqual({
-           id: newCheckIn.getID(),
-           branchId: 'branch1',
-           roomId: 'roomId1',
-           person: "[{\"name\":\"name1\",\"identityCard\":\"id1\"}]",
-           checkInDate: newCheckIn.getCheckInDate().toISOString(),
-           checkOutDate: newCheckIn.getCheckOutDate(),
-           consumeNumber:0,
-           reservationId:null,
+           ID: newCheckIn.getID(),
+           BRANCHID: 'branch1',
+           ROOMID: 'roomId1',
+           PERSON: "[{\"name\":\"name1\",\"identityCard\":\"id1\"}]",
+           CHECKINDATE: newCheckIn.getCheckInDate().toISOString(),
+           CHECKOUTDATE: newCheckIn.getCheckOutDate(),
+           CONSUMENUMBER: 0,
+           RESERVATIONID:null,
        });
     });
 
@@ -75,15 +75,15 @@ describe('convertTypeToDBRow',()=>{
        const dbRow = convertManager.convert(newReservation);
        
        expect(dbRow).toEqual({
-            id: newReservation.getID(),
-            createReservationDate: newReservation.getcreateReservationDate().toISOString(),
-            branchId: 'branch1',
-            customerId:'customer1',
-            roomLayout_areaReal: 24,
-            roomLayout_bedType_numInt: 1,
-            roomLayout_bedType_typeString: "单人床",
-            roomLayout_windowBool: 1,
-            reservationState: "pending",
+            ID: newReservation.getID(),
+            CREATERESERVATIONDATE: newReservation.getcreateReservationDate().toISOString(),
+            BRANCHID: 'branch1',
+            CUSTOMERID:'customer1',
+            ROOMLAYOUT_AREAREAL: 24,
+            ROOMLAYOUT_BEDTYPE_NUMINT: 1,
+            ROOMLAYOUT_BEDTYPE_TYPESTRING: "单人床",
+            ROOMLAYOUT_WINDOWBOOL: 1,
+            RESERVATIONSTATE: "pending",
        });
     });
 
@@ -92,14 +92,14 @@ describe('convertTypeToDBRow',()=>{
         const dbRow = convertManager.convert(newRoom);
         
         expect(dbRow).toEqual({
-            id: '101',
-            roomType_areaReal: 0,
-            roomType_windowBool: 0,
-            roomType_bedType_typeString: "单人床",
-            roomType_bedType_numInt: 1,
-            activeState: 1,
-            isEmptyBool: 1,
-            priceReal: 0,
+            ID: '101',
+            ROOMLAYOUT_AREAREAL: 0,
+            ROOMLAYOUT_WINDOWBOOL: 0,
+            ROOMLAYOUT_BEDTYPE_TYPESTRING: "单人床",
+            ROOMLAYOUT_BEDTYPE_NUMINT: 1,
+            ACTIVESTATE: 1,
+            ISEMPTYBOOL: 1,
+            PRICEREAL: 0,
         });
     });
 });

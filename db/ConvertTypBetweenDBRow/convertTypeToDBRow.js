@@ -41,23 +41,23 @@ class convertTypeToDBRow{
 
         this.registerConverter(person, (instance) => {
             return {
-                name: instance.name,
-                identityCard: instance.identityCard
+                NAME: instance.name,
+                IDENTITYCARD: instance.identityCard,
             };
         });
 
         this.registerConverter(BedInRoom, (instance) => {
             return {
-                typeString: instance.typeString,
-                numInt: instance.numInt
+                TYPESTRING: instance.typeString,
+                NUMINT: instance.numInt
             };
         });
 
         this.registerConverter(RoomLayout, (instance) => {
             return {
-                areaReal: instance.areaReal,
-                windowBool: instance.windowBool ? 1 : 0,
-                bedType: this.convertToDBRow(instance.bedType)
+                AREAREAL: instance.areaReal,
+                WINDOWBOOL: instance.windowBool ? 1 : 0,
+                BEDTYPE: this.convertToDBRow(instance.bedType)
             };
         });
 
@@ -68,60 +68,60 @@ class convertTypeToDBRow{
 
         this.registerConverter(branchAccount,(instance)=>{
             return{
-                id: instance.getID(),
-                password: instance.getPassword(),
-                activeState: this.convertToDBRow(instance.getActiveState())
+                ID: instance.getID(),
+                PASSWORD: instance.getPassword(),
+                ACTIVESTATE: this.convertToDBRow(instance.getActiveState())
             };
         });
 
         this.registerConverter(headquarterAccount,(instance)=>{
             return{
-                id: instance.getID(),
-                password: instance.getPassword(),
-                activeState: this.convertToDBRow(instance.getActiveState())
+                ID: instance.getID(),
+                PASSWORD: instance.getPassword(),
+                ACTIVESTATE: this.convertToDBRow(instance.getActiveState())
             };
         });
 
         this.registerConverter(customerAccount,(instance)=>{
             return{
-                id: instance.getID(),
-                password: instance.getPassword(),
-                phone: instance.getPhoneString(),
-                activeState: this.convertToDBRow(instance.getActiveState())
+                ID: instance.getID(),
+                PASSWORD: instance.getPassword(),
+                PHONE: instance.getPhoneString(),
+                ACTIVESTATE: this.convertToDBRow(instance.getActiveState())
             };
         });
 
         this.registerConverter(checkIn,(instance)=>{
              return {
-            id: instance.getID(),
-            branchId: instance.getBranchId(),
-            roomId: instance.getRoomId(),
-            checkInDate: instance.getCheckInDate(),
-            checkOutDate: instance.getCheckOutDate(),
-            person: this.convertToDBRow(instance.getPerson()),
-            reservationId: instance.getReservationId(),
-            consumeNumber: instance.getConsumeNumber(),
+            ID: instance.getID(),
+            BRANCHID: instance.getBranchId(),
+            ROOMID: instance.getRoomId(),
+            CHECKINDATE: instance.getCheckInDate(),
+            CHECKOUTDATE: instance.getCheckOutDate(),
+            PERSON: this.convertToDBRow(instance.getPerson()),
+            RESERVATIONID: instance.getReservationId(),
+            CONSUMENUMBER: instance.getConsumeNumber(),
         };
         });
 
         this.registerConverter(reservation,(instance)=>{
              return {
-            id: instance.getID(),
-            branchId: instance.getBranchId(),
-            customerId: instance.getCustomerId(),
-            roomLayout: this.convertToDBRow(instance.getRoomLayout()),
-            createReservationDate: instance.getcreateReservationDate(),
-            reservationState: this.convertToDBRow(instance.getState()),
+            ID: instance.getID(),
+            BRANCHID: instance.getBranchId(),
+            CUSTOMERID: instance.getCustomerId(),
+            ROOMLAYOUT: this.convertToDBRow(instance.getRoomLayout()),
+            CREATERESERVATIONDATE: instance.getcreateReservationDate(),
+            RESERVATIONSTATE: this.convertToDBRow(instance.getState()),
             };
         });
 
         this.registerConverter(room,(instance)=>{
             return {
-            id: instance.getID(),
-            roomType: this.convertToDBRow(instance.getRoomType()),
-            activeState: this.convertToDBRow(instance.getActiveState()),
-            isEmptyBool: instance.getEmpty() ? 1 : 0,
-            priceReal: instance.getPrice(),
+            ID: instance.getID(),
+            ROOMLAYOUT: this.convertToDBRow(instance.getRoomType()),
+            ACTIVESTATE: this.convertToDBRow(instance.getActiveState()),
+            ISEMPTYBOOL: instance.getEmpty() ? 1 : 0,
+            PRICEREAL: instance.getPrice(),
         };
         
         });

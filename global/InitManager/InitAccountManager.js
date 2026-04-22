@@ -5,32 +5,25 @@ const headquarterAccount = require('../../account/headquarterAccount');
 const branchAccountManager = require('../../accountManager/branchAccountManager');
 const customerAccountManager = require('../../accountManager/customerAccountManager');
 const headquarterAccountManager = require('../../accountManager/headquarterAccountManager');
-
 const SingletonFactory = require('../../util/SingletonFactory');
 
-const OracleAccessLayer = require('../../db/OracleAccessLayer');
+const globalDatabaseAccessLayer = require('../DatabaseConnection/DatabaeseConnect');
 
-// 数据库连接配置
-const dbConfig = {
-    user: 'system',
-    password: '123456',
-    connectString: 'localhost:1521/hellooracle'
-};
+const convertDBRowToType=require('../../db/ConvertTypBetweenDBRow/convertDBRowToType');
 
-const curAccessLayer = SingletonFactory.getInstance(OracleAccessLayer, dbConfig);
 
 // 建立表名、账户类型和管理器的映射关系
-const accountConfig = {
+const accountClassTableConfig = {
     'BRANCH_ACCOUNT': {
-        type: branchAccount,
+        type: 'branchAccount',
         manager: branchAccountManager
     },
     'CUSTOMER_ACCOUNT': {
-        type: customerAccount,
+        type: 'customerAccount',
         manager: customerAccountManager
     },
     'HEADQUARTER_ACCOUNT': {
-        type: headquarterAccount,
+        type: 'headquarterAccount',
         manager: headquarterAccountManager
     }
 };
@@ -41,7 +34,7 @@ const accountConfig = {
  * @returns {Promise<Array>} 包含所有账户数据的数组
  */
 async function readAccountDataFromDB(accountTableName) {
-    return await curAccessLayer.getTableAllRows(accountTableName);
+    return await globalDatabaseAccessLayer.getTableAllRows(accountTableName);
 }
 
 /**
@@ -49,9 +42,10 @@ async function readAccountDataFromDB(accountTableName) {
  * @param {string} accountTableName - 账户表名
  * @param {Array} accountDatas - 包含所有账户数据的数组
  */
-function writeAccountDataFromDBToManager(accountType, accountManager, accountDatas) {
+function writeAccountDataIntoManager(accountType, accountManager, accountDatas) {
+    const curConvertDBRowToType=new convertDBRowToType();
     accountDatas.forEach(accountData => {
-        accountManager.addOneNewAccount(new accountType(accountData.ID, accountData.PASSWORD));
+        accountManager.addOneNewAccount(curConvertDBRowToType.convert(accountType,accountData));
     });
 }
 
@@ -62,15 +56,17 @@ async function initAllAccountManager() {
     try {
         console.log('开始初始化账户管理器...');
         
-        for (const [tableName, config] of Object.entries(accountConfig)) {
+        for (const [tableName, config] of Object.entries(accountClassTableConfig)) {
             try {
                 console.log(`处理表${tableName}...`);
+
                 // 读取账户数据
                 const accountDatas = await readAccountDataFromDB(tableName);
+
                 // 获取账户管理器
                 const manager = SingletonFactory.getInstance(config.manager);
                 // 写入账户数据到管理器
-                writeAccountDataFromDBToManager(config.type, manager, accountDatas);
+                writeAccountDataIntoManager(config.type, manager, accountDatas);
                 console.log(`表${tableName}数据加载完成`);
             } catch (error) {
                 console.warn(`处理表${tableName}时出错:`, error.message);
@@ -81,6 +77,7 @@ async function initAllAccountManager() {
         
         console.log('账户管理器初始化完成');
     } catch (error) {
+
         console.error('初始化账户管理器失败:', error);
         console.warn('系统将在无数据库模式下运行');
     }

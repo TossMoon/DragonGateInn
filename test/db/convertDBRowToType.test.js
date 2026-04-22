@@ -1,4 +1,4 @@
-const convertDBRowToType = require('../../db/InvertTypBetweenDBRow/convertDBRowToType');
+const convertDBRowToType = require('../../db/ConvertTypBetweenDBRow/convertDBRowToType');
 
 
 const branchAccount = require('../../account/branchAccount');
@@ -15,7 +15,7 @@ const curConvertDBRowToType =new convertDBRowToType();
 describe('convertTypeToDBRow',()=>{
     it('activeState',()=>{
         const dbRow={
-            activeState: 1,
+            ACTIVESTATE: 1,
         }
         const result = curConvertDBRowToType.convert('activeState',dbRow);
         expect(result).toEqual(new activeState(true));
@@ -23,9 +23,9 @@ describe('convertTypeToDBRow',()=>{
 
     it('branchAccount',()=>{
         const dbRow={
-            id: '101',
-            password: '123456',
-            activeState: 1,
+            ID: '101',
+            PASSWORD: '123456',
+            ACTIVESTATE: 1,
         }
         const result = curConvertDBRowToType.convert('branchAccount',dbRow);
         expect(result).toEqual(new branchAccount('101','123456'));
@@ -33,9 +33,9 @@ describe('convertTypeToDBRow',()=>{
 
     it('headquarterAccount',()=>{
         const dbRow={
-            id: '101',
-            password: '123456',
-            activeState: 1,
+            ID: '101',
+            PASSWORD: '123456',
+            ACTIVESTATE: 1,
         }
         const result = curConvertDBRowToType.convert('headquarterAccount',dbRow);
         expect(result).toEqual(new headquarterAccount('101','123456'));
@@ -43,10 +43,10 @@ describe('convertTypeToDBRow',()=>{
 
     it('customerAccount',()=>{
         const dbRow={
-            id: '101',
-            password: '123456',
-            phone: '13800000000',
-            activeState: 1,
+            ID: '101',
+            PASSWORD: '123456',
+            PHONE: '13800000000',
+            ACTIVESTATE: 1,
         }
         const result = curConvertDBRowToType.convert('customerAccount',dbRow);
         expect(result).toEqual(new customerAccount('101','123456','13800000000'));
@@ -54,14 +54,14 @@ describe('convertTypeToDBRow',()=>{
 
     it('should convert room to DB row',()=>{
         const dbRow={
-            id: '101',
-            roomLayout_areaReal: 0,
-            roomLayout_windowBool: 0,
-            roomLayout_bedType_typeString: "单人床",
-            roomLayout_bedType_numInt: 1,
-            activeState: 1,
-            isEmptyBool: 1,
-            priceReal: 0,
+            ID: '101',
+            ROOMLAYOUT_AREAREAL: 0,
+            ROOMLAYOUT_WINDOWBOOL: 0,
+            ROOMLAYOUT_BEDTYPE_TYPESTRING: "单人床",
+            ROOMLAYOUT_BEDTYPE_NUMINT: 1,
+            ACTIVESTATE: 1,
+            ISEMPTYBOOL: 1,
+            PRICEREAL: 0,
         }
         const roomInstance = curConvertDBRowToType.convert('room',dbRow);
         expect(roomInstance).toEqual(new room('101'));
@@ -69,14 +69,14 @@ describe('convertTypeToDBRow',()=>{
 
     it('checkIn',()=>{
         const dbRow={
-            id: '93328245',
-            branchId: 'branch1',
-            roomId: 'roomId1',
-            person: "[{\"name\":\"name1\",\"identityCard\":\"id1\"}]",
-            checkInDate: '2023-01-01T00:00:00.000Z',
-            checkOutDate: null,
-            consumeNumber:0,
-            reservationId:null,
+            ID: '93328245',
+            BRANCHID: 'branch1',
+            ROOMID: 'roomId1',
+            PERSON: "[{\"name\":\"name1\",\"identityCard\":\"id1\"}]",
+            CHECKINDATE: '2023-01-01T00:00:00.000Z',
+            CHECKOUTDATE: null,
+            CONSUMENUMBER:0,
+            RESERVATIONID:null,
         }
         const result = curConvertDBRowToType.convert('checkIn',dbRow);
         //expect(result).toEqual(checkInFactory('branch1','roomId1',[new person('name1','id1')]));
@@ -84,15 +84,15 @@ describe('convertTypeToDBRow',()=>{
 
     it('reservation',()=>{
         const dbRow={
-            id: '93328245',
-            createReservationDate:'2023-01-01T00:00:00.000Z' ,
-            branchId: 'branch1',
-            customerId:'customer1',
-            roomLayout_areaReal: 24,
-            roomLayout_bedType_numInt: 1,
-            roomLayout_bedType_typeString: "单人床",
-            roomLayout_windowBool: 1,
-            reservationState: "pending",
+            ID: '93328245',
+            CREATERESERVATIONDATE:'2023-01-01T00:00:00.000Z' ,
+            BRANCHID: 'branch1',
+            CUSTOMERID:'customer1',
+            ROOMLAYOUT_AREAREAL: 24,
+            ROOMLAYOUT_BEDTYPE_NUMINT: 1,
+            ROOMLAYOUT_BEDTYPE_TYPESTRING: "单人床",
+            ROOMLAYOUT_WINDOWBOOL: 1,
+            RESERVATIONSTATE: "pending",
         }
         const result = curConvertDBRowToType.convert('reservation',dbRow);
         // expect(result).toEqual(reservationFactory('customer1','branch1',
