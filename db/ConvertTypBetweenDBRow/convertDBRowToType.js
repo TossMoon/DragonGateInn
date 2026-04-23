@@ -130,6 +130,7 @@ class convertDBRowToType{
        this.registerConverter('room',(obj)=>{
             const result = new room(
                obj.ID,
+               obj.BRANCHID,
                this.convertToType('roomLayout',obj.ROOMLAYOUT)
             );
             if (obj.ACTIVESTATE == 1) {

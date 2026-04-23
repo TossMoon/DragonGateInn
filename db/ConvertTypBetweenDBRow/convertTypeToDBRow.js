@@ -121,6 +121,7 @@ class convertTypeToDBRow{
             ROOMLAYOUT: this.convertToDBRow(instance.getRoomType()),
             ACTIVESTATE: this.convertToDBRow(instance.getActiveState()),
             ISEMPTYBOOL: instance.getEmpty() ? 1 : 0,
+            BRANCHID: instance.getBranchId(),
             PRICEREAL: instance.getPrice(),
         };
         

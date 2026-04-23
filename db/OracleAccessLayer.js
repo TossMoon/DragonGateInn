@@ -43,7 +43,7 @@ class OracleAccessLayer extends DatabaseAccessLayer {
             if (this.connection) {
 
                 console.log('Oracle数据库断开连接中...');
-                
+
                 await this.connection.close();
                 this.connection = null;
 
@@ -76,8 +76,8 @@ class OracleAccessLayer extends DatabaseAccessLayer {
             await this.ensureConnection();
             console.log(`获取表${tableName}的所有列信息`);
             const result = await this.connection.execute(
-                `SELECT column_name, data_type 
-                 FROM user_tab_columns 
+                `SELECT column_name, data_type
+                 FROM user_tab_columns
                  WHERE table_name = UPPER(:tableName)`,
                 { tableName: tableName }
             );
@@ -124,16 +124,62 @@ class OracleAccessLayer extends DatabaseAccessLayer {
         try {
             await this.ensureConnection();
             console.log(`向表${tableName}插入数据:`, data);
-            
+
             // 构建INSERT语句
-            const columns = Object.keys(data);
-            const placeholders = columns.map((_, index) => `:${index + 1}`);
-            const sql = `INSERT INTO ${tableName} (${columns.join(', ')}) 
+            const columns = [];
+            const placeholders = [];
+            const values = [];
+            let index = 1;
+
+            for (const [key, value] of Object.entries(data)) {
+                columns.push(key);
+                
+                if (value && typeof value === 'string' && value.includes('T')) {
+                    // 检测ISO 8601格式日期字符串
+                    const dateRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/;
+                    if (dateRegex.test(value)) {
+                        // 使用TO_DATE函数明确指定日期格式
+                        placeholders.push(`TO_DATE(:${index}, 'YYYY-MM-DD HH24:MI:SS')`);
+                        const d = new Date(value);
+                        const year = d.getFullYear();
+                        const month = String(d.getMonth() + 1).padStart(2, '0');
+                        const day = String(d.getDate()).padStart(2, '0');
+                        const hours = String(d.getHours()).padStart(2, '0');
+                        const minutes = String(d.getMinutes()).padStart(2, '0');
+                        const seconds = String(d.getSeconds()).padStart(2, '0');
+                        values.push(`${year}-${month}-${day} ${hours}:${minutes}:${seconds}`);
+                        index++;
+                        continue;
+                    }
+                } else if (value instanceof Date) {
+                    // 对于Date对象
+                    placeholders.push(`TO_DATE(:${index}, 'YYYY-MM-DD HH24:MI:SS')`);
+                    const year = value.getFullYear();
+                    const month = String(value.getMonth() + 1).padStart(2, '0');
+                    const day = String(value.getDate()).padStart(2, '0');
+                    const hours = String(value.getHours()).padStart(2, '0');
+                    const minutes = String(value.getMinutes()).padStart(2, '0');
+                    const seconds = String(value.getSeconds()).padStart(2, '0');
+                    values.push(`${year}-${month}-${day} ${hours}:${minutes}:${seconds}`);
+                    index++;
+                    continue;
+                }
+                
+                // 普通值
+                placeholders.push(`:${index}`);
+                values.push(value);
+                index++;
+            }
+
+            const sql = `INSERT INTO ${tableName} (${columns.join(', ')})
                         VALUES (${placeholders.join(', ')})`;
+
+            console.log('SQL语句:', sql);
+            console.log('参数值:', values);
 
             const result = await this.connection.execute(
                 sql,
-                Object.values(data),
+                values,
                 { autoCommit: true }
             );
 
@@ -156,7 +202,7 @@ class OracleAccessLayer extends DatabaseAccessLayer {
         const setClause = Object.keys(data)
             .map((key, index) => `${key} = :${index + 1}`)
             .join(', ');
-        
+
         const whereClause = Object.keys(condition)
             .map((key, index) => `${key} = :${Object.keys(data).length + index + 1}`)
             .join(' AND ');
@@ -178,14 +224,69 @@ class OracleAccessLayer extends DatabaseAccessLayer {
         try {
             await this.ensureConnection();
             console.log(`更新表${tableName}的数据:`, data, '条件:', condition);
-            
-            const sql = `UPDATE ${tableName} 
-                        SET ${this.createUpdateClause(data,condition).setClause} 
-                        WHERE ${this.createUpdateClause(data,condition).whereClause}`;
+
+            // 构建UPDATE语句，处理日期类型
+            const setParts = [];
+            const values = [];
+            let index = 1;
+
+            for (const [key, value] of Object.entries(data)) {
+                if (value && typeof value === 'string' && value.includes('T')) {
+                    // 检测ISO 8601格式日期字符串
+                    const dateRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/;
+                    if (dateRegex.test(value)) {
+                        // 使用TO_DATE函数
+                        setParts.push(`${key} = TO_DATE(:${index}, 'YYYY-MM-DD HH24:MI:SS')`);
+                        const d = new Date(value);
+                        const year = d.getFullYear();
+                        const month = String(d.getMonth() + 1).padStart(2, '0');
+                        const day = String(d.getDate()).padStart(2, '0');
+                        const hours = String(d.getHours()).padStart(2, '0');
+                        const minutes = String(d.getMinutes()).padStart(2, '0');
+                        const seconds = String(d.getSeconds()).padStart(2, '0');
+                        values.push(`${year}-${month}-${day} ${hours}:${minutes}:${seconds}`);
+                        index++;
+                        continue;
+                    }
+                } else if (value instanceof Date) {
+                    // 对于Date对象
+                    setParts.push(`${key} = TO_DATE(:${index}, 'YYYY-MM-DD HH24:MI:SS')`);
+                    const year = value.getFullYear();
+                    const month = String(value.getMonth() + 1).padStart(2, '0');
+                    const day = String(value.getDate()).padStart(2, '0');
+                    const hours = String(value.getHours()).padStart(2, '0');
+                    const minutes = String(value.getMinutes()).padStart(2, '0');
+                    const seconds = String(value.getSeconds()).padStart(2, '0');
+                    values.push(`${year}-${month}-${day} ${hours}:${minutes}:${seconds}`);
+                    index++;
+                    continue;
+                }
+                
+                // 普通值
+                setParts.push(`${key} = :${index}`);
+                values.push(value);
+                index++;
+            }
+
+            // 添加条件值
+            for (const value of Object.values(condition)) {
+                values.push(value);
+            }
+
+            const whereParts = Object.keys(condition)
+                .map((key, i) => `${key} = :${setParts.length + i + 1}`)
+                .join(' AND ');
+
+            const sql = `UPDATE ${tableName}
+                        SET ${setParts.join(', ')}
+                        WHERE ${whereParts}`;
+
+            console.log('SQL语句:', sql);
+            console.log('参数值:', values);
 
             const result = await this.connection.execute(
                 sql,
-                [...Object.values(data), ...Object.values(condition)],
+                values,
                 { autoCommit: true }
             );
 
@@ -206,11 +307,10 @@ class OracleAccessLayer extends DatabaseAccessLayer {
         try {
             await this.ensureConnection();
             console.log(`删除表${tableName}的数据:`, condition);
-            
-            const sql = 
-            `DELETE FROM ${tableName} 
+
+            const sql = `DELETE FROM ${tableName}
             WHERE ${this.createUpdateClause({},condition).whereClause}`;
-            
+
             const result = await this.connection.execute(
                 sql,
                 Object.values(condition),
@@ -224,7 +324,6 @@ class OracleAccessLayer extends DatabaseAccessLayer {
         }
     }
 
-
     /**
      * 创建表
      * @param {string} tableName - 表名或完整的SQL语句
@@ -234,7 +333,7 @@ class OracleAccessLayer extends DatabaseAccessLayer {
     async createTable(tableName, columns) {
         try {
             await this.ensureConnection();
-            
+
             let sql;
             if (columns) {
                 // 如果提供了列信息，构建SQL语句
@@ -245,7 +344,7 @@ class OracleAccessLayer extends DatabaseAccessLayer {
                 console.log('执行创建表的SQL语句');
                 sql = tableName;
             }
-            
+
             await this.connection.execute(sql, { autoCommit: true });
             return true;
         } catch (error) {

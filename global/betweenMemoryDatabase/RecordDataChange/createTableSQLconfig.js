@@ -8,7 +8,8 @@ function getCreateTableSQLconfig(branchId) {
         {
             tableName: `ROOM`,
             sql: `  CREATE TABLE ROOM_${branchId} (
-                    ID VARCHAR2(50) NOT NULL,            
+                    ID VARCHAR2(50) NOT NULL,        
+                    BRANCHID VARCHAR2(50),              
                     ROOMLAYOUT_AREAREAL NUMBER(10, 2),    
                     ROOMLAYOUT_WINDOWBOOL NUMBER(1),      
                     ROOMLAYOUT_BEDTYPE_TYPESTRING VARCHAR2(100), 
