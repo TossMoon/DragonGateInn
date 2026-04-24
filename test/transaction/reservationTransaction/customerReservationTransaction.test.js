@@ -5,10 +5,18 @@ const cancelReservationTransaction=require('../../../transaction/reservationTran
 const confirmReservationTransaction=require('../../../transaction/reservationTransaction/confirmReservationTransaction');
 const customerRegisterTransaction=require('../../../transaction/accountTransaction/registerTransaction/customerRegisterTransaction');
 const branchRegisterTransaction=require('../../../transaction/accountTransaction/registerTransaction/branchRegisterTransaction');
+const branchAddDisplayRoomTransaction=require('../../../transaction/displayRoomTransaction/branchAddDisplayRoomTransaction');
+
+const {displayRoom}=require('../../../branchResource/displayRoom/displayRoom');
+const {RoomLayout,BedInRoom}=require('../../../branchResource/room/room');
 
 const allReservationManager=require('../../../branchResource/reservation/allReservationManager');
 
 const {reservationState}=require('../../../branchResource/reservation/reservation');
+const reservateByDisplayRoomTransaction=require('../../../transaction/reservationTransaction/reservateByDisplayRoomTransaction');
+
+const {recordDataChangeManager}=require('../../../global/betweenMemoryDatabase/RecordDataChange/recordDataChange');
+
 describe('顾客的预订房间事务',()=>{
     it('顾客的预订房间事务的执行',()=>{
         let newCustomerRegisterTransaction=new customerRegisterTransaction();
@@ -23,6 +31,29 @@ describe('顾客的预订房间事务',()=>{
         
         expect(SingletonFactory.getInstance(allReservationManager).getAllObjectList()).toContain(reservation);
        
+    })
+
+    it('顾客通过展出房间列表来预定',async()=>{
+       
+
+        let newCustomerRegisterTransaction=new customerRegisterTransaction();
+        const customerId=newCustomerRegisterTransaction.execute('138000000012','123456').resultContent.getID();
+
+        let newBranchRegisterTransaction=new branchRegisterTransaction();
+        const branchId=newBranchRegisterTransaction.execute().resultContent.getID();
+
+        const dispalyTransaction=new branchAddDisplayRoomTransaction();
+        const roomLayout = new RoomLayout(50, true, new BedInRoom("双人床", 1));
+        const newDisplayRoom=new displayRoom('display1', branchId, roomLayout, 1000000);
+        dispalyTransaction.execute(branchId, newDisplayRoom);
+
+        const reservateTransaction=new reservateByDisplayRoomTransaction();
+        const reservation=await reservateTransaction.execute(branchId,customerId,newDisplayRoom.getID()).resultContent;
+
+       
+
+        expect(SingletonFactory.getInstance(allReservationManager).getAllObjectList()).toContain(reservation);
+
     })
 
     it('顾客的取消房间事务的执行',()=>{
