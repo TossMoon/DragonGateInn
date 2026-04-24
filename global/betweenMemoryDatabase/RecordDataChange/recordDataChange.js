@@ -128,6 +128,11 @@ class recordDataChangeManager{
         }
         this.changeList=[];
     }
+
+    clearChange()
+    {
+        this.changeList=[];
+    }
 }
 
 module.exports={

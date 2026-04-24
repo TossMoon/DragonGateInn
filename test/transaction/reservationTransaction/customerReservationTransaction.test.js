@@ -19,7 +19,7 @@ describe('顾客的预订房间事务',()=>{
 
         let newCustomerReservateTransaction=new customerReservateTransaction();
         const reservation=newCustomerReservateTransaction.execute(customerId,branchId,
-        {area:100,windowBool:true,bedType:{typeString:'double',numId:1}}).resultContent;
+        {area:100,windowBool:true,typeString:'double',numId:1}).resultContent;
         
         expect(SingletonFactory.getInstance(allReservationManager).getAllObjectList()).toContain(reservation);
        
@@ -36,7 +36,7 @@ describe('顾客的预订房间事务',()=>{
         //创建预约订单
         let newCustomerReservateTransaction=new customerReservateTransaction();
         const reservation=newCustomerReservateTransaction.execute(customerId,branchId,
-        {area:100,windowBool:true,bedType:{typeString:'double',numId:1}}).resultContent;
+        {area:100,windowBool:true,typeString:'double',numId:1}).resultContent;
 
         
         let newCustomerCancelTransaction=new cancelReservationTransaction();
@@ -58,11 +58,12 @@ describe('顾客的预订房间事务',()=>{
         //创建预约订单
         let newCustomerReservateTransaction=new customerReservateTransaction();
         const reservation=newCustomerReservateTransaction.execute(customerId,branchId,
-        {area:100,windowBool:true,bedType:{typeString:'double',numId:1}}).resultContent;
+        {area:100,windowBool:true,typeString:'double',numId:1}).resultContent;
 
         
         let newCustomerConfirmTransaction=new confirmReservationTransaction();
         newCustomerConfirmTransaction.execute(reservation.getID());
+
         expect(SingletonFactory.getInstance(allReservationManager).getAllObjectList()
             .find(object=>object.getID()==reservation.getID())  
             .getState())
