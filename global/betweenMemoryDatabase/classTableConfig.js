@@ -9,10 +9,12 @@ const headquarterAccountManager = require('../../accountManager/headquarterAccou
 const {checkIn,person,checkInFactory}=require('../../branchResource/checkIn/checkIn');
 const {reservationState,reservation,reservationFactory}=require('../../branchResource/reservation/reservation');
 const {room,RoomLayout,BedInRoom}=require('../../branchResource/room/room');
+const {displayRoom}=require('../../branchResource/displayRoom/displayRoom');
 
 const allCheckInManager=require('../../branchResource/checkIn/allCheckInManager');
 const allReservationManager=require('../../branchResource/reservation/allReservationManager');  
 const allRoomManager=require('../../branchResource/room/allRoomManager');
+const allDisplayRoomManager=require('../../branchResource/displayRoom/allDisplayRoomManager');
 
 const SingletonFactory=require('../../util/SingletonFactory');
 
@@ -53,6 +55,11 @@ const branchResourceTableConfig=[
         tableName: 'ROOM' ,
         type: room,
         manager: SingletonFactory.getInstance(allRoomManager)
+    },
+    {
+        tableName: 'DISPLAYROOM' ,
+        type: displayRoom,
+        manager: SingletonFactory.getInstance(allDisplayRoomManager)
     }
 ]
 

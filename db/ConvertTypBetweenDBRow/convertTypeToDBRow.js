@@ -8,6 +8,7 @@ const headquarterAccount = require('../../account/headquarterAccount');
 const {checkIn,person,checkInFactory}=require('../../branchResource/checkIn/checkIn');
 const {reservationState,reservation,reservationFactory}=require('../../branchResource/reservation/reservation');
 const {room,RoomLayout,BedInRoom}=require('../../branchResource/room/room');
+const {displayRoom}=require('../../branchResource/displayRoom/displayRoom');
 const activeState = require('../../util/activeState');
 
 class convertTypeToDBRow{
@@ -124,7 +125,16 @@ class convertTypeToDBRow{
             BRANCHID: instance.getBranchId(),
             PRICEREAL: instance.getPrice(),
         };
-        
+        });
+
+        this.registerConverter(displayRoom,(instance)=>{
+            return {
+            ID: instance.getID(),
+            BRANCHID: instance.getBranchId(),
+            ROOMLAYOUT: this.convertToDBRow(instance.getRoomLayout()),
+            APPRAISEPRICE: instance.getAppraisePrice(),
+            ACTIVESTATE: this.convertToDBRow(instance.getActiveState()),
+        };
         });
     }
 
