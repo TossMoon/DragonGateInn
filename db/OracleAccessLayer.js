@@ -1,8 +1,9 @@
 const util = require('util');
-
+const assert = require('assert');
 
 const DatabaseAccessLayer = require('./DatabaseAccessLayer');
 const oracledb = require('oracledb'); // 直接导入，不再使用try-catch
+const e = require('express');
 
 // Oracle数据库访问实现类
 class OracleAccessLayer extends DatabaseAccessLayer {
@@ -113,6 +114,78 @@ class OracleAccessLayer extends DatabaseAccessLayer {
             throw error;
         }
     }
+    
+    /**
+     * 将JavaScript日期对象转换为Oracle数据库中的日期字符串
+     * @param {Date} date - JavaScript日期对象
+     * @returns {string} Oracle数据库中的日期字符串
+     */
+    _convertJSDateToOracleDate(date)
+    {
+        assert(date instanceof Date);
+
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        const seconds = String(date.getSeconds()).padStart(2, '0');
+
+        return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+
+    }
+
+    /**
+     * 检测字符串是否为ISO 8601格式日期字符串
+     * @param {string} str - 要检测的字符串
+     * @returns {boolean} 是否为ISO 8601格式日期字符串
+     */
+    _stringIsISO8601Date(str)
+    {
+        return str && typeof str === 'string' && str.includes('T') 
+                && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(str);
+    }
+
+    /**
+     * 遍历所有的数据字段，整理其中与日期相关的数据的格式
+     * 将JavaScript日期对象转换为Oracle数据库中的日期字符串，处理ISO 8601格式日期字符串
+     * @param {Object} data - 包含日期对象的JavaScript对象
+     * @returns {Object} 包含Oracle数据库中的日期字符串和普通值的数组
+     */
+    _convertDateToOracleRow(data)
+    {
+        const placeholders = [];
+        const values = [];
+        
+        //生成实际修改的数据
+        for (const [_, value] of Object.entries(data)){
+             // 日期对象或ISO 8601格式日期字符串
+            if (this._stringIsISO8601Date(value)||value instanceof Date) {
+                values.push(this._convertJSDateToOracleDate(value instanceof Date?value:new Date(value)));
+            }
+            else{
+                values.push(value);
+            }
+        }
+
+        //生成占位符
+        const indexs = Array.from({length: Object.keys(data).length}, (_, i) => i + 1);
+        for (const [_, value] of Object.entries(data)){
+            // 处理日期相关的数据
+            if (this._stringIsISO8601Date(value)||value instanceof Date) {
+                placeholders.push(`TO_DATE(:${indexs.shift()}, 'YYYY-MM-DD HH24:MI:SS')`);   
+            }
+            else{
+                // 普通值
+                placeholders.push(`:${indexs.shift()}`);
+            }
+        }
+
+        return {
+            placeholders,
+            values
+        }
+    }
 
     /**
      * 向表中写入数据
@@ -127,50 +200,12 @@ class OracleAccessLayer extends DatabaseAccessLayer {
 
             // 构建INSERT语句
             const columns = [];
-            const placeholders = [];
-            const values = [];
-            let index = 1;
-
-            for (const [key, value] of Object.entries(data)) {
+            Object.keys(data).forEach(key => {
                 columns.push(key);
-                
-                if (value && typeof value === 'string' && value.includes('T')) {
-                    // 检测ISO 8601格式日期字符串
-                    const dateRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/;
-                    if (dateRegex.test(value)) {
-                        // 使用TO_DATE函数明确指定日期格式
-                        placeholders.push(`TO_DATE(:${index}, 'YYYY-MM-DD HH24:MI:SS')`);
-                        const d = new Date(value);
-                        const year = d.getFullYear();
-                        const month = String(d.getMonth() + 1).padStart(2, '0');
-                        const day = String(d.getDate()).padStart(2, '0');
-                        const hours = String(d.getHours()).padStart(2, '0');
-                        const minutes = String(d.getMinutes()).padStart(2, '0');
-                        const seconds = String(d.getSeconds()).padStart(2, '0');
-                        values.push(`${year}-${month}-${day} ${hours}:${minutes}:${seconds}`);
-                        index++;
-                        continue;
-                    }
-                } else if (value instanceof Date) {
-                    // 对于Date对象
-                    placeholders.push(`TO_DATE(:${index}, 'YYYY-MM-DD HH24:MI:SS')`);
-                    const year = value.getFullYear();
-                    const month = String(value.getMonth() + 1).padStart(2, '0');
-                    const day = String(value.getDate()).padStart(2, '0');
-                    const hours = String(value.getHours()).padStart(2, '0');
-                    const minutes = String(value.getMinutes()).padStart(2, '0');
-                    const seconds = String(value.getSeconds()).padStart(2, '0');
-                    values.push(`${year}-${month}-${day} ${hours}:${minutes}:${seconds}`);
-                    index++;
-                    continue;
-                }
-                
-                // 普通值
-                placeholders.push(`:${index}`);
-                values.push(value);
-                index++;
-            }
+            });
 
+            const {placeholders,values}=this._convertDateToOracleRow(data);
+            
             const sql = `INSERT INTO ${tableName} (${columns.join(', ')})
                         VALUES (${placeholders.join(', ')})`;
 
@@ -225,60 +260,18 @@ class OracleAccessLayer extends DatabaseAccessLayer {
             await this.ensureConnection();
             console.log(`更新表${tableName}的数据:`, data, '条件:', condition);
 
-            // 构建UPDATE语句，处理日期类型
-            const setParts = [];
-            const values = [];
-            let index = 1;
+            const {placeholders, values} = this._convertDateToOracleRow(data);
+            const columns = Object.keys(data);
 
-            for (const [key, value] of Object.entries(data)) {
-                if (value && typeof value === 'string' && value.includes('T')) {
-                    // 检测ISO 8601格式日期字符串
-                    const dateRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/;
-                    if (dateRegex.test(value)) {
-                        // 使用TO_DATE函数
-                        setParts.push(`${key} = TO_DATE(:${index}, 'YYYY-MM-DD HH24:MI:SS')`);
-                        const d = new Date(value);
-                        const year = d.getFullYear();
-                        const month = String(d.getMonth() + 1).padStart(2, '0');
-                        const day = String(d.getDate()).padStart(2, '0');
-                        const hours = String(d.getHours()).padStart(2, '0');
-                        const minutes = String(d.getMinutes()).padStart(2, '0');
-                        const seconds = String(d.getSeconds()).padStart(2, '0');
-                        values.push(`${year}-${month}-${day} ${hours}:${minutes}:${seconds}`);
-                        index++;
-                        continue;
-                    }
-                } else if (value instanceof Date) {
-                    // 对于Date对象
-                    setParts.push(`${key} = TO_DATE(:${index}, 'YYYY-MM-DD HH24:MI:SS')`);
-                    const year = value.getFullYear();
-                    const month = String(value.getMonth() + 1).padStart(2, '0');
-                    const day = String(value.getDate()).padStart(2, '0');
-                    const hours = String(value.getHours()).padStart(2, '0');
-                    const minutes = String(value.getMinutes()).padStart(2, '0');
-                    const seconds = String(value.getSeconds()).padStart(2, '0');
-                    values.push(`${year}-${month}-${day} ${hours}:${minutes}:${seconds}`);
-                    index++;
-                    continue;
-                }
-                
-                // 普通值
-                setParts.push(`${key} = :${index}`);
-                values.push(value);
-                index++;
-            }
+            const setClause = columns.map((col, i) => `${col} = ${placeholders[i]}`).join(', ');
 
-            // 添加条件值
-            for (const value of Object.values(condition)) {
-                values.push(value);
-            }
-
+            const conditionValues = Object.values(condition);
             const whereParts = Object.keys(condition)
-                .map((key, i) => `${key} = :${setParts.length + i + 1}`)
+                .map((key, i) => `${key} = :${values.length + i + 1}`)
                 .join(' AND ');
 
             const sql = `UPDATE ${tableName}
-                        SET ${setParts.join(', ')}
+                        SET ${setClause}
                         WHERE ${whereParts}`;
 
             console.log('SQL语句:', sql);
@@ -286,7 +279,7 @@ class OracleAccessLayer extends DatabaseAccessLayer {
 
             const result = await this.connection.execute(
                 sql,
-                values,
+                [...values, ...conditionValues],
                 { autoCommit: true }
             );
 
