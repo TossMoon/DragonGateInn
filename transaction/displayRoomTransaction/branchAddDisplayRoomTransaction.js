@@ -1,8 +1,8 @@
 const assert=require('assert'); 
 
 const branchDisplayRoomTransaction=require('./branchDisplayRoomTransaction');
-const { displayRoom } = require('../../branchResource/displayRoom/displayRoom');
-
+const { displayRoom, displayFactory } = require('../../branchResource/displayRoom/displayRoom');
+const {RoomLayout,BedInRoom}=require('../../branchResource/room/room');
 /**
  * 分店添加展示房间事务
  */
@@ -18,33 +18,40 @@ class branchAddDisplayRoomTransaction extends branchDisplayRoomTransaction{
     execute(...args){
         super.execute(...args); 
 
-        //检查分店参数是否符合要求
-        assert(this.checkBranchArg(args));
+        const [branchId,roomLayout,appraisePrice]=args;
 
-        if(!this.checkBranchExist(args[0])){
+
+        /**
+         * 检查分店是否存在
+         */
+        if(!this.checkBranchExist(branchId)){
             return this.packageResult(false,null,"分店不存在");
         }
         
-        //检查添加的变量是否是展示房间实例
-        assert(args.every((item,index) => {
-            if(index>0){return item instanceof displayRoom}
-            return true;
-        }));
+        /**
+         * 创建房间布局
+         */
+        const requireRoomLayout=new RoomLayout(roomLayout.area,roomLayout.windowBool,
+            new BedInRoom(roomLayout.typeString,roomLayout.numId));
 
-        args.forEach((item,index)=>{
-            if(index>0){
-                this.getNeedChangeBranchDisplayRoomManager(args[0])
-                    .addDisplayRoom(item);
-            }
-        });
+        /**
+         * 创建展示房间
+         */
+        const newDisplayRoom=displayFactory(branchId,requireRoomLayout,appraisePrice);
 
-        args.forEach((item,index)=>{
-            if(index>0){
-                this.changeDatabase('insert',item);
-            }
-        });
+       /**
+         * 添加展示房间到分店的展示房间管理器
+         */
+        this.getNeedChangeBranchDisplayRoomManager(branchId)
+            .addDisplayRoom(newDisplayRoom);
+       
+        /**
+         * 插入数据库中的房间
+         */
+        this.changeDatabase('insert',newDisplayRoom);
+           
 
-        return this.packageResult(true,null,"展示房间添加成功");
+        return this.packageResult(true,newDisplayRoom,"展示房间添加成功");
     }
 }
 

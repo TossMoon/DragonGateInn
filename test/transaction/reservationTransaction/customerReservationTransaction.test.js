@@ -43,9 +43,9 @@ describe('顾客的预订房间事务',()=>{
         const branchId=newBranchRegisterTransaction.execute().resultContent.getID();
 
         const dispalyTransaction=new branchAddDisplayRoomTransaction();
-        const roomLayout = new RoomLayout(50, true, new BedInRoom("双人床", 1));
-        const newDisplayRoom=new displayRoom('display1', branchId, roomLayout, 1000000);
-        dispalyTransaction.execute(branchId, newDisplayRoom);
+        const newDisplayRoom= dispalyTransaction.execute(branchId,  
+            {area:100,windowBool:true,typeString:'double',numId:1},1000000).resultContent;
+        
 
         const reservateTransaction=new reservateByDisplayRoomTransaction();
         const reservation=await reservateTransaction.execute(branchId,customerId,newDisplayRoom.getID()).resultContent;

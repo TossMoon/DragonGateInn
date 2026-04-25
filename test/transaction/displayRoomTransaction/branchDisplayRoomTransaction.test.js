@@ -17,17 +17,14 @@ describe('分店可以进行的展示房间事务',()=>{
         const newBranchAccount= registerTransaction.execute().resultContent;
 
         const transaction=new branchAddDisplayRoomTransaction();
-        const roomLayout = new RoomLayout(50, true, new BedInRoom("双人床", 1));
-        const newDisplayRoom=new displayRoom('display1', newBranchAccount.getID(), roomLayout, 1000000);
-        
-        SingletonFactory.getInstance(allDisplayRoomManager).addNewBranchManager(newBranchAccount.getID());
-        transaction.execute(newBranchAccount.getID(), newDisplayRoom);
+        const newDisplayRoom= transaction.execute(newBranchAccount.getID(),  
+            {area:100,windowBool:true,typeString:'double',numId:1},1000000).resultContent;
 
 
         expect(SingletonFactory.getInstance(allDisplayRoomManager).getAllObjectList().length).toBe(1);
 
         expect(SingletonFactory.getInstance(allDisplayRoomManager)
-                .getOneDisplayRoomById(newBranchAccount.getID(), 'display1'))
+                .getOneDisplayRoomById(newBranchAccount.getID(), newDisplayRoom.getID()))
                 .toBe(newDisplayRoom);
     });
 
@@ -36,13 +33,12 @@ describe('分店可以进行的展示房间事务',()=>{
         const registerTransaction=new branchRegisterTransaction();
         const newBranchAccount= registerTransaction.execute().resultContent;
 
-        const roomLayout = new RoomLayout(50, true, new BedInRoom("双人床", 1));
-        const newDisplayRoom=new displayRoom('display2', newBranchAccount.getID(), roomLayout, 1000000);
-        const addDisplayRoomTransaction=new branchAddDisplayRoomTransaction();
-        addDisplayRoomTransaction.execute(newBranchAccount.getID(), newDisplayRoom);
+        const addTransaction=new branchAddDisplayRoomTransaction();
+        const newDisplayRoom= addTransaction.execute(newBranchAccount.getID(),  
+            {area:100,windowBool:true,typeString:'double',numId:1},1000000).resultContent;
 
-        const transaction=new branchDisableDisplayRoomTransaction();
-        transaction.execute(newBranchAccount.getID(), newDisplayRoom.getID());
+        const disableTransaction=new branchDisableDisplayRoomTransaction();
+        disableTransaction.execute(newBranchAccount.getID(), newDisplayRoom.getID());
 
 
         expect(SingletonFactory.getInstance(allDisplayRoomManager)
@@ -57,10 +53,10 @@ describe('分店可以进行的展示房间事务',()=>{
         const registerTransaction=new branchRegisterTransaction();
         const newBranchAccount= registerTransaction.execute().resultContent;
 
-        const roomLayout = new RoomLayout(50, true, new BedInRoom("双人床", 1));
-        const newDisplayRoom=new displayRoom('display3', newBranchAccount.getID(), roomLayout, 1000000);
-        const addDisplayRoomTransaction=new branchAddDisplayRoomTransaction();
-        addDisplayRoomTransaction.execute(newBranchAccount.getID(), newDisplayRoom);
+        
+        const addTransaction=new branchAddDisplayRoomTransaction();
+        const newDisplayRoom= addTransaction.execute(newBranchAccount.getID(),  
+            {area:100,windowBool:true,typeString:'double',numId:1},1000000).resultContent;
 
         // 先下架
         const disableTransaction=new branchDisableDisplayRoomTransaction();

@@ -1,6 +1,12 @@
 const activeState=require('../../util/activeState');
 const assert=require('assert');
 const {RoomLayout,BedInRoom}=require('../room/room');
+const randomGenerator=require('../../util/randomIdGenerator');
+
+/**
+ * 展出房间的编号生成器
+ */
+const randomDisplayRoomIdGenerator=new randomGenerator();
 
 /**
  * 展出房间类
@@ -9,6 +15,8 @@ class displayRoom{
     constructor(id, branchId, roomLayout=new RoomLayout(0, false, new BedInRoom("单人床", 1)), appraisePrice=0){
         //资源唯一标识符
         this.id=id;
+
+        randomDisplayRoomIdGenerator.occupyId(this.id);
 
         //发布该资源的分店ID
         this.branchId=branchId;
@@ -89,4 +97,12 @@ class displayRoom{
     }
 }
 
+/**
+ * 展出房间工厂函数
+ */
+function displayFactory(branchId, roomLayout, appraisePrice=0){
+    return new displayRoom(randomDisplayRoomIdGenerator.generateId(), branchId, roomLayout, appraisePrice);
+}
+
 module.exports.displayRoom=displayRoom;
+module.exports.displayFactory=displayFactory;
