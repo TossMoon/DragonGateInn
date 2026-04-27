@@ -23,19 +23,12 @@ const checkoutTransaction = require('./transaction/checkInTransaction/checkoutTr
 const addConsumeTransaction = require('./transaction/checkInTransaction/addConsumeTransaction');
 
 // 导入管理器
-const allRoomManagerClass = require('./branchResource/room/allRoomManager');
-const allReservationManagerClass = require('./branchResource/reservation/allReservationManager');
-const allCheckInManagerClass = require('./branchResource/checkIn/allCheckInManager');
-const allDisplayRoomManagerClass = require('./branchResource/displayRoom/allDisplayRoomManager');
+const allRoomManager = require('./branchResource/room/allRoomManager');
+const allReservationManager = require('./branchResource/reservation/allReservationManager');
+const allCheckInManager = require('./branchResource/checkIn/allCheckInManager');
+const allDisplayRoomManager = require('./branchResource/displayRoom/allDisplayRoomManager');
 
 const SingletonFactory = require('./util/SingletonFactory');
-
-
-// 创建管理器实例
-const allRoomManager = new allRoomManagerClass();
-const allReservationManager = new allReservationManagerClass();
-const allCheckInManager = new allCheckInManagerClass();
-const allDisplayRoomManager = new allDisplayRoomManagerClass();
 
 /**
  * 启动服务器
@@ -52,23 +45,23 @@ async function start() {
     app.get('/', (req, res) => {
         res.sendFile(path.join(__dirname, 'public', 'index.html'));
     });
-    
+
     // 健康检查
     app.get('/health', (req, res) => {
         res.json({ status: 'ok' });
     });
-    
+
     // 账户相关接口
     app.post('/api/register/branch', async (req, res) => {
         try {
-            const transaction = new branchRegisterTransaction(req.body);
-            const result = await transaction.execute();
+            const transaction = new branchRegisterTransaction();
+            const result = await transaction.execute(req.body.branchName);
             res.json(result);
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
     });
-    
+
     app.post('/api/register/customer', async (req, res) => {
         try {
             const transaction = new customerRegisterTransaction(req.body);
@@ -78,7 +71,7 @@ async function start() {
             res.status(500).json({ error: error.message });
         }
     });
-    
+
     app.post('/api/register/headquarter', async (req, res) => {
         try {
             const transaction = new headquarterRegisterTransaction(req.body);
@@ -88,7 +81,7 @@ async function start() {
             res.status(500).json({ error: error.message });
         }
     });
-    
+
     app.post('/api/login/branch', async (req, res) => {
         try {
             const transaction = new loginBranchTransaction(req.body);
@@ -98,7 +91,7 @@ async function start() {
             res.status(500).json({ error: error.message });
         }
     });
-    
+
     app.post('/api/login/customer', async (req, res) => {
         try {
             const transaction = new loginCustomerTransaction(req.body);
@@ -108,17 +101,17 @@ async function start() {
             res.status(500).json({ error: error.message });
         }
     });
-    
+
     app.post('/api/login/headquarter', async (req, res) => {
         try {
             const transaction = new loginHeadquarterTransaction();
-            const result =  transaction.execute(req.body.headquarterId, req.body.password);
+            const result = transaction.execute(req.body.headquarterId, req.body.password);
             res.json(result);
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
     });
-    
+
     // 房间相关接口
     app.get('/api/rooms', async (req, res) => {
         try {
@@ -128,7 +121,7 @@ async function start() {
             res.status(500).json({ error: error.message });
         }
     });
-    
+
     app.get('/api/rooms/branch/:branchId', async (req, res) => {
         try {
             const { branchId } = req.params;
@@ -138,7 +131,7 @@ async function start() {
             res.status(500).json({ error: error.message });
         }
     });
-    
+
     app.post('/api/rooms/add', async (req, res) => {
         try {
             const transaction = new branchAddRoomTransaction(req.body);
@@ -148,7 +141,7 @@ async function start() {
             res.status(500).json({ error: error.message });
         }
     });
-    
+
     app.post('/api/rooms/disable', async (req, res) => {
         try {
             const transaction = new branchDisableRoomTransaction(req.body);
@@ -158,7 +151,7 @@ async function start() {
             res.status(500).json({ error: error.message });
         }
     });
-    
+
     // 展示房间相关接口
     app.get('/api/display-rooms', async (req, res) => {
         try {
@@ -168,7 +161,7 @@ async function start() {
             res.status(500).json({ error: error.message });
         }
     });
-    
+
     app.get('/api/display-rooms/branch/:branchId', async (req, res) => {
         try {
             const { branchId } = req.params;
@@ -178,7 +171,7 @@ async function start() {
             res.status(500).json({ error: error.message });
         }
     });
-    
+
     app.post('/api/display-rooms/add', async (req, res) => {
         try {
             const transaction = new branchAddDisplayRoomTransaction(req.body);
@@ -188,7 +181,7 @@ async function start() {
             res.status(500).json({ error: error.message });
         }
     });
-    
+
     app.post('/api/display-rooms/disable', async (req, res) => {
         try {
             const transaction = new branchDisableDisplayRoomTransaction(req.body);
@@ -198,7 +191,7 @@ async function start() {
             res.status(500).json({ error: error.message });
         }
     });
-    
+
     app.post('/api/display-rooms/enable', async (req, res) => {
         try {
             const transaction = new branchEnableDisplayRoomTransaction(req.body);
@@ -208,7 +201,7 @@ async function start() {
             res.status(500).json({ error: error.message });
         }
     });
-    
+
     // 预约相关接口
     app.get('/api/reservations', async (req, res) => {
         try {
@@ -218,7 +211,7 @@ async function start() {
             res.status(500).json({ error: error.message });
         }
     });
-    
+
     app.get('/api/reservations/customer/:customerId', async (req, res) => {
         try {
             const { customerId } = req.params;
@@ -228,7 +221,7 @@ async function start() {
             res.status(500).json({ error: error.message });
         }
     });
-    
+
     app.get('/api/reservations/branch/:branchId', async (req, res) => {
         try {
             const { branchId } = req.params;
@@ -238,7 +231,7 @@ async function start() {
             res.status(500).json({ error: error.message });
         }
     });
-    
+
     app.post('/api/reservations/create', async (req, res) => {
         try {
             const transaction = new customerReservateTransaction(req.body);
@@ -248,7 +241,7 @@ async function start() {
             res.status(500).json({ error: error.message });
         }
     });
-    
+
     app.post('/api/reservations/cancel', async (req, res) => {
         try {
             const transaction = new cancelReservationTransaction(req.body);
@@ -258,7 +251,7 @@ async function start() {
             res.status(500).json({ error: error.message });
         }
     });
-    
+
     app.post('/api/reservations/confirm', async (req, res) => {
         try {
             const transaction = new confirmReservationTransaction(req.body);
@@ -268,7 +261,7 @@ async function start() {
             res.status(500).json({ error: error.message });
         }
     });
-    
+
     // 入住相关接口
     app.get('/api/checkins', async (req, res) => {
         try {
@@ -278,7 +271,7 @@ async function start() {
             res.status(500).json({ error: error.message });
         }
     });
-    
+
     app.get('/api/checkins/branch/:branchId', async (req, res) => {
         try {
             const { branchId } = req.params;
@@ -288,7 +281,7 @@ async function start() {
             res.status(500).json({ error: error.message });
         }
     });
-    
+
     app.get('/api/checkins/customer/:customerId', async (req, res) => {
         try {
             const { customerId } = req.params;
@@ -298,7 +291,7 @@ async function start() {
             res.status(500).json({ error: error.message });
         }
     });
-    
+
     app.post('/api/checkins/create', async (req, res) => {
         try {
             const transaction = new createCheckInTransaction(req.body);
@@ -308,7 +301,7 @@ async function start() {
             res.status(500).json({ error: error.message });
         }
     });
-    
+
     app.post('/api/checkins/checkout', async (req, res) => {
         try {
             const transaction = new checkoutTransaction(req.body);
@@ -318,7 +311,7 @@ async function start() {
             res.status(500).json({ error: error.message });
         }
     });
-    
+
     app.post('/api/checkins/add-consume', async (req, res) => {
         try {
             const transaction = new addConsumeTransaction(req.body);
@@ -328,20 +321,28 @@ async function start() {
             res.status(500).json({ error: error.message });
         }
     });
-    
+
     // 启动服务器
     return new Promise((resolve, reject) => {
         const server = app.listen(PORT, () => {
             console.log(`服务器运行在 http://localhost:${PORT}`);
             resolve(server);
         });
-        
+
         server.on('error', (error) => {
             reject(error);
         });
     });
 }
 
-module.exports = {
-    start
-};
+// 导出start函数
+module.exports = { start };
+
+// 如果直接运行此文件，则启动服务器
+if (require.main === module) {
+    start().then(() => {
+        console.log('应用启动成功');
+    }).catch((error) => {
+        console.error('应用启动失败:', error);
+    });
+}

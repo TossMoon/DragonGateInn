@@ -1,4 +1,4 @@
-import { roomAPI, displayRoomAPI, reservationAPI, checkInAPI } from '../api/index.js';
+import { roomAPI, displayRoomAPI, reservationAPI, checkInAPI, authAPI } from '../api/index.js';
 import { authManager } from '../auth/index.js';
 
 class HeadquarterView {
@@ -427,7 +427,55 @@ class HeadquarterView {
     }
 
     showAddBranchModal() {
-        alert('添加分店功能：请通过API实现');
+        this.container.innerHTML += `
+            <div class="modal-overlay" id="add-branch-modal">
+                <div class="modal">
+                    <div class="modal-header">
+                        <h3>添加新分店</h3>
+                        <button class="close-btn" onclick="document.getElementById('add-branch-modal').remove()">×</button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="add-branch-form">
+                            <div class="form-group">
+                                <label for="branchName">分店名称</label>
+                                <input type="text" id="branchName" name="branchName" required placeholder="请输入分店名称">
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" onclick="document.getElementById('add-branch-modal').remove()">取消</button>
+                        <button class="btn" onclick="window.headquarterView.handleAddBranch()">确认添加</button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    async handleAddBranch() {
+        try {
+            // 调用注册分店API（不需要参数，系统自动生成ID和密码）
+            const response = await authAPI.registerBranch({
+                branchName: document.getElementById('branchName').value
+            });
+
+            if (response.success || response.isSuccess) {
+                // 提取系统生成的账号信息
+                const newAccount = response.data || response;
+                const branchId = newAccount.id;
+                const password = newAccount.password;
+
+                // 显示成功信息和账号信息
+                alert(`分店添加成功！\n\n分店ID: ${branchId}\n初始密码: ${password}\n\n请妥善保管账号信息！`);
+
+                document.getElementById('add-branch-modal').remove();
+                // 刷新分店列表
+                this.loadContent();
+            } else {
+                alert('添加失败: ' + (response.error || '未知错误'));
+            }
+        } catch (error) {
+            alert('添加失败: ' + error.message);
+        }
     }
 
     viewBranchDetail(branchId) {

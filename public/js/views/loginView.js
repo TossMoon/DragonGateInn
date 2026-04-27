@@ -203,7 +203,7 @@ class LoginView {
                     break;
             }
 
-            if (response.success) {
+            if (response.successBool === true) {
                 authManager.login({
                     type: this.currentTab,
                     id: data.customerId || data.branchId || data.headquarterId,
@@ -217,7 +217,7 @@ class LoginView {
                     window.location.reload();
                 }, 1000);
             } else {
-                this.showMessage(response.error || '登录失败', 'error');
+                this.showMessage(response.error || response.message, 'error');
             }
         } catch (error) {
             this.showMessage(error.message || '登录失败，请稍后重试', 'error');

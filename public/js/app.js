@@ -66,6 +66,7 @@ class App {
     renderCustomerView() {
         if (!this.customerView) {
             this.customerView = new CustomerView(this.container);
+            window.customerView = this.customerView; // 保存到window对象
         }
         this.customerView.render();
     }
@@ -73,6 +74,7 @@ class App {
     renderBranchView() {
         if (!this.branchView) {
             this.branchView = new BranchView(this.container);
+            window.branchView = this.branchView; // 保存到window对象
         }
         this.branchView.render();
     }
@@ -80,6 +82,7 @@ class App {
     renderHeadquarterView() {
         if (!this.headquarterView) {
             this.headquarterView = new HeadquarterView(this.container);
+            window.headquarterView = this.headquarterView; // 保存到window对象
         }
         this.headquarterView.render();
     }

@@ -23,15 +23,20 @@ class branchRegisterTransaction extends transaction{
     execute(...args){
         super.execute(...args);
         
-        assert(args.length===0);
+        //assert(args.length===0);
 
         //添加这个分店的账户 到分店账号管理器
 
         const newBranchAccount=
             new branchAccount(transaction.getManager(accountApplication).getRandomAccount()
                 ,transaction.getManager(accountApplication).getInitPassword());
+        
+        //设置分店名
+        newBranchAccount.setBranchName(args[0]);
+
         transaction.getManager(branchManager).addOneNewAccount(
             newBranchAccount);
+        
 
         //为这个分店增加所有的资源管理器
         branchResourceManagers.forEach(manager=>{

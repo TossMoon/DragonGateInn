@@ -22,9 +22,12 @@ class AuthManager {
     }
 
     saveToStorage(user) {
+        console.log('saveToStorage被调用, user:', user);
         try {
             if (user) {
-                localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user));
+                const userJson = JSON.stringify(user);
+                console.log('保存到storage的JSON:', userJson);
+                localStorage.setItem(AUTH_STORAGE_KEY, userJson);
             } else {
                 localStorage.removeItem(AUTH_STORAGE_KEY);
             }
@@ -34,8 +37,10 @@ class AuthManager {
     }
 
     login(userData) {
+        console.log('authManager.login()被调用, userData:', userData);
         this.currentUser = userData;
         this.saveToStorage(userData);
+        console.log('authManager.login()完成, this.currentUser:', this.currentUser);
     }
 
     logout() {
@@ -44,6 +49,7 @@ class AuthManager {
     }
 
     getCurrentUser() {
+        console.log('getCurrentUser()被调用, 返回:', this.currentUser);
         return this.currentUser;
     }
 
