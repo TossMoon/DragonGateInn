@@ -154,10 +154,9 @@ class OracleAccessLayer extends DatabaseAccessLayer {
      */
     _convertDateToOracleRow(data)
     {
-        const placeholders = [];
-        const values = [];
         
         //生成实际修改的数据
+        const values = [];
         for (const [_, value] of Object.entries(data)){
              // 日期对象或ISO 8601格式日期字符串
             if (this._stringIsISO8601Date(value)||value instanceof Date) {
@@ -169,6 +168,7 @@ class OracleAccessLayer extends DatabaseAccessLayer {
         }
 
         //生成占位符
+        const placeholders = [];
         const indexs = Array.from({length: Object.keys(data).length}, (_, i) => i + 1);
         for (const [_, value] of Object.entries(data)){
             // 处理日期相关的数据
