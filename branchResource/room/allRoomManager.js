@@ -27,6 +27,22 @@ class allRoomManager extends allBranchManager{
         return super.getOneManagerByBranchId(branchId).getOneRoomById(roomId);
     }
 
+    /**
+     * 获取所有房间
+     * @returns {room[]} 所有房间的引用类型对象数组
+     */
+    getAllRooms(){
+        return super.getAllObjectList();
+    }
+
+    /**
+     * 根据分店编号获取房间列表
+     * @param {string} branchId 分店的编号
+     * @returns {room[]} 房间的引用类型对象数组
+     */
+    getRoomsByBranchId(branchId){
+        return super.getOneManagerByBranchId(branchId).getAllRooms();
+    }
 
     /**
      * 获取所有空闲房间

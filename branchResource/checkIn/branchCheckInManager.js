@@ -32,6 +32,14 @@ class branchCheckInManager extends branchManager{
             checkIn.setCheckOutDateAsNow();
         }
     }
+
+    /**
+     * 获取所有入住记录
+     * @returns {checkIn[]} 所有入住记录的引用类型对象数组
+     */
+    getAllCheckIns(){
+        return this.getAllObjectList();
+    }
 }
 module.exports=branchCheckInManager;
 

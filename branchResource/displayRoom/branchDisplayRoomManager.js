@@ -82,6 +82,15 @@ class branchDisplayRoomManager extends branchManager{
     {
         return this.objectList;
     }
+
+    /**
+     * 获取所有展出房间（复数形式，保持一致性）
+     * @returns {displayRoom[]} 所有展出房间的引用类型对象数组
+     */
+    getAllDisplayRooms()
+    {
+        return this.getAllDisplayRoom();
+    }
 }
 
 module.exports=branchDisplayRoomManager;

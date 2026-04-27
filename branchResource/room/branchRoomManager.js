@@ -99,5 +99,14 @@ class branchRoomManager extends branchManager{
     {
         return this.objectList.filter(room=>room.getEmpty());
     }
+
+    /**
+     * 获取所有房间
+     * @returns {room[]} 所有房间的引用类型对象数组
+     */
+    getAllRooms()
+    {
+        return this.objectList;
+    }
 }
 module.exports=branchRoomManager;

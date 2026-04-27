@@ -53,6 +53,14 @@ class branchReservationManager extends branchManager{
             reservation.cancel();
         }
     }
+
+    /**
+     * 获取所有预约
+     * @returns {reservation[]} 所有预约的引用类型对象数组
+     */
+    getAllReservations(){
+        return this.getAllObjectList();
+    }
 }
 
 module.exports=branchReservationManager;

@@ -64,6 +64,24 @@ class allDisplayRoomManager extends allBranchManager{
     {
         return super.getAllObjectList();
     }
+
+    /**
+     * 获取所有展出房间（复数形式，保持一致性）
+     * @returns {displayRoom[]} 所有展出房间的引用类型对象数组
+     */
+    getAllDisplayRooms()
+    {
+        return this.getAllDisplayRoom();
+    }
+
+    /**
+     * 根据分店编号获取展出房间列表
+     * @param {string} branchId 分店的编号
+     * @returns {displayRoom[]} 展出房间的引用类型对象数组
+     */
+    getDisplayRoomsByBranchId(branchId){
+        return super.getOneManagerByBranchId(branchId).getAllDisplayRooms();
+    }
 }
 
 module.exports=allDisplayRoomManager;
