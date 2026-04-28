@@ -16,6 +16,10 @@ class RoomAPI {
     async disableRoom(roomId) {
         return apiClient.post('/rooms/disable', { roomId });
     }
+
+    async changePrice(priceData) {
+        return apiClient.post('/rooms/change-price', priceData);
+    }
 }
 
 class DisplayRoomAPI {

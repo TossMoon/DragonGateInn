@@ -179,9 +179,12 @@ class BranchView {
                                 <thead>
                                     <tr>
                                         <th>房间ID</th>
-                                        <th>户型</th>
+                                        <th>面积(㎡)</th>
+                                        <th>窗户</th>
+                                        <th>床铺</th>
                                         <th>价格</th>
-                                        <th>状态</th>
+                                        <th>出租状态</th>
+                                        <th>占用状态</th>
                                         <th>操作</th>
                                     </tr>
                                 </thead>
@@ -189,14 +192,19 @@ class BranchView {
                                     ${rooms.map(r => `
                                         <tr>
                                             <td>${r.id}</td>
-                                            <td>${r.roomLayout || '标准'}</td>
-                                            <td>¥${r.price || 0}</td>
-                                            <td><span class="status ${r.roomState === 'EMPTY' || r.roomState === 0 ? 'active' : 'inactive'}">${this.getRoomStatusText(r.roomState)}</span></td>
+                                            <td>${r.roomType?.areaReal || '-'}</td>
+                                            <td>${r.roomType?.windowBool ? '有窗' : '无窗'}</td>
+                                            <td>${r.roomType?.bedType ? (r.roomType.bedType.typeString || r.roomType.bedType) + ' x ' + (r.roomType.bedType.numInt || 1) : '-'}</td>
+                                            <td>¥${r.priceReal || 0}</td>
+                                            <td><span class="status ${r.roomState === 'EMPTY' || r.roomState === 0 ? 'active' : 'inactive'}">${this.getRoomStatusText(r.activeState?.activeBool)}</span></td>
+                                            <td><span class="status ${r.isEmptyBool ? 'active' : 'inactive'}">${r.isEmptyBool ? '空闲' : '已入住'}</span></td>
                                             <td>
                                                 ${r.roomState === 'EMPTY' || r.roomState === 0 ?
-                                                    `<button class="btn btn-danger" style="width: auto; padding: 5px 10px;" onclick="window.branchView.disableRoom('${r.id}')">下架</button>`
+                                                    `<button class="btn btn-danger" style="width: auto; padding: 5px 10px; margin-right: 5px;" onclick="window.branchView.disableRoom('${r.id}')">下架</button>
+                                                     <button class="btn btn-secondary" style="width: auto; padding: 5px 10px;" onclick="window.branchView.showChangePriceModal('${r.id}', ${r.priceReal || 0})">改价</button>`
                                                     :
-                                                    `<button class="btn btn-secondary" style="width: auto; padding: 5px 10px;" onclick="window.branchView.enableRoom('${r.id}')">上架</button>`
+                                                    `<button class="btn btn-secondary" style="width: auto; padding: 5px 10px; margin-right: 5px;" onclick="window.branchView.enableRoom('${r.id}')">上架</button>
+                                                     <button class="btn btn-secondary" style="width: auto; padding: 5px 10px;" onclick="window.branchView.showChangePriceModal('${r.id}', ${r.priceReal || 0})">改价</button>`
                                                 }
                                             </td>
                                         </tr>
@@ -228,8 +236,10 @@ class BranchView {
                             displayRooms.map(room => `
                                 <div class="item-card">
                                     <h3>展示房间 - ${room.id}</h3>
-                                    <p>户型: ${room.roomLayout || '标准'}</p>
-                                    <p>价格: ¥${room.appraisePrice || room.price || 0}</p>
+                                    <p><strong>面积:</strong> ${room.roomType?.areaReal || '-'} ㎡</p>
+                                    <p><strong>窗户:</strong> ${room.roomType?.windowBool ? '有窗' : '无窗'}</p>
+                                    <p><strong>床铺:</strong> ${room.roomType?.bedType ? (room.roomType.bedType.typeString || room.roomType.bedType) + ' x ' + (room.roomType.bedType.numInt || 1) : '-'}</p>
+                                    <p><strong>价格:</strong> ¥${room.appraisePrice || room.price || 0}/晚</p>
                                     <span class="status ${room.activeState === 'ACTIVE' || room.activeState === 1 ? 'active' : 'inactive'}">
                                         ${room.activeState === 'ACTIVE' || room.activeState === 1 ? '已上架' : '已下架'}
                                     </span>
@@ -358,18 +368,33 @@ class BranchView {
 
     getRoomStatusText(state) {
         switch (state) {
-            case 'EMPTY':
-            case 0:
-                return '空闲';
-            case 'OCCUPIED':
-            case 1:
-                return '已占用';
-            case 'DISABLED':
-            case 2:
-                return '已下架';
+            case true:
+                return '可上架';
+            case false:
+                return '不可上架';
             default:
                 return '未知';
         }
+    }
+
+    formatRoomLayout(room) {
+        let layout = '';
+        if (room.roomType && room.roomType.areaReal) {
+            layout += `${room.roomType.areaReal}㎡ `;
+        }
+        if (room.roomType && room.roomType.windowBool !== undefined) {
+            layout += room.roomType.windowBool ? '有窗 ' : '无窗 ';
+        }
+        if (room.roomType && room.roomType.bedType) {
+            const bedType = room.roomType.bedType.typeString || room.roomType.bedType;
+            const bedNum = room.roomType.bedType.numInt || 1;
+            layout += `${bedType} x ${bedNum}`;
+        } else if (room.roomLayout) {
+            layout += room.roomLayout;
+        } else {
+            layout += '标准间';
+        }
+        return layout.trim();
     }
 
     getReservationStatusClass(state) {
@@ -407,7 +432,145 @@ class BranchView {
     }
 
     showAddRoomModal() {
-        alert('添加房间功能：请通过API实现');
+        const modal = document.createElement('div');
+        modal.className = 'modal-overlay';
+        modal.innerHTML = `
+            <div class="modal">
+                <div class="modal-header">
+                    <h3>添加房间</h3>
+                    <button class="close-btn" onclick="this.closest('.modal-overlay').remove()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="add-room-form">
+                        <div class="form-group">
+                            <label for="room-id">房间ID</label>
+                            <input type="text" id="room-id" required placeholder="请输入房间ID">
+                        </div>
+                        <div class="form-group">
+                            <label for="room-area">房间面积 (㎡)</label>
+                            <input type="number" id="room-area" value="20" min="10" max="200">
+                        </div>
+                        <div class="form-group">
+                            <label>是否有窗户</label>
+                            <div style="display: flex; gap: 20px;">
+                                <label><input type="radio" name="has-window" value="true" checked> 是</label>
+                                <label><input type="radio" name="has-window" value="false"> 否</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="bed-type">床铺类型</label>
+                            <select id="bed-type">
+                                <option value="单人床">单人床</option>
+                                <option value="双人床">双人床</option>
+                                <option value="大床房">大床房</option>
+                                <option value="家庭房">家庭房</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="bed-num">床铺数量</label>
+                            <input type="number" id="bed-num" value="1" min="1" max="5">
+                        </div>
+                        <div class="form-group">
+                            <label for="room-price">房间价格 (元/晚)</label>
+                            <input type="number" id="room-price" value="100" min="0" step="10">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()">取消</button>
+                    <button type="button" class="btn" onclick="window.branchView.submitAddRoom()">添加房间</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+
+    async submitAddRoom() {
+        const branchId = authManager.getBranchId() || authManager.getUserId();
+        const roomId = document.getElementById('room-id').value;
+        const area = parseFloat(document.getElementById('room-area').value);
+        const windowBool = document.querySelector('input[name="has-window"]:checked').value === 'true';
+        const bedType = document.getElementById('bed-type').value;
+        const bedNum = parseInt(document.getElementById('bed-num').value);
+        const price = parseFloat(document.getElementById('room-price').value);
+
+        try {
+            const response = await roomAPI.addRoom({
+                branchId,
+                roomId,
+                area,
+                window: windowBool,
+                bedType,
+                bedNum,
+                price
+            });
+
+            if (response.successbool) {
+                alert('房间添加成功！');
+                document.querySelector('.modal-overlay').remove();
+                await this.loadContent();
+            } else {
+                alert('添加失败: ' + (response.error || '未知错误'));
+            }
+        } catch (error) {
+            alert('添加失败: ' + error.message);
+        }
+    }
+
+    showChangePriceModal(roomId, currentPrice) {
+        const modal = document.createElement('div');
+        modal.className = 'modal-overlay';
+        modal.innerHTML = `
+            <div class="modal">
+                <div class="modal-header">
+                    <h3>修改房间价格</h3>
+                    <button class="close-btn" onclick="this.closest('.modal-overlay').remove()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>房间ID</label>
+                        <input type="text" value="${roomId}" disabled style="background: #f5f5f5;">
+                    </div>
+                    <div class="form-group">
+                        <label>当前价格</label>
+                        <input type="text" value="¥${currentPrice}" disabled style="background: #f5f5f5;">
+                    </div>
+                    <div class="form-group">
+                        <label for="new-price">新价格 (元/晚)</label>
+                        <input type="number" id="new-price" value="${currentPrice}" min="0" step="10" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()">取消</button>
+                    <button type="button" class="btn" onclick="window.branchView.submitChangePrice('${roomId}')">确认修改</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+
+    async submitChangePrice(roomId) {
+        const branchId = authManager.getBranchId() || authManager.getUserId();
+        const newPrice = parseFloat(document.getElementById('new-price').value);
+
+        if (isNaN(newPrice) || newPrice < 0) {
+            alert('请输入有效的价格');
+            return;
+        }
+
+        try {
+            const response = await roomAPI.changePrice({ branchId, roomId, price: newPrice });
+
+            if (response.successBool) {
+                alert('价格修改成功！');
+                document.querySelector('.modal-overlay').remove();
+                await this.loadContent();
+            } else {
+                alert('修改失败: ' + (response.error || '未知错误'));
+            }
+        } catch (error) {
+            alert('修改失败: ' + error.message);
+        }
     }
 
     async disableRoom(roomId) {
@@ -415,7 +578,7 @@ class BranchView {
 
         try {
             const response = await roomAPI.disableRoom(roomId);
-            if (response.success) {
+            if (response.successbool) {
                 alert('房间已下架');
                 await this.loadContent();
             } else {
@@ -429,7 +592,7 @@ class BranchView {
     async enableRoom(roomId) {
         try {
             const response = await roomAPI.addRoom({ roomId, state: 'EMPTY' });
-            if (response.success) {
+            if (response.successbool) {
                 alert('房间已上架');
                 await this.loadContent();
             } else {
@@ -449,7 +612,7 @@ class BranchView {
 
         try {
             const response = await displayRoomAPI.disableDisplayRoom(displayRoomId);
-            if (response.success) {
+            if (response.successbool) {
                 alert('展示房间已下架');
                 await this.loadContent();
             } else {
@@ -463,7 +626,7 @@ class BranchView {
     async enableDisplayRoom(displayRoomId) {
         try {
             const response = await displayRoomAPI.enableDisplayRoom(displayRoomId);
-            if (response.success) {
+            if (response.successbool) {
                 alert('展示房间已重新上架');
                 await this.loadContent();
             } else {
@@ -477,7 +640,7 @@ class BranchView {
     async confirmReservation(reservationId) {
         try {
             const response = await reservationAPI.confirmReservation(reservationId);
-            if (response.success) {
+            if (response.successbool) {
                 alert('预约已确认');
                 await this.loadContent();
             } else {
@@ -493,7 +656,7 @@ class BranchView {
 
         try {
             const response = await reservationAPI.cancelReservation(reservationId);
-            if (response.success) {
+            if (response.successbool) {
                 alert('预约已拒绝');
                 await this.loadContent();
             } else {
@@ -517,7 +680,7 @@ class BranchView {
 
         try {
             const response = await checkInAPI.addConsume(checkInId, parseFloat(amount), description);
-            if (response.success) {
+            if (response.successbool) {
                 alert('消费已添加');
                 await this.loadContent();
             } else {
@@ -533,7 +696,7 @@ class BranchView {
 
         try {
             const response = await checkInAPI.checkout(checkInId);
-            if (response.success) {
+            if (response.successbool) {
                 alert('退房成功');
                 await this.loadContent();
             } else {

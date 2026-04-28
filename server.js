@@ -15,6 +15,7 @@ const cancelReservationTransaction = require('./transaction/reservationTransacti
 const confirmReservationTransaction = require('./transaction/reservationTransaction/confirmReservationTransaction');
 const branchAddRoomTransaction = require('./transaction/roomTransaction/branchAddRoomTransaction');
 const branchDisableRoomTransaction = require('./transaction/roomTransaction/branchDisableRoomTransaction');
+const branchChangePriceTransaction = require('./transaction/roomTransaction/barnchChangePriceTanscation');
 const branchAddDisplayRoomTransaction = require('./transaction/displayRoomTransaction/branchAddDisplayRoomTransaction');
 const branchDisableDisplayRoomTransaction = require('./transaction/displayRoomTransaction/branchDisableDisplayRoomTransaction');
 const branchEnableDisplayRoomTransaction = require('./transaction/displayRoomTransaction/branchEnableDisplayRoomTransaction');
@@ -39,10 +40,7 @@ async function start() {
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
 
-    // 静态文件服务
-    app.use(express.static(path.join(__dirname, 'public')));
-
-    // 路由配置
+    // 路由配置 - 放在静态文件服务之前，确保 API 路由优先处理
     app.get('/', (req, res) => {
         res.sendFile(path.join(__dirname, 'public', 'index.html'));
     });
@@ -150,8 +148,14 @@ async function start() {
 
     app.post('/api/rooms/add', async (req, res) => {
         try {
-            const transaction = new branchAddRoomTransaction(req.body);
-            const result = await transaction.execute();
+            const { branchId, roomId, area, window, bedType, bedNum, price } = req.body;
+            const { room, RoomLayout, BedInRoom } = require('./branchResource/room/room');
+            const bed = new BedInRoom(bedType || '单人床', bedNum || 1);
+            const layout = new RoomLayout(area || 20, window || false, bed);
+            const roomInstance = new room(roomId, branchId, layout);
+            roomInstance.setPrice(price || 0);
+            const transaction = new branchAddRoomTransaction();
+            const result = transaction.execute(branchId, roomInstance);
             res.json(result);
         } catch (error) {
             res.status(500).json({ error: error.message });
@@ -162,6 +166,17 @@ async function start() {
         try {
             const transaction = new branchDisableRoomTransaction(req.body);
             const result = await transaction.execute();
+            res.json(result);
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    });
+
+    app.post('/api/rooms/change-price', async (req, res) => {
+        try {
+            const { branchId, roomId, price } = req.body;
+            const transaction = new branchChangePriceTransaction();
+            const result = transaction.execute(branchId, roomId, price);
             res.json(result);
         } catch (error) {
             res.status(500).json({ error: error.message });
@@ -337,6 +352,9 @@ async function start() {
             res.status(500).json({ error: error.message });
         }
     });
+
+    // 静态文件服务 - 放在所有 API 路由之后，确保 API 请求不会被静态文件中间件拦截
+    app.use(express.static(path.join(__dirname, 'public')));
 
     // 启动服务器
     return new Promise((resolve, reject) => {

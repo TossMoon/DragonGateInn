@@ -15,6 +15,12 @@ class branchRoomTransaction extends transaction{
      * @returns {boolean} 如果参数符合要求则返回true，否则返回false
      */
     checkRoomIdArg(args){
+
+        if(!Array.isArray(args)){
+            typeof item==='string' 
+                    && transaction.getManager(allRoomManager).getOneRoomById(args,item) !== null;
+        }
+
         return args.every((item,index) => {
             if(index>0){
                 return typeof item==='string' 
@@ -38,6 +44,10 @@ class branchRoomTransaction extends transaction{
      * @returns {boolean} 如果参数符合要求则返回true，否则返回false
      */
     checkBranchArg(args){
+        if(!Array.isArray(args)){
+            return typeof item==='string';
+        }
+
         if(args.length<2){
             return false;
         }
