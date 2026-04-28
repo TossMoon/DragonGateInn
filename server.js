@@ -236,8 +236,8 @@ async function start() {
 
     app.post('/api/display-rooms/disable', async (req, res) => {
         try {
-            const transaction = new branchDisableDisplayRoomTransaction(req.body);
-            const result = await transaction.execute();
+            const transaction = new branchDisableDisplayRoomTransaction();
+            const result = await transaction.execute(req.body.branchId, req.body.displayRoomId);
             res.json(result);
         } catch (error) {
             res.status(500).json({ error: error.message });
@@ -246,8 +246,8 @@ async function start() {
 
     app.post('/api/display-rooms/enable', async (req, res) => {
         try {
-            const transaction = new branchEnableDisplayRoomTransaction(req.body);
-            const result = await transaction.execute();
+            const transaction = new branchEnableDisplayRoomTransaction();
+            const result = await transaction.execute(req.body.branchId, req.body.displayRoomId);
             res.json(result);
         } catch (error) {
             res.status(500).json({ error: error.message });

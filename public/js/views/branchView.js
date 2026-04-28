@@ -693,7 +693,12 @@ class BranchView {
         if (!confirm('确定要下架此展示房间吗？')) return;
 
         try {
-            const response = await displayRoomAPI.disableDisplayRoom(displayRoomId);
+
+            const branchId = authManager.getBranchId() || authManager.getUserId();
+            const response = await displayRoomAPI.disableDisplayRoom({
+                branchId,
+                displayRoomId
+            });
             if (response.successBool) {
                 alert('展示房间已下架');
                 await this.loadContent();
@@ -707,7 +712,12 @@ class BranchView {
 
     async enableDisplayRoom(displayRoomId) {
         try {
-            const response = await displayRoomAPI.enableDisplayRoom(displayRoomId);
+            
+            const branchId = authManager.getBranchId() || authManager.getUserId();
+            const response = await displayRoomAPI.enableDisplayRoom({
+                branchId,
+                displayRoomId
+            });
             if (response.successBool) { 
                 alert('展示房间已重新上架');
                 await this.loadContent();

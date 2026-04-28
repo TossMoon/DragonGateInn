@@ -40,11 +40,11 @@ class DisplayRoomAPI {
     }
 
     async disableDisplayRoom(displayRoomId) {
-        return apiClient.post('/display-rooms/disable', { displayRoomId });
+        return apiClient.post('/display-rooms/disable', displayRoomId );
     }
 
     async enableDisplayRoom(displayRoomId) {
-        return apiClient.post('/display-rooms/enable', { displayRoomId });
+        return apiClient.post('/display-rooms/enable', displayRoomId );
     }
 }
 
