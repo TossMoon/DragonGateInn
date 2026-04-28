@@ -40,6 +40,7 @@ class App {
     }
 
     renderLogin() {
+        console.log('渲染登录视图');
         if (!this.loginView) {
             this.loginView = new LoginView(this.container);
         }
@@ -47,6 +48,7 @@ class App {
     }
 
     renderUserView(user) {
+        console.log('渲染用户视图, 用户类型:', user.type);
         switch (user.type) {
             case 'customer':
                 this.renderCustomerView();
@@ -64,27 +66,34 @@ class App {
     }
 
     renderCustomerView() {
+        console.log('渲染顾客视图');
         if (!this.customerView) {
             this.customerView = new CustomerView(this.container);
-            window.customerView = this.customerView; // 保存到window对象
+            window.customerView = this.customerView;
+            console.log('customerView已设置到window');
         }
         this.customerView.render();
     }
 
     renderBranchView() {
+        console.log('渲染分店视图');
         if (!this.branchView) {
             this.branchView = new BranchView(this.container);
-            window.branchView = this.branchView; // 保存到window对象
+            window.branchView = this.branchView;
+            console.log('branchView已设置到window');
         }
         this.branchView.render();
     }
 
     renderHeadquarterView() {
+        console.log('渲染总部视图');
         if (!this.headquarterView) {
             this.headquarterView = new HeadquarterView(this.container);
-            window.headquarterView = this.headquarterView; // 保存到window对象
+            window.headquarterView = this.headquarterView;
+            console.log('headquarterView已设置到window');
         }
         this.headquarterView.render();
+        console.log('headquarterView实例:', window.headquarterView);
     }
 
     logout() {
@@ -94,8 +103,20 @@ class App {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
+    console.log('DOMContentLoaded事件触发');
     const app = new App();
     app.init();
 });
+
+// 添加全局函数用于调试
+window.testHeadquarterView = function() {
+    console.log('测试headquarterView:', window.headquarterView);
+    if (window.headquarterView && typeof window.headquarterView.showAddBranchModal === 'function') {
+        console.log('showAddBranchModal方法存在');
+        window.headquarterView.showAddBranchModal();
+    } else {
+        console.log('showAddBranchModal方法不存在');
+    }
+};
 
 export default App;

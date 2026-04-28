@@ -71,6 +71,7 @@ class convertTypeToDBRow{
             return{
                 ID: instance.getID(),
                 PASSWORD: instance.getPassword(),
+                NAME: instance.getBranchName(),
                 ACTIVESTATE: this.convertToDBRow(instance.getActiveState())
             };
         });

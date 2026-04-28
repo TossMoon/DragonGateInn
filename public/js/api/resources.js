@@ -92,7 +92,26 @@ class CheckInAPI {
     }
 }
 
+class BranchAPI {
+    async getAllBranches() {
+        return apiClient.get('/branches');
+    }
+
+    async getBranchById(branchId) {
+        return apiClient.get(`/branches/${branchId}`);
+    }
+
+    async updateBranch(branchId, branchData) {
+        return apiClient.post(`/branches/update/${branchId}`, branchData);
+    }
+
+    async deleteBranch(branchId) {
+        return apiClient.post('/branches/delete', { branchId });
+    }
+}
+
 export const roomAPI = new RoomAPI();
 export const displayRoomAPI = new DisplayRoomAPI();
 export const reservationAPI = new ReservationAPI();
 export const checkInAPI = new CheckInAPI();
+export const branchAPI = new BranchAPI();

@@ -26,9 +26,27 @@ async function startApp() {
         // 获取数据变更记录管理器
         const dataChangeManager = SingletonFactory.getInstance(recordDataChangeManager);
         
+        // 添加定时保存功能（每1秒保存一次）
+        const saveInterval = setInterval(() => {
+            if(dataChangeManager.changeList.length<=0){
+                return;
+            }
+            
+            dataChangeManager.changeDatabase()
+                .then(() => {
+                    console.log(`${new Date().toLocaleTimeString()} - 定时保存成功`);
+                })
+                .catch(err => {
+                    console.error(`${new Date().toLocaleTimeString()} - 定时保存失败:`, err);
+                });
+        }, 1000);
+        
         // 处理程序结束事件
         function handleExit(signal) {
             console.log(`收到 ${signal} 信号，准备退出...`);
+            
+            // 清除定时保存定时器
+            clearInterval(saveInterval);
             
             // 存储变更到数据库
             dataChangeManager.changeDatabase()
@@ -52,6 +70,8 @@ async function startApp() {
         // 监听退出信号
         process.on('SIGINT', handleExit);  // Ctrl+C
         process.on('SIGTERM', handleExit); // kill 命令
+        process.on('uncaughtException', handleExit);
+        process.on('unhandledRejection', handleExit);
     } catch (error) {
         console.error('应用启动失败:', error);
         process.exit(1);

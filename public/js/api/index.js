@@ -1,6 +1,6 @@
 import apiClient from './client.js';
 import authAPI from './auth.js';
-import { roomAPI, displayRoomAPI, reservationAPI, checkInAPI } from './resources.js';
+import { roomAPI, displayRoomAPI, reservationAPI, checkInAPI, branchAPI } from './resources.js';
 
 export {
     apiClient,
@@ -8,7 +8,8 @@ export {
     roomAPI,
     displayRoomAPI,
     reservationAPI,
-    checkInAPI
+    checkInAPI,
+    branchAPI
 };
 
 export default {
@@ -17,5 +18,6 @@ export default {
     roomAPI,
     displayRoomAPI,
     reservationAPI,
-    checkInAPI
+    checkInAPI,
+    branchAPI
 };

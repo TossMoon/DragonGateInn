@@ -64,8 +64,9 @@ class convertDBRowToType{
        this.registerConverter('branchAccount',(obj)=>{
             const result=new branchAccount(
                obj.ID,
-               obj.PASSWORD
+               obj.PASSWORD,
             );
+            result.setBranchName(obj.NAME);
             if (obj.ACTIVESTATE == 1) {
                 result.setEnable();
             } else {

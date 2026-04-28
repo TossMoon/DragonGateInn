@@ -1,4 +1,4 @@
-import { roomAPI, displayRoomAPI, reservationAPI, checkInAPI, authAPI } from '../api/index.js';
+import { roomAPI, displayRoomAPI, reservationAPI, checkInAPI, authAPI, branchAPI } from '../api/index.js';
 import { authManager } from '../auth/index.js';
 
 class HeadquarterView {
@@ -13,7 +13,7 @@ class HeadquarterView {
             <div class="header">
                 <h1>总部端 - 龙门客栈</h1>
                 <p>总部ID: ${user.id}</p>
-                <button class="btn btn-secondary" style="margin-top: 10px; width: auto;" onclick="window.headquarterView.logout()">退出登录</button>
+                <button id="btn-logout" class="btn btn-secondary" style="margin-top: 10px; width: auto;">退出登录</button>
             </div>
 
             <div class="navigation">
@@ -32,6 +32,7 @@ class HeadquarterView {
         `;
 
         this.bindNavigationEvents();
+        this.bindLogoutEvent();
         await this.loadContent();
     }
 
@@ -49,6 +50,13 @@ class HeadquarterView {
                 await this.loadContent();
             });
         });
+    }
+
+    bindLogoutEvent() {
+        const logoutBtn = this.container.querySelector('#btn-logout');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', () => this.logout());
+        }
     }
 
     async loadContent() {
@@ -165,10 +173,22 @@ class HeadquarterView {
 
     async renderBranches(container) {
         try {
+            const branches = await branchAPI.getAllBranches();  // 直接获取分店列表
             const rooms = await roomAPI.getAllRooms();
             const reservations = await reservationAPI.getAllReservations();
 
             const branchStats = {};
+             // 先用分店列表初始化
+            branches.forEach(b => {
+            branchStats[b.idString] = { 
+                name: b.branchName,      // 分店名称
+                activeState: b.activeState.activeBool,
+                totalRooms: 0, 
+                emptyRooms: 0, 
+                reservations: 0 
+                };
+            });
+
             rooms.forEach(r => {
                 if (!branchStats[r.branchId]) {
                     branchStats[r.branchId] = { totalRooms: 0, emptyRooms: 0, reservations: 0 };
@@ -189,7 +209,7 @@ class HeadquarterView {
                 <div class="card">
                     <div class="card-header">
                         分店列表
-                        <button class="btn" style="width: auto; margin-left: 20px;" onclick="window.headquarterView.showAddBranchModal()">添加分店</button>
+                        <button id="btn-add-branch" class="btn" style="width: auto; margin-left: 20px;">添加分店</button>
                     </div>
                     <div class="table-container">
                         ${Object.keys(branchStats).length === 0 ? '<p>暂无分店</p>' : `
@@ -197,10 +217,12 @@ class HeadquarterView {
                                 <thead>
                                     <tr>
                                         <th>分店ID</th>
+                                        <th>分店名称</th>
                                         <th>房间总数</th>
                                         <th>空闲房间</th>
                                         <th>待处理预约</th>
                                         <th>入住率</th>
+                                        <th>状态</th>
                                         <th>操作</th>
                                     </tr>
                                 </thead>
@@ -211,12 +233,14 @@ class HeadquarterView {
                                         return `
                                             <tr>
                                                 <td>${branchId}</td>
+                                                <td>${stats.name}</td>
                                                 <td>${stats.totalRooms}</td>
                                                 <td>${stats.emptyRooms}</td>
                                                 <td>${stats.reservations}</td>
+                                                <td>${stats.activeState ? '已启用' : '已禁用'}</td>
                                                 <td>${occupancyRate}</td>
                                                 <td>
-                                                    <button class="btn btn-secondary" style="width: auto; padding: 5px 10px;" onclick="window.headquarterView.viewBranchDetail('${branchId}')">详情</button>
+                                                    <button class="btn btn-secondary btn-branch-detail" style="width: auto; padding: 5px 10px;" data-branch-id="${branchId}">详情</button>
                                                 </td>
                                             </tr>
                                         `;
@@ -227,6 +251,19 @@ class HeadquarterView {
                     </div>
                 </div>
             `;
+
+            const addBranchBtn = container.querySelector('#btn-add-branch');
+            if (addBranchBtn) {
+                addBranchBtn.addEventListener('click', () => this.showAddBranchModal());
+            }
+
+            const detailBtns = container.querySelectorAll('.btn-branch-detail');
+            detailBtns.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const branchId = e.target.dataset.branchId;
+                    this.viewBranchDetail(branchId);
+                });
+            });
         } catch (error) {
             container.innerHTML = `<div class="message error">加载分店数据失败: ${error.message}</div>`;
         }
@@ -427,12 +464,13 @@ class HeadquarterView {
     }
 
     showAddBranchModal() {
+        console.log('showAddBranchModal called');
         this.container.innerHTML += `
             <div class="modal-overlay" id="add-branch-modal">
                 <div class="modal">
                     <div class="modal-header">
                         <h3>添加新分店</h3>
-                        <button class="close-btn" onclick="document.getElementById('add-branch-modal').remove()">×</button>
+                        <button id="btn-close-modal" class="close-btn">×</button>
                     </div>
                     <div class="modal-body">
                         <form id="add-branch-form">
@@ -443,32 +481,44 @@ class HeadquarterView {
                         </form>
                     </div>
                     <div class="modal-footer">
-                        <button class="btn btn-secondary" onclick="document.getElementById('add-branch-modal').remove()">取消</button>
-                        <button class="btn" onclick="window.headquarterView.handleAddBranch()">确认添加</button>
+                        <button id="btn-cancel" class="btn btn-secondary">取消</button>
+                        <button id="btn-confirm-add" class="btn">确认添加</button>
                     </div>
                 </div>
             </div>
         `;
+
+        document.getElementById('btn-close-modal').addEventListener('click', () => {
+            document.getElementById('add-branch-modal').remove();
+        });
+
+        document.getElementById('btn-cancel').addEventListener('click', () => {
+            document.getElementById('add-branch-modal').remove();
+        });
+
+        document.getElementById('btn-confirm-add').addEventListener('click', () => {
+            this.handleAddBranch();
+        });
     }
 
     async handleAddBranch() {
+        console.log('handleAddBranch called');
+        const branchName = document.getElementById('branchName').value.trim();
+        if (!branchName) {
+            alert('请输入分店名称');
+            return;
+        }
         try {
-            // 调用注册分店API（不需要参数，系统自动生成ID和密码）
-            const response = await authAPI.registerBranch({
-                branchName: document.getElementById('branchName').value
-            });
+            const response = await authAPI.registerBranch({ branchName: branchName });
 
-            if (response.success || response.isSuccess) {
-                // 提取系统生成的账号信息
-                const newAccount = response.data || response;
-                const branchId = newAccount.id;
-                const password = newAccount.password;
+            if (response.success || response.successBool) {
+                const newAccount = response.resultContent || response;
+                const branchId = newAccount.idString;
+                const password = newAccount.passwordString;
 
-                // 显示成功信息和账号信息
                 alert(`分店添加成功！\n\n分店ID: ${branchId}\n初始密码: ${password}\n\n请妥善保管账号信息！`);
 
                 document.getElementById('add-branch-modal').remove();
-                // 刷新分店列表
                 this.loadContent();
             } else {
                 alert('添加失败: ' + (response.error || '未知错误'));
@@ -490,5 +540,4 @@ class HeadquarterView {
     }
 }
 
-window.headquarterView = null;
 export default HeadquarterView;

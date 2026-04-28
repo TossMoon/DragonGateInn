@@ -8,7 +8,7 @@ const branchRegisterTransaction = require('./transaction/accountTransaction/regi
 const customerRegisterTransaction = require('./transaction/accountTransaction/registerTransaction/customerRegisterTransaction');
 const headquarterRegisterTransaction = require('./transaction/accountTransaction/registerTransaction/headquarterRegisterTransaction');
 const loginBranchTransaction = require('./transaction/accountTransaction/loginTransaction/loginBranchTransaction');
-const loginCustomerTransaction = require('./transaction/accountTransaction/loginTransaction/loginCustomerTransaction');
+const loginCustomerByPhoneTransaction = require('./transaction/accountTransaction/loginTransaction/loginCustomerByPhoneTransaction');
 const loginHeadquarterTransaction = require('./transaction/accountTransaction/loginTransaction/loginHeadquarterTransaction');
 const customerReservateTransaction = require('./transaction/reservationTransaction/customerReservateTransaction');
 const cancelReservationTransaction = require('./transaction/reservationTransaction/cancelReservationTransaction');
@@ -27,6 +27,7 @@ const allRoomManager = require('./branchResource/room/allRoomManager');
 const allReservationManager = require('./branchResource/reservation/allReservationManager');
 const allCheckInManager = require('./branchResource/checkIn/allCheckInManager');
 const allDisplayRoomManager = require('./branchResource/displayRoom/allDisplayRoomManager');
+const allBranchManager = require('./accountManager/branchAccountManager');
 
 const SingletonFactory = require('./util/SingletonFactory');
 
@@ -51,6 +52,21 @@ async function start() {
         res.json({ status: 'ok' });
     });
 
+    //获取所有分店列表
+    app.get('/api/branches',(req,res)=>{
+        console.log('收到 /api/branches 请求');
+        try {
+            const manager = SingletonFactory.getInstance(allBranchManager);
+            console.log('manager:', manager);
+            const branches = manager.getAllAccountList();
+            console.log('分店数据:', branches);
+            res.json(branches);
+        } catch (error) {
+            console.error('获取分店数据失败:', error);
+            res.status(500).json({ error: error.message });
+        }
+    })
+
     // 账户相关接口
     app.post('/api/register/branch', async (req, res) => {
         try {
@@ -64,8 +80,8 @@ async function start() {
 
     app.post('/api/register/customer', async (req, res) => {
         try {
-            const transaction = new customerRegisterTransaction(req.body);
-            const result = await transaction.execute();
+            const transaction = new customerRegisterTransaction();
+            const result = await transaction.execute(req.body.phone, req.body.password);
             res.json(result);
         } catch (error) {
             res.status(500).json({ error: error.message });
@@ -84,8 +100,8 @@ async function start() {
 
     app.post('/api/login/branch', async (req, res) => {
         try {
-            const transaction = new loginBranchTransaction(req.body);
-            const result = await transaction.execute();
+            const transaction = new loginBranchTransaction();
+            const result = await transaction.execute(req.body.branchId, req.body.password);
             res.json(result);
         } catch (error) {
             res.status(500).json({ error: error.message });
@@ -94,8 +110,8 @@ async function start() {
 
     app.post('/api/login/customer', async (req, res) => {
         try {
-            const transaction = new loginCustomerTransaction(req.body);
-            const result = await transaction.execute();
+            const transaction = new loginCustomerByPhoneTransaction();
+            const result = await transaction.execute(req.body.customerId, req.body.password);
             res.json(result);
         } catch (error) {
             res.status(500).json({ error: error.message });
@@ -340,9 +356,13 @@ module.exports = { start };
 
 // 如果直接运行此文件，则启动服务器
 if (require.main === module) {
-    start().then(() => {
+    start().then((server) => {
         console.log('应用启动成功');
+        console.log('服务器状态:', server.address());
+        // 保持进程运行
+        process.stdin.resume();
     }).catch((error) => {
         console.error('应用启动失败:', error);
+        process.exit(1);
     });
 }

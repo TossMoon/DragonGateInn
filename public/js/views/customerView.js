@@ -1,4 +1,4 @@
-import { roomAPI, displayRoomAPI, reservationAPI, checkInAPI } from '../api/index.js';
+import { displayRoomAPI, reservationAPI, checkInAPI } from '../api/index.js';
 import { authManager } from '../auth/index.js';
 
 class CustomerView {
@@ -72,15 +72,10 @@ class CustomerView {
 
     async renderRooms(container) {
         try {
-            const rooms = await roomAPI.getAllRooms();
             const displayRooms = await displayRoomAPI.getAllDisplayRooms();
 
             container.innerHTML = `
                 <div class="stats">
-                    <div class="stat-card">
-                        <h3>${rooms.length}</h3>
-                        <p>可用房间</p>
-                    </div>
                     <div class="stat-card">
                         <h3>${displayRooms.length}</h3>
                         <p>展示房间</p>
@@ -91,13 +86,6 @@ class CustomerView {
                 <div class="grid">
                     ${displayRooms.length === 0 ? '<p>暂无展示房间</p>' :
                         displayRooms.map(room => this.renderDisplayRoomCard(room)).join('')
-                    }
-                </div>
-
-                <h2 style="margin-bottom: 20px; margin-top: 30px;">可入住房间</h2>
-                <div class="grid">
-                    ${rooms.length === 0 ? '<p>暂无可入住房间</p>' :
-                        rooms.map(room => this.renderRoomCard(room)).join('')
                     }
                 </div>
             `;
@@ -124,21 +112,6 @@ class CustomerView {
                     ${!isActive ? 'disabled' : ''}>
                     预约此房间
                 </button>
-            </div>
-        `;
-    }
-
-    renderRoomCard(room) {
-        const isEmpty = room.roomState === 'EMPTY' || room.roomState === 0;
-        return `
-            <div class="item-card">
-                <h3>房间 ${room.id}</h3>
-                <p>分店: ${room.branchId}</p>
-                <p>户型: ${room.roomLayout || '标准'}</p>
-                <p class="price">¥${room.price || 0}</p>
-                <span class="status ${isEmpty ? 'active' : 'inactive'}">
-                    ${isEmpty ? '可入住' : '已被占用'}
-                </span>
             </div>
         `;
     }
