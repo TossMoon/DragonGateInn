@@ -199,7 +199,7 @@ class BranchView {
                                             <td><span class="status ${r.roomState === 'EMPTY' || r.roomState === 0 ? 'active' : 'inactive'}">${this.getRoomStatusText(r.activeState?.activeBool)}</span></td>
                                             <td><span class="status ${r.isEmptyBool ? 'active' : 'inactive'}">${r.isEmptyBool ? '空闲' : '已入住'}</span></td>
                                             <td>
-                                                ${r.roomState === 'EMPTY' || r.roomState === 0 ?
+                                                ${r.activeState?.activeBool === true ?
                                                     `<button class="btn btn-danger" style="width: auto; padding: 5px 10px; margin-right: 5px;" onclick="window.branchView.disableRoom('${r.id}')">下架</button>
                                                      <button class="btn btn-secondary" style="width: auto; padding: 5px 10px;" onclick="window.branchView.showChangePriceModal('${r.id}', ${r.priceReal || 0})">改价</button>`
                                                     :
@@ -369,9 +369,9 @@ class BranchView {
     getRoomStatusText(state) {
         switch (state) {
             case true:
-                return '可上架';
+                return '可对外出租';
             case false:
-                return '不可上架';
+                return '不可对外出租';
             default:
                 return '未知';
         }
@@ -505,7 +505,7 @@ class BranchView {
                 price
             });
 
-            if (response.successbool) {
+            if (response.successBool) {
                 alert('房间添加成功！');
                 document.querySelector('.modal-overlay').remove();
                 await this.loadContent();
@@ -577,9 +577,10 @@ class BranchView {
         if (!confirm('确定要下架此房间吗？')) return;
 
         try {
-            const response = await roomAPI.disableRoom(roomId);
-            if (response.successbool) {
-                alert('房间已下架');
+            const branchId = authManager.getBranchId() || authManager.getUserId();
+            const response = await roomAPI.disableRoom({ branchId, roomId: roomId });
+            if (response.successBool) {
+                alert('房间已不能对外出租');
                 await this.loadContent();
             } else {
                 alert('操作失败: ' + (response.error || '未知错误'));
@@ -591,9 +592,10 @@ class BranchView {
 
     async enableRoom(roomId) {
         try {
-            const response = await roomAPI.addRoom({ roomId, state: 'EMPTY' });
-            if (response.successbool) {
-                alert('房间已上架');
+            const branchId = authManager.getBranchId() || authManager.getUserId();
+            const response = await roomAPI.enableRoom({ branchId, roomId: roomId });
+            if (response.successBool) {
+                alert('房间已可以对外出租');
                 await this.loadContent();
             } else {
                 alert('操作失败: ' + (response.error || '未知错误'));
@@ -612,7 +614,7 @@ class BranchView {
 
         try {
             const response = await displayRoomAPI.disableDisplayRoom(displayRoomId);
-            if (response.successbool) {
+            if (response.successBool) {
                 alert('展示房间已下架');
                 await this.loadContent();
             } else {
@@ -626,7 +628,7 @@ class BranchView {
     async enableDisplayRoom(displayRoomId) {
         try {
             const response = await displayRoomAPI.enableDisplayRoom(displayRoomId);
-            if (response.successbool) {
+            if (response.successBool) { 
                 alert('展示房间已重新上架');
                 await this.loadContent();
             } else {
@@ -640,7 +642,7 @@ class BranchView {
     async confirmReservation(reservationId) {
         try {
             const response = await reservationAPI.confirmReservation(reservationId);
-            if (response.successbool) {
+            if (response.successBool) {
                 alert('预约已确认');
                 await this.loadContent();
             } else {
@@ -656,7 +658,7 @@ class BranchView {
 
         try {
             const response = await reservationAPI.cancelReservation(reservationId);
-            if (response.successbool) {
+            if (response.successBool) {
                 alert('预约已拒绝');
                 await this.loadContent();
             } else {
@@ -680,7 +682,7 @@ class BranchView {
 
         try {
             const response = await checkInAPI.addConsume(checkInId, parseFloat(amount), description);
-            if (response.successbool) {
+            if (response.successBool) {
                 alert('消费已添加');
                 await this.loadContent();
             } else {
@@ -696,7 +698,7 @@ class BranchView {
 
         try {
             const response = await checkInAPI.checkout(checkInId);
-            if (response.successbool) {
+            if (response.successBool) {
                 alert('退房成功');
                 await this.loadContent();
             } else {

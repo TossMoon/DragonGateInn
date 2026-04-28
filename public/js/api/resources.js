@@ -13,8 +13,12 @@ class RoomAPI {
         return apiClient.post('/rooms/add', roomData);
     }
 
-    async disableRoom(roomId) {
-        return apiClient.post('/rooms/disable', { roomId });
+    async enableRoom(roomData) {
+        return apiClient.post('/rooms/enable', roomData);
+    }
+
+    async disableRoom(roomData) {
+        return apiClient.post('/rooms/disable', roomData);
     }
 
     async changePrice(priceData) {

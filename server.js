@@ -7,14 +7,19 @@ const PORT = process.env.PORT || 3000;
 const branchRegisterTransaction = require('./transaction/accountTransaction/registerTransaction/branchRegisterTransaction');
 const customerRegisterTransaction = require('./transaction/accountTransaction/registerTransaction/customerRegisterTransaction');
 const headquarterRegisterTransaction = require('./transaction/accountTransaction/registerTransaction/headquarterRegisterTransaction');
+
 const loginBranchTransaction = require('./transaction/accountTransaction/loginTransaction/loginBranchTransaction');
 const loginCustomerByPhoneTransaction = require('./transaction/accountTransaction/loginTransaction/loginCustomerByPhoneTransaction');
 const loginHeadquarterTransaction = require('./transaction/accountTransaction/loginTransaction/loginHeadquarterTransaction');
+
 const customerReservateTransaction = require('./transaction/reservationTransaction/customerReservateTransaction');
 const cancelReservationTransaction = require('./transaction/reservationTransaction/cancelReservationTransaction');
 const confirmReservationTransaction = require('./transaction/reservationTransaction/confirmReservationTransaction');
+
+
 const branchAddRoomTransaction = require('./transaction/roomTransaction/branchAddRoomTransaction');
 const branchDisableRoomTransaction = require('./transaction/roomTransaction/branchDisableRoomTransaction');
+const branchEnableRoomTransaction = require('./transaction/roomTransaction/branchEnableRoomTransaction');
 const branchChangePriceTransaction = require('./transaction/roomTransaction/barnchChangePriceTanscation');
 const branchAddDisplayRoomTransaction = require('./transaction/displayRoomTransaction/branchAddDisplayRoomTransaction');
 const branchDisableDisplayRoomTransaction = require('./transaction/displayRoomTransaction/branchDisableDisplayRoomTransaction');
@@ -162,10 +167,20 @@ async function start() {
         }
     });
 
+    app.post('/api/rooms/enable',async(req,res)=>{
+        try{
+            const transaction = new branchEnableRoomTransaction();
+            const result = await transaction.execute(req.body.branchId, req.body.roomId);
+            res.json(result);
+        }catch(error){
+            res.status(500).json({ error: error.message });
+        }
+    })
+    
     app.post('/api/rooms/disable', async (req, res) => {
         try {
-            const transaction = new branchDisableRoomTransaction(req.body);
-            const result = await transaction.execute();
+            const transaction = new branchDisableRoomTransaction();
+            const result = transaction.execute(req.body.branchId, req.body.roomId);
             res.json(result);
         } catch (error) {
             res.status(500).json({ error: error.message });
