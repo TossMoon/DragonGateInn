@@ -175,7 +175,30 @@ async function start() {
         }catch(error){
             res.status(500).json({ error: error.message });
         }
-    })
+    });
+
+    app.get('/api/rooms/available/:branchId', async (req, res) => {
+        try {
+            const { branchId } = req.params;
+            const rooms = await SingletonFactory.getInstance(allRoomManager).getRoomsByBranchId(branchId);
+            const availableRooms = rooms.filter(room => room.isEmptyBool === true && room.activeState.activeBool === true);
+            res.json(availableRooms);
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    });
+    
+    // 预约相关接口
+    app.get('/api/reservations/pending/:branchId', async (req, res) => {
+        try {
+            const { branchId } = req.params;
+            const reservations = await SingletonFactory.getInstance(allReservationManager).getReservationsByBranchId(branchId);
+            const pendingReservations = reservations.filter(r => r.statusStr === '待确认');
+            res.json(pendingReservations);
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    });
     
     app.post('/api/rooms/disable', async (req, res) => {
         try {
@@ -201,7 +224,11 @@ async function start() {
     // 展示房间相关接口
     app.get('/api/display-rooms', async (req, res) => {
         try {
-            const displayRooms = await SingletonFactory.getInstance(allDisplayRoomManager).getAllDisplayRooms();
+            const displayRooms = await SingletonFactory.getInstance(allDisplayRoomManager).getAllActiveDisplayRoom();
+            displayRooms.forEach(room => {
+                room.branchName=SingletonFactory.getInstance(allBranchManager).getOneAccountByID(room.branchId).getBranchName();
+            });
+
             res.json(displayRooms);
         } catch (error) {
             res.status(500).json({ error: error.message });
@@ -221,10 +248,6 @@ async function start() {
     app.post('/api/display-rooms/add', async (req, res) => {
         try {
             const { branchId, area, windowBool, typeString, numId, appraisePrice } = req.body;
-
-            const { RoomLayout, BedInRoom } = require('./branchResource/room/room');
-            const bed = new BedInRoom(typeString || '单人床', numId || 1);
-            const roomLayout = new RoomLayout(area || 20, windowBool || false, bed);
 
             const transaction = new branchAddDisplayRoomTransaction();
             const result = await transaction.execute(branchId,{area,windowBool,typeString,numId},appraisePrice);
@@ -346,8 +369,15 @@ async function start() {
 
     app.post('/api/checkins/create', async (req, res) => {
         try {
-            const transaction = new createCheckInTransaction(req.body);
-            const result = await transaction.execute();
+            const { branchId, roomId,persons,reservationId } = req.body;
+
+            const transaction = new createCheckInTransaction();
+            const result = await transaction.execute(
+                branchId,
+                roomId,
+                persons,
+                reservationId || null
+            );
             res.json(result);
         } catch (error) {
             res.status(500).json({ error: error.message });

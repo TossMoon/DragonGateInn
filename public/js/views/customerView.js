@@ -97,20 +97,22 @@ class CustomerView {
     }
 
     renderDisplayRoomCard(room) {
-        const isActive = room.activeState === 'ACTIVE' || room.activeState === 1;
+        const isActive = room.activeState.activeBool;
         return `
             <div class="item-card">
                 <h3>展示房间 - ${room.id}</h3>
-                <p>分店: ${room.branchId}</p>
-                <p>户型: ${room.roomLayout || '标准'}</p>
-                <p class="price">¥${room.appraisePrice || room.price || 0}</p>
+                <p>分店: ${room.branchName}</p>
+                <p><strong>面积:</strong> ${room.roomLayout?.areaReal || '-'} ㎡</p>
+                <p><strong>窗户:</strong> ${room.roomLayout?.windowBool ? '有窗' : '无窗'}</p>
+                <p><strong>床铺:</strong> ${room.roomLayout?.bedType ? (room.roomLayout.bedType.typeString || room.roomLayout.bedType) + ' x ' + (room.roomLayout.bedType.numInt || 1) : '-'}</p>
+                <p class="price">¥${room.appraisePrice || room.priceReal || 0}</p>
                 <span class="status ${isActive ? 'active' : 'inactive'}">
                     ${isActive ? '可预约' : '暂不可预约'}
                 </span>
                 <button class="btn" style="margin-top: 15px;"
                     onclick="window.customerView.reserveDisplayRoom('${room.id}', '${room.branchId}')"
                     ${!isActive ? 'disabled' : ''}>
-                    预约此房间
+                    预约
                 </button>
             </div>
         `;

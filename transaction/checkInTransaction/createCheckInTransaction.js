@@ -23,14 +23,34 @@ class createCheckInTransaction extends transaction{
     }
 
     /**
+     * 获取房间对象
+     * @param {string} branchId 分店的编号
+     * @param {string} roomId 房间的编号
+     * @returns {room} 房间对象
+     */
+    _getRoomObject(branchId,roomId){
+        return transaction.getManager(allRoomManager)
+            .getOneManagerByBranchId(branchId).getOneRoomById(roomId);
+    }
+
+    /**
      * 检查房间是否存在
      * @param {string} branchId 分店的编号
      * @param {string} roomId 房间的编号
      * @returns {boolean} 房间是否存在
      */
     isRoomExist(branchId,roomId){
-        return transaction.getManager(allRoomManager)
-            .getOneManagerByBranchId(branchId).getOneRoomById(roomId)!=null;
+        return this._getRoomObject(branchId,roomId)!=null;
+    }
+
+    /**
+     * 获取房间的价格
+     * @param {string} branchId 分店的编号
+     * @param {string} roomId 房间的编号
+     * @returns {number} 房间的价格
+     */
+    getRoomPrice(branchId,roomId){
+        return this._getRoomObject(branchId,roomId).getPriceReal();
     }
 
     /**
@@ -76,6 +96,9 @@ class createCheckInTransaction extends transaction{
         //TODO:检查预约是否存在，现在还没想好怎么实现，在哪里实现
 
         const newCheckIn=checkInFactory(branchId,roomId,persons,connectReservationId);
+
+        newCheckIn.addConsumption(this.getRoomPrice(branchId,roomId));
+        
         transaction.getManager(allCheckInManager)
             .getOneManagerByBranchId(branchId)
             .addNewCheckIn(newCheckIn);

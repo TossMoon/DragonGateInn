@@ -9,6 +9,10 @@ class RoomAPI {
         return apiClient.get(`/rooms/branch/${branchId}`);
     }
 
+    async getAvailableRooms(branchId) {
+        return apiClient.get(`/rooms/available/${branchId}`);
+    }
+
     async addRoom(roomData) {
         return apiClient.post('/rooms/add', roomData);
     }
@@ -59,6 +63,10 @@ class ReservationAPI {
 
     async getReservationsByBranch(branchId) {
         return apiClient.get(`/reservations/branch/${branchId}`);
+    }
+
+    async getPendingReservations(branchId) {
+        return apiClient.get(`/reservations/pending/${branchId}`);
     }
 
     async createReservation(reservationData) {

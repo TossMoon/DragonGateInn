@@ -506,7 +506,6 @@ class BranchView {
             });
 
             if (response.successBool) {
-                alert('房间添加成功！');
                 document.querySelector('.modal-overlay').remove();
                 await this.loadContent();
             } else {
@@ -562,7 +561,6 @@ class BranchView {
             const response = await roomAPI.changePrice({ branchId, roomId, price: newPrice });
 
             if (response.successBool) {
-                alert('价格修改成功！');
                 document.querySelector('.modal-overlay').remove();
                 await this.loadContent();
             } else {
@@ -580,7 +578,6 @@ class BranchView {
             const branchId = authManager.getBranchId() || authManager.getUserId();
             const response = await roomAPI.disableRoom({ branchId, roomId: roomId });
             if (response.successBool) {
-                alert('房间已不能对外出租');
                 await this.loadContent();
             } else {
                 alert('操作失败: ' + (response.error || '未知错误'));
@@ -595,7 +592,6 @@ class BranchView {
             const branchId = authManager.getBranchId() || authManager.getUserId();
             const response = await roomAPI.enableRoom({ branchId, roomId: roomId });
             if (response.successBool) {
-                alert('房间已可以对外出租');
                 await this.loadContent();
             } else {
                 alert('操作失败: ' + (response.error || '未知错误'));
@@ -678,7 +674,6 @@ class BranchView {
             });
 
             if (response.successBool) {
-                alert('展示房间添加成功！');
                 document.querySelector('.modal-overlay').remove();
                 await this.loadContent();
             } else {
@@ -700,7 +695,6 @@ class BranchView {
                 displayRoomId
             });
             if (response.successBool) {
-                alert('展示房间已下架');
                 await this.loadContent();
             } else {
                 alert('操作失败: ' + (response.error || '未知错误'));
@@ -719,7 +713,6 @@ class BranchView {
                 displayRoomId
             });
             if (response.successBool) { 
-                alert('展示房间已重新上架');
                 await this.loadContent();
             } else {
                 alert('操作失败: ' + (response.error || '未知错误'));
@@ -733,7 +726,6 @@ class BranchView {
         try {
             const response = await reservationAPI.confirmReservation(reservationId);
             if (response.successBool) {
-                alert('预约已确认');
                 await this.loadContent();
             } else {
                 alert('操作失败: ' + (response.error || '未知错误'));
@@ -749,7 +741,6 @@ class BranchView {
         try {
             const response = await reservationAPI.cancelReservation(reservationId);
             if (response.successBool) {
-                alert('预约已拒绝');
                 await this.loadContent();
             } else {
                 alert('操作失败: ' + (response.error || '未知错误'));
@@ -760,7 +751,207 @@ class BranchView {
     }
 
     showCheckInModal() {
-        alert('办理入住功能：请通过API实现');
+        const branchId = authManager.getBranchId() || authManager.getUserId();
+
+        const modal = document.createElement('div');
+        modal.className = 'modal-overlay';
+        modal.id = 'checkin-modal';
+        modal.innerHTML = `
+            <div class="modal" style="max-width: 800px; max-height: 90vh; overflow-y: auto;">
+                <div class="modal-header">
+                    <h3>办理入住</h3>
+                    <button class="close-btn" onclick="this.closest('.modal-overlay').remove()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div>
+                            <h4 style="margin-bottom: 10px;">选择空闲房间</h4>
+                            <div id="available-rooms-container" style="max-height: 300px; overflow-y: auto; border: 1px solid #ddd; border-radius: 8px; padding: 10px;">
+                                <p style="color: #666;">加载中...</p>
+                            </div>
+                            <input type="hidden" id="selected-room-id">
+                        </div>
+                        <div>
+                            <h4 style="margin-bottom: 10px;">关联预约单（可选）</h4>
+                            <div id="reservations-container" style="max-height: 150px; overflow-y: auto; border: 1px solid #ddd; border-radius: 8px; padding: 10px;">
+                                <p style="color: #666;">加载中...</p>
+                            </div>
+                            <input type="hidden" id="selected-reservation-id">
+                        </div>
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <h4>入住人员信息</h4>
+                        <div id="persons-container">
+                            <div class="person-row" style="display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 10px; margin-bottom: 10px; align-items: center;">
+                                <div>
+                                    <label style="font-size: 12px; color: #666;">姓名</label>
+                                    <input type="text" class="person-name" placeholder="请输入姓名" required>
+                                </div>
+                                <div>
+                                    <label style="font-size: 12px; color: #666;">身份证号</label>
+                                    <input type="text" class="person-idcard" placeholder="请输入身份证号" required>
+                                </div>
+                                <button type="button" class="btn btn-secondary" onclick="this.closest('.person-row').remove()" style="padding: 5px 10px;">删除</button>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-secondary" onclick="window.branchView.addPersonRow()" style="margin-top: 10px;">+ 添加人员</button>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()">取消</button>
+                    <button type="button" class="btn" onclick="window.branchView.submitCheckIn()">确认入住</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+
+        this.loadAvailableRoomsAndReservations(branchId);
+    }
+
+    async loadAvailableRoomsAndReservations(branchId) {
+        try {
+            const [rooms, reservations] = await Promise.all([
+                roomAPI.getAvailableRooms(branchId),
+                reservationAPI.getPendingReservations(branchId)
+            ]);
+
+            const roomsContainer = document.getElementById('available-rooms-container');
+            if (rooms.length === 0) {
+                roomsContainer.innerHTML = '<p style="color: #666;">暂无可用房间</p>';
+            } else {
+                roomsContainer.innerHTML = rooms.map(room => `
+                    <div class="room-option" data-room-id="${room.id}" data-room-info="${room.id}|${room.roomType?.areaReal || '-'}|${room.roomType?.bedType?.typeString || '-'}|${room.roomType?.bedType?.numInt || 1}|${room.price || 0}"
+                         onclick="window.branchView.selectRoom(this)"
+                         style="padding: 10px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 8px; cursor: pointer; transition: all 0.2s;">
+                        <div style="font-weight: bold; color: #333;">房间ID: ${room.id}</div>
+                        <div style="font-size: 12px; color: #666; margin-top: 5px;">
+                            面积: ${room.roomType?.areaReal || '-'}㎡ |
+                            床铺: ${room.roomType?.bedType?.typeString || '-' || '-'} x ${room.roomType?.bedType?.numInt || 1} |
+                            价格: ¥${room.priceReal || 0}/晚
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            const reservationsContainer = document.getElementById('reservations-container');
+            if (reservations.length === 0) {
+                reservationsContainer.innerHTML = '<p style="color: #666;">暂无需确认的预约</p>';
+            } else {
+                reservationsContainer.innerHTML = reservations.map(res => `
+                    <div class="reservation-option" data-reservation-id="${res.id}" data-reservation-info="${res.id}|${res.customerIdStr || '-'}|${res.customerNameStr || '-'}"
+                         onclick="window.branchView.selectReservation(this)"
+                         style="padding: 10px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 8px; cursor: pointer; transition: all 0.2s;">
+                        <div style="font-weight: bold; color: #333;">预约单: ${res.id}</div>
+                        <div style="font-size: 12px; color: #666; margin-top: 5px;">
+                            顾客: ${res.customerNameStr || res.customerIdStr || '-'} |
+                            入住日期: ${res.checkInDate || '-'}
+                        </div>
+                    </div>
+                `).join('');
+            }
+        } catch (error) {
+            console.error('加载数据失败:', error);
+            document.getElementById('available-rooms-container').innerHTML = '<p style="color: red;">加载失败</p>';
+            document.getElementById('reservations-container').innerHTML = '<p style="color: red;">加载失败</p>';
+        }
+    }
+
+    selectRoom(element) {
+        document.querySelectorAll('.room-option').forEach(el => {
+            el.style.borderColor = '#ddd';
+            el.style.backgroundColor = 'transparent';
+        });
+        element.style.borderColor = '#007bff';
+        element.style.backgroundColor = '#f0f7ff';
+
+        const roomId = element.dataset.roomId;
+        document.getElementById('selected-room-id').value = roomId;
+    }
+
+    selectReservation(element) {
+        document.querySelectorAll('.reservation-option').forEach(el => {
+            el.style.borderColor = '#ddd';
+            el.style.backgroundColor = 'transparent';
+        });
+        if (document.querySelector('.reservation-option.selected') === element) {
+            element.classList.remove('selected');
+            element.style.borderColor = '#ddd';
+            element.style.backgroundColor = 'transparent';
+            document.getElementById('selected-reservation-id').value = '';
+        } else {
+            element.classList.add('selected');
+            element.style.borderColor = '#28a745';
+            element.style.backgroundColor = '#f0fff4';
+            document.getElementById('selected-reservation-id').value = element.dataset.reservationId;
+        }
+    }
+
+    addPersonRow() {
+        const container = document.getElementById('persons-container');
+        const newRow = document.createElement('div');
+        newRow.className = 'person-row';
+        newRow.style.cssText = 'display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 10px; margin-bottom: 10px; align-items: center;';
+        newRow.innerHTML = `
+            <div>
+                <label style="font-size: 12px; color: #666;">姓名</label>
+                <input type="text" class="person-name" placeholder="请输入姓名" required>
+            </div>
+            <div>
+                <label style="font-size: 12px; color: #666;">身份证号</label>
+                <input type="text" class="person-idcard" placeholder="请输入身份证号" required>
+            </div>
+            <button type="button" class="btn btn-secondary" onclick="this.closest('.person-row').remove()" style="padding: 5px 10px;">删除</button>
+        `;
+        container.appendChild(newRow);
+    }
+
+    async submitCheckIn() {
+        const branchId = authManager.getBranchId() || authManager.getUserId();
+        const roomId = document.getElementById('selected-room-id').value;
+        const reservationId = document.getElementById('selected-reservation-id').value || null;
+
+        const personRows = document.querySelectorAll('.person-row');
+        const persons = [];
+
+        for (const row of personRows) {
+            const name = row.querySelector('.person-name').value.trim();
+            const idCard = row.querySelector('.person-idcard').value.trim();
+
+            if (!name || !idCard) {
+                alert('请填写每位入住人员的姓名和身份证号');
+                return;
+            }
+
+            persons.push({ name, idCard });
+        }
+
+        if (!roomId) {
+            alert('请选择入住房间');
+            return;
+        }
+
+        if (persons.length === 0) {
+            alert('请至少添加一位入住人员');
+            return;
+        }
+
+        try {
+            const response = await checkInAPI.createCheckIn({
+                branchId,
+                roomId,
+                persons,
+                reservationId
+            });
+
+            if (response.successBool) {
+                document.getElementById('checkin-modal').remove();
+                await this.loadContent();
+            } else {
+                alert('入住办理失败: ' + (response.error || '未知错误'));
+            }
+        } catch (error) {
+            alert('入住办理失败: ' + error.message);
+        }
     }
 
     async addConsume(checkInId) {
@@ -773,7 +964,6 @@ class BranchView {
         try {
             const response = await checkInAPI.addConsume(checkInId, parseFloat(amount), description);
             if (response.successBool) {
-                alert('消费已添加');
                 await this.loadContent();
             } else {
                 alert('操作失败: ' + (response.error || '未知错误'));
@@ -789,7 +979,6 @@ class BranchView {
         try {
             const response = await checkInAPI.checkout(checkInId);
             if (response.successBool) {
-                alert('退房成功');
                 await this.loadContent();
             } else {
                 alert('操作失败: ' + (response.error || '未知错误'));

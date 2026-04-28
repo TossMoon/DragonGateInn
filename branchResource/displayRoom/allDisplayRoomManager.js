@@ -53,7 +53,7 @@ class allDisplayRoomManager extends allBranchManager{
      */
     getAllActiveDisplayRoom()
     {
-        return super.getAllObjectList().filter(displayRoom=>displayRoom.getActiveState().getIsActive());
+        return super.getAllObjectList().filter(displayRoom=>displayRoom.getActiveState().getActiveBool());
     }
 
     /**
