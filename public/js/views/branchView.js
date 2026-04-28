@@ -86,8 +86,8 @@ class BranchView {
             const reservations = await reservationAPI.getReservationsByBranch(branchId);
             const checkins = await checkInAPI.getCheckInsByBranch(branchId);
 
-            const emptyRooms = rooms.filter(r => r.roomState === 'EMPTY' || r.roomState === 0);
-            const occupiedRooms = rooms.filter(r => r.roomState === 'OCCUPIED' || r.roomState === 1);
+            const emptyRooms = rooms.filter(r => r.isEmptyBool === true);
+            const occupiedRooms = rooms.filter(r => r.isEmptyBool === false);
 
             container.innerHTML = `
                 <div class="stats">
@@ -236,15 +236,15 @@ class BranchView {
                             displayRooms.map(room => `
                                 <div class="item-card">
                                     <h3>展示房间 - ${room.id}</h3>
-                                    <p><strong>面积:</strong> ${room.roomType?.areaReal || '-'} ㎡</p>
-                                    <p><strong>窗户:</strong> ${room.roomType?.windowBool ? '有窗' : '无窗'}</p>
-                                    <p><strong>床铺:</strong> ${room.roomType?.bedType ? (room.roomType.bedType.typeString || room.roomType.bedType) + ' x ' + (room.roomType.bedType.numInt || 1) : '-'}</p>
+                                    <p><strong>面积:</strong> ${room.roomLayout?.areaReal || '-'} ㎡</p>
+                                    <p><strong>窗户:</strong> ${room.roomLayout?.windowBool ? '有窗' : '无窗'}</p>
+                                    <p><strong>床铺:</strong> ${room.roomLayout?.bedType ? (room.roomLayout.bedType.typeString || room.roomLayout.bedType) + ' x ' + (room.roomLayout.bedType.numInt || 1) : '-'}</p>
                                     <p><strong>价格:</strong> ¥${room.appraisePrice || room.price || 0}/晚</p>
-                                    <span class="status ${room.activeState === 'ACTIVE' || room.activeState === 1 ? 'active' : 'inactive'}">
-                                        ${room.activeState === 'ACTIVE' || room.activeState === 1 ? '已上架' : '已下架'}
+                                    <span class="status ${room.activeState?.activeBool === true ? 'active' : 'inactive'}">
+                                        ${room.activeState?.activeBool === true ? '已上架' : '已下架'}
                                     </span>
                                     <div style="margin-top: 15px;">
-                                        ${room.activeState === 'ACTIVE' || room.activeState === 1 ?
+                                        ${room.activeState?.activeBool === true ?
                                             `<button class="btn btn-danger" style="width: auto;" onclick="window.branchView.disableDisplayRoom('${room.id}')">下架</button>`
                                             :
                                             `<button class="btn btn-secondary" style="width: auto;" onclick="window.branchView.enableDisplayRoom('${room.id}')">重新上架</button>`
@@ -606,7 +606,87 @@ class BranchView {
     }
 
     showAddDisplayRoomModal() {
-        alert('添加展示房间功能：请通过API实现');
+        const modal = document.createElement('div');
+        modal.className = 'modal-overlay';
+        modal.innerHTML = `
+            <div class="modal">
+                <div class="modal-header">
+                    <h3>添加展示房间</h3>
+                    <button class="close-btn" onclick="this.closest('.modal-overlay').remove()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="add-display-room-form">
+                        <div class="form-group">
+                            <label for="display-room-area">房间面积 (㎡)</label>
+                            <input type="number" id="display-room-area" value="20" min="10" max="200" required>
+                        </div>
+                        <div class="form-group">
+                            <label>是否有窗户</label>
+                            <div style="display: flex; gap: 20px; margin-top: 5px;">
+                                <label style="display: flex; align-items: center; gap: 5px;">
+                                    <input type="radio" name="display-room-window" value="true" checked> 是
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 5px;">
+                                    <input type="radio" name="display-room-window" value="false"> 否
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="display-room-bed-type">床铺类型</label>
+                            <select id="display-room-bed-type">
+                                <option value="单人床">单人床</option>
+                                <option value="双人床">双人床</option>
+                                <option value="大床房">大床房</option>
+                                <option value="家庭房">家庭房</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="display-room-bed-num">床铺数量</label>
+                            <input type="number" id="display-room-bed-num" value="1" min="1" max="5">
+                        </div>
+                        <div class="form-group">
+                            <label for="display-room-price">预估价格 (元/晚)</label>
+                            <input type="number" id="display-room-price" value="100" min="0" step="10">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()">取消</button>
+                    <button type="button" class="btn" onclick="window.branchView.submitAddDisplayRoom()">添加展示房间</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+
+    async submitAddDisplayRoom() {
+        const branchId = authManager.getBranchId() || authManager.getUserId();
+        const area = parseFloat(document.getElementById('display-room-area').value);
+        const windowBool = document.querySelector('input[name="display-room-window"]:checked').value === 'true';
+        const typeString = document.getElementById('display-room-bed-type').value;
+        const numId = parseInt(document.getElementById('display-room-bed-num').value);
+        const appraisePrice = parseFloat(document.getElementById('display-room-price').value);
+
+        try {
+            const response = await displayRoomAPI.addDisplayRoom({
+                branchId,
+                area,
+                windowBool,
+                typeString,
+                numId,  
+                appraisePrice
+            });
+
+            if (response.successBool) {
+                alert('展示房间添加成功！');
+                document.querySelector('.modal-overlay').remove();
+                await this.loadContent();
+            } else {
+                alert('添加失败: ' + (response.error || '未知错误'));
+            }
+        } catch (error) {
+            alert('添加失败: ' + error.message);
+        }
     }
 
     async disableDisplayRoom(displayRoomId) {

@@ -220,8 +220,14 @@ async function start() {
 
     app.post('/api/display-rooms/add', async (req, res) => {
         try {
-            const transaction = new branchAddDisplayRoomTransaction(req.body);
-            const result = await transaction.execute();
+            const { branchId, area, windowBool, typeString, numId, appraisePrice } = req.body;
+
+            const { RoomLayout, BedInRoom } = require('./branchResource/room/room');
+            const bed = new BedInRoom(typeString || '单人床', numId || 1);
+            const roomLayout = new RoomLayout(area || 20, windowBool || false, bed);
+
+            const transaction = new branchAddDisplayRoomTransaction();
+            const result = await transaction.execute(branchId,{area,windowBool,typeString,numId},appraisePrice);
             res.json(result);
         } catch (error) {
             res.status(500).json({ error: error.message });
