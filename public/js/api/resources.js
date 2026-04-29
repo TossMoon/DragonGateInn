@@ -65,6 +65,10 @@ class ReservationAPI {
         return apiClient.get(`/reservations/branch/${branchId}`);
     }
 
+    async getPendingReservationsByBranch(branchId) {
+        return apiClient.get(`/reservations/pending/branch/${branchId}`);
+    }
+
     async getPendingReservations(branchId) {
         return apiClient.get(`/reservations/pending/${branchId}`);
     }
@@ -74,11 +78,11 @@ class ReservationAPI {
     }
 
     async cancelReservation(reservationId) {
-        return apiClient.post('/reservations/cancel', reservationId );
+        return apiClient.post('/reservations/cancel', { reservationId });
     }
 
     async confirmReservation(reservationId) {
-        return apiClient.post('/reservations/confirm',  reservationId );
+        return apiClient.post('/reservations/confirm', { reservationId });
     }
 }
 

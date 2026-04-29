@@ -2,6 +2,7 @@ const assert=require('assert');
 
 const {allBranchManager}=require('../template/allBranchManager');
 
+
 const SingletonFactory=require('../../util/SingletonFactory');
 const customerAccountManager=require('../../accountManager/customerAccountManager');
 
@@ -61,12 +62,41 @@ class allReservationManager extends allBranchManager{
     }
 
     /**
+     * 获取带顾客手机号的预约列表
+     * @param {reservation[]} reservations 预约的引用类型对象数组
+     * @returns {reservation[]} 带顾客手机号的预约列表的引用类型对象数组
+     */
+    _getHaveCusotmerPhoneReservations(reservations)
+    {
+        return reservations.map(r => {
+                const customerAccount = SingletonFactory.getInstance(customerAccountManager)
+                                                      .getOneAccountByID(r.customerIdString);
+                return {
+                    ...r,
+                    customerPhone: customerAccount ? customerAccount.getPhoneString() : '未知顾客'
+                };
+        });
+    }
+
+    /**
      * 根据分店编号获取预约列表
      * @param {string} branchId 分店的编号
      * @returns {reservation[]} 预约的引用类型对象数组
      */
     getReservationsByBranchId(branchId){
-        return super.getOneManagerByBranchId(branchId).getAllReservations();
+        const reservations= super.getOneManagerByBranchId(branchId).getAllReservations();
+        return this._getHaveCusotmerPhoneReservations(reservations);
+    }
+
+    /**
+     * 根据分店编号获取待确认预约列表
+     * @param {string} branchId 分店的编号
+     * @returns {reservation[]} 待确认预约列表的引用类型对象数组
+     */
+    getPendingReservationsByBranchId(branchId){
+        const reservations= super.getOneManagerByBranchId(branchId).getAllReservations();
+
+        return this._getHaveCusotmerPhoneReservations(reservations.filter(r => r.state.state === 'pending'));
     }
 }
 module.exports=allReservationManager;

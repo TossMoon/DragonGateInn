@@ -1,6 +1,6 @@
 import { roomAPI, displayRoomAPI, reservationAPI, checkInAPI } from '../api/index.js';
 import { authManager } from '../auth/index.js';
-import { getReservationStatusClass, getReservationStatusText } from '../utils/reservationUtils.js';
+import { getReservationStatusClass, getReservationStatusText,canCancelReservation} from '../utils/reservationUtils.js';
 
 class BranchView {
     constructor(container) {
@@ -84,7 +84,7 @@ class BranchView {
         try {
             const rooms = await roomAPI.getRoomsByBranch(branchId);
             const displayRooms = await displayRoomAPI.getDisplayRoomsByBranch(branchId);
-            const reservations = await reservationAPI.getReservationsByBranch(branchId);
+            const reservations = await reservationAPI.getPendingReservationsByBranch(branchId);
             const checkins = await checkInAPI.getCheckInsByBranch(branchId);
 
             const emptyRooms = rooms.filter(r => r.isEmptyBool === true);
@@ -124,8 +124,8 @@ class BranchView {
                                 <tbody>
                                     ${reservations.slice(0, 5).map(r => `
                                         <tr>
-                                            <td>${r.id}</td>
-                                            <td>${getReservationStatusText(r.state)}</td>
+                                            <td>${r.reservationIdString}</td>
+                                            <td>${getReservationStatusText(r.state.state)}</td>
                                         </tr>
                                     `).join('')}
                                 </tbody>
@@ -277,9 +277,9 @@ class BranchView {
                                     <tr>
                                         <th>预约ID</th>
                                         <th>顾客ID</th>
+                                        <th>顾客手机号</th>
                                         <th>房间户型</th>
-                                        <th>入住日期</th>
-                                        <th>退房日期</th>
+                                        <th>创建日期</th>
                                         <th>状态</th>
                                         <th>操作</th>
                                     </tr>
@@ -287,16 +287,16 @@ class BranchView {
                                 <tbody>
                                     ${reservations.map(r => `
                                         <tr>
-                                            <td>${r.id}</td>
-                                            <td>${r.customerId}</td>
+                                            <td>${r.reservationIdString}</td>
+                                            <td>${r.customerIdString}</td>
+                                            <td>${r.customerPhone}</td>
                                             <td>${r.roomType || '标准'}</td>
-                                            <td>${r.checkInDate || r.startDate || '未指定'}</td>
-                                            <td>${r.checkOutDate || r.endDate || '未指定'}</td>
-                                            <td><span class="status ${getReservationStatusClass(r.state)}">${getReservationStatusText(r.state)}</span></td>
+                                            <td>${r.createReservationDate || '未指定'}</td>                             
+                                            <td><span class="status ${getReservationStatusClass(r.state.state)}">${getReservationStatusText(r.state.state)}</span></td>
                                             <td>
-                                                ${r.state === 'PENDING' || r.state === 0 ?
-                                                    `<button class="btn" style="width: auto; padding: 5px 10px;" onclick="window.branchView.confirmReservation('${r.id}')">确认</button>
-                                                     <button class="btn btn-danger" style="width: auto; padding: 5px 10px;" onclick="window.branchView.rejectReservation('${r.id}')">拒绝</button>`
+                                                ${canCancelReservation(r.state.state) ?
+                                                    `<button class="btn" style="width: auto; padding: 5px 10px;" onclick="window.branchView.confirmReservation('${r.reservationIdString}')">确认</button>
+                                                     <button class="btn btn-danger" style="width: auto; padding: 5px 10px;" onclick="window.branchView.rejectReservation('${r.reservationIdString}')">拒绝</button>`
                                                     : ''}
                                             </td>
                                         </tr>
@@ -808,10 +808,10 @@ class BranchView {
                     <div class="reservation-option" data-reservation-id="${res.id}" data-reservation-info="${res.id}|${res.customerIdStr || '-'}|${res.customerNameStr || '-'}"
                          onclick="window.branchView.selectReservation(this)"
                          style="padding: 10px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 8px; cursor: pointer; transition: all 0.2s;">
-                        <div style="font-weight: bold; color: #333;">预约单: ${res.id}</div>
+                        <div style="font-weight: bold; color: #333;">预约单: ${res.reservationIdString}</div>
                         <div style="font-size: 12px; color: #666; margin-top: 5px;">
-                            顾客: ${res.customerNameStr || res.customerIdStr || '-'} |
-                            入住日期: ${res.checkInDate || '-'}
+                            顾客: ${ res.customerPhone || '-'} |
+                            创建预约日期: ${res.createReservationDate || '-'}
                         </div>
                     </div>
                 `).join('');

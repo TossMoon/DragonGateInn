@@ -194,7 +194,7 @@ async function start() {
         try {
             const { branchId } = req.params;
             const reservations = await SingletonFactory.getInstance(allReservationManager).getReservationsByBranchId(branchId);
-            const pendingReservations = reservations.filter(r => r.statusStr === '待确认');
+            const pendingReservations = reservations.filter(r => r.state.state == 'pending');
             res.json(pendingReservations);
         } catch (error) {
             res.status(500).json({ error: error.message });
@@ -302,6 +302,16 @@ async function start() {
         try {
             const { branchId } = req.params;
             const reservations = await SingletonFactory.getInstance(allReservationManager).getReservationsByBranchId(branchId);
+            res.json(reservations);
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    });
+
+    app.get('/api/reservations/pending/branch/:branchId',async (req, res) => {
+        try {
+            const { branchId } = req.params;
+            const reservations = await SingletonFactory.getInstance(allReservationManager).getPendingReservationsByBranchId(branchId);
             res.json(reservations);
         } catch (error) {
             res.status(500).json({ error: error.message });
