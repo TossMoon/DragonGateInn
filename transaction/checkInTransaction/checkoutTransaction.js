@@ -3,9 +3,22 @@ const assert=require('assert');
 const transaction=require('../transaction');
 const allCheckInManager=require('../../branchResource/checkIn/allCheckInManager');
 
+const allRoomManager=require('../../branchResource/room/allRoomManager');
+
 class checkoutTransaction extends transaction{
     constructor(){
         super();
+    }
+
+     /**
+     * 获取房间对象
+     * @param {string} branchId 分店的编号
+     * @param {string} roomId 房间的编号
+     * @returns {room} 房间对象
+     */
+    _getRoomObject(branchId,roomId){
+        return transaction.getManager(allRoomManager)
+            .getOneManagerByBranchId(branchId).getOneRoomById(roomId);
     }
 
      /**
@@ -29,6 +42,10 @@ class checkoutTransaction extends transaction{
        
         // 设置退房日期为当前时间
         curCheckIn.setCheckOutDateAsNow();
+
+        //设置入住手续包含的房间被占用
+        this._getRoomObject(curCheckIn.getBranchId(),curCheckIn.getRoomId())
+            .setEmpty();
              
         this.changeDatabase('update',curCheckIn);
         return this.packageResult(true,curCheckIn,"入住订单退房成功");

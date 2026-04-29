@@ -88,6 +88,8 @@ class createCheckInTransaction extends transaction{
         {
             return this.packageResult(false,null,'roomId is not exist');
         }
+
+
         
         const personObjects=persons.map(item=>new person(item.name,item.idCard))
 
@@ -99,7 +101,12 @@ class createCheckInTransaction extends transaction{
 
         const newCheckIn=checkInFactory(branchId,roomId,personObjects,connectReservationId);
 
+        //将入住加入消费
         newCheckIn.addConsumeNumber(this.getRoomPrice(branchId,roomId));
+
+        //将入住手续包含的房间设置为已占用
+        this._getRoomObject(branchId,roomId)
+            .setOccupied();
         
         transaction.getManager(allCheckInManager)
             .getOneManagerByBranchId(branchId)
