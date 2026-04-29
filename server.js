@@ -397,8 +397,8 @@ async function start() {
 
     app.post('/api/checkins/checkout', async (req, res) => {
         try {
-            const transaction = new checkoutTransaction(req.body);
-            const result = await transaction.execute();
+            const transaction = new checkoutTransaction();
+            const result = await transaction.execute(req.body.checkInId);
             res.json(result);
         } catch (error) {
             res.status(500).json({ error: error.message });
@@ -407,8 +407,8 @@ async function start() {
 
     app.post('/api/checkins/add-consume', async (req, res) => {
         try {
-            const transaction = new addConsumeTransaction(req.body);
-            const result = await transaction.execute();
+            const transaction = new addConsumeTransaction();
+            const result = await transaction.execute(req.body.checkInId,req.body.amount);
             res.json(result);
         } catch (error) {
             res.status(500).json({ error: error.message });

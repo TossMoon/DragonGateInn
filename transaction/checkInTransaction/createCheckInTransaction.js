@@ -50,7 +50,7 @@ class createCheckInTransaction extends transaction{
      * @returns {number} 房间的价格
      */
     getRoomPrice(branchId,roomId){
-        return this._getRoomObject(branchId,roomId).getPriceReal();
+        return this._getRoomObject(branchId,roomId).getPrice();
     }
 
     /**
@@ -89,15 +89,17 @@ class createCheckInTransaction extends transaction{
             return this.packageResult(false,null,'roomId is not exist');
         }
         
-        if(!this.checkPersonArg(persons)){
+        const personObjects=persons.map(item=>new person(item.name,item.idCard))
+
+        if(!this.checkPersonArg(personObjects)){
             return this.packageResult(false,null,'person is not a person array');
         }
 
         //TODO:检查预约是否存在，现在还没想好怎么实现，在哪里实现
 
-        const newCheckIn=checkInFactory(branchId,roomId,persons,connectReservationId);
+        const newCheckIn=checkInFactory(branchId,roomId,personObjects,connectReservationId);
 
-        newCheckIn.addConsumption(this.getRoomPrice(branchId,roomId));
+        newCheckIn.addConsumeNumber(this.getRoomPrice(branchId,roomId));
         
         transaction.getManager(allCheckInManager)
             .getOneManagerByBranchId(branchId)

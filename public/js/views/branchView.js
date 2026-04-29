@@ -147,7 +147,7 @@ class BranchView {
                                 <tbody>
                                     ${checkins.slice(0, 5).map(c => `
                                         <tr>
-                                            <td>${c.id}</td>
+                                            <td>${c.Id}</td>
                                             <td>${c.roomId}</td>
                                             <td>${c.checkOutDate ? '已退房' : '入住中'}</td>
                                         </tr>
@@ -332,7 +332,6 @@ class BranchView {
                                     <tr>
                                         <th>入住ID</th>
                                         <th>房间ID</th>
-                                        <th>顾客ID</th>
                                         <th>入住日期</th>
                                         <th>退房日期</th>
                                         <th>消费</th>
@@ -342,16 +341,15 @@ class BranchView {
                                 <tbody>
                                     ${checkins.map(c => `
                                         <tr>
-                                            <td>${c.id}</td>
+                                            <td>${c.Id}</td>
                                             <td>${c.roomId}</td>
-                                            <td>${c.customerId}</td>
                                             <td>${c.checkInDate || c.startDate || '未指定'}</td>
                                             <td>${c.checkOutDate || c.endDate || '未退房'}</td>
                                             <td>¥${c.consumeNumber || c.consumeAmount || 0}</td>
                                             <td>
                                                 ${!c.checkOutDate && !c.endDate ?
-                                                    `<button class="btn" style="width: auto; padding: 5px 10px;" onclick="window.branchView.addConsume('${c.id}')">加消费</button>
-                                                     <button class="btn btn-secondary" style="width: auto; padding: 5px 10px;" onclick="window.branchView.checkout('${c.id}')">退房</button>`
+                                                    `<button class="btn" style="width: auto; padding: 5px 10px;" onclick="window.branchView.addConsume('${c.Id}')">加消费</button>
+                                                     <button class="btn btn-secondary" style="width: auto; padding: 5px 10px;" onclick="window.branchView.checkout('${c.Id}')">退房</button>`
                                                     : ''}
                                             </td>
                                         </tr>
@@ -925,11 +923,11 @@ class BranchView {
         const amount = prompt('请输入消费金额:');
         if (!amount) return;
 
-        const description = prompt('请输入消费说明:');
-        if (!description) return;
+        // const description = prompt('请输入消费说明:');
+        // if (!description) return;
 
         try {
-            const response = await checkInAPI.addConsume(checkInId, parseFloat(amount), description);
+            const response = await checkInAPI.addConsume(checkInId, parseFloat(amount));
             if (response.successBool) {
                 await this.loadContent();
             } else {
