@@ -1,6 +1,7 @@
 const customerReservateTransaction=require('./customerReservateTransaction');
 const allDisplayRoomManager=require('../../branchResource/displayRoom/allDisplayRoomManager');
 const transaction=require('../../transaction/transaction');
+const customerAccountManager=require('../../accountManager/customerAccountManager');
 /**
  * 顾客使用展示房间预约
  */
@@ -10,8 +11,7 @@ class reservateByDisplayRoomTransaction extends customerReservateTransaction{
     }
 
     execute(...args){
-        super.execute(...args);
-        const [branchID, customerID, displayRoomID] = args;
+        const [branchID, customerNumber, displayRoomID] = args;
 
         const displayRoom=transaction.getManager(allDisplayRoomManager)
                 .getOneDisplayRoomById(branchID, displayRoomID);
@@ -24,7 +24,22 @@ class reservateByDisplayRoomTransaction extends customerReservateTransaction{
         {
             return this.packageResult(false,null,"展示房间已被下架");
         }
-        return super.execute(customerID,branchID,displayRoom.getRoomLayout());
+
+        const customerID=transaction.getManager(customerAccountManager)
+                .getCustomAccountByPhoneString(customerNumber).getID();
+
+        if(customerID==null){
+            return this.packageResult(false,null,"顾客不存在");
+        }
+
+        return super.execute(customerID,branchID,
+            {
+                area: displayRoom.getRoomLayout().areaReal,
+                windowBool: displayRoom.getRoomLayout().windowBool,
+                typeString: displayRoom.getRoomLayout().bedType.typeString,
+                numId: displayRoom.getRoomLayout().bedType.numInt,
+            }
+            );
     }
 }
 

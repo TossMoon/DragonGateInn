@@ -13,6 +13,7 @@ const loginCustomerByPhoneTransaction = require('./transaction/accountTransactio
 const loginHeadquarterTransaction = require('./transaction/accountTransaction/loginTransaction/loginHeadquarterTransaction');
 
 const customerReservateTransaction = require('./transaction/reservationTransaction/customerReservateTransaction');
+const reservateByDisplayRoomTransaction = require('./transaction/reservationTransaction/reservateByDisplayRoomTransaction');
 const cancelReservationTransaction = require('./transaction/reservationTransaction/cancelReservationTransaction');
 const confirmReservationTransaction = require('./transaction/reservationTransaction/confirmReservationTransaction');
 
@@ -290,7 +291,7 @@ async function start() {
     app.get('/api/reservations/customer/:customerId', async (req, res) => {
         try {
             const { customerId } = req.params;
-            const reservations = await SingletonFactory.getInstance(allReservationManager).getReservationsByCustomerId(customerId);
+            const reservations = await SingletonFactory.getInstance(allReservationManager).getReservationByCustomerPhone(customerId);
             res.json(reservations);
         } catch (error) {
             res.status(500).json({ error: error.message });
@@ -309,8 +310,8 @@ async function start() {
 
     app.post('/api/reservations/create', async (req, res) => {
         try {
-            const transaction = new customerReservateTransaction(req.body);
-            const result = await transaction.execute();
+            const transaction = new reservateByDisplayRoomTransaction();
+            const result = await transaction.execute(req.body.branchId,req.body.customerId,req.body.displayRoomId);
             res.json(result);
         } catch (error) {
             res.status(500).json({ error: error.message });
@@ -319,8 +320,8 @@ async function start() {
 
     app.post('/api/reservations/cancel', async (req, res) => {
         try {
-            const transaction = new cancelReservationTransaction(req.body);
-            const result = await transaction.execute();
+            const transaction = new cancelReservationTransaction();
+            const result = await transaction.execute(req.body.reservationId);
             res.json(result);
         } catch (error) {
             res.status(500).json({ error: error.message });
@@ -329,8 +330,8 @@ async function start() {
 
     app.post('/api/reservations/confirm', async (req, res) => {
         try {
-            const transaction = new confirmReservationTransaction(req.body);
-            const result = await transaction.execute();
+            const transaction = new confirmReservationTransaction();
+            const result = await transaction.execute(req.body.reservationId);
             res.json(result);
         } catch (error) {
             res.status(500).json({ error: error.message });

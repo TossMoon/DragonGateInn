@@ -243,7 +243,7 @@ class LoginView {
                 password: data.password
             });
 
-            if (response.success) {
+            if (response.successBool) {
                 this.showMessage('注册成功！请登录', 'success');
                 setTimeout(() => {
                     this.currentTab = 'customer';

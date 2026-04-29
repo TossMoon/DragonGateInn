@@ -1,5 +1,6 @@
 import { roomAPI, displayRoomAPI, reservationAPI, checkInAPI } from '../api/index.js';
 import { authManager } from '../auth/index.js';
+import { getReservationStatusClass, getReservationStatusText } from '../utils/reservationUtils.js';
 
 class BranchView {
     constructor(container) {
@@ -124,7 +125,7 @@ class BranchView {
                                     ${reservations.slice(0, 5).map(r => `
                                         <tr>
                                             <td>${r.id}</td>
-                                            <td>${this.getReservationStatusText(r.state)}</td>
+                                            <td>${getReservationStatusText(r.state)}</td>
                                         </tr>
                                     `).join('')}
                                 </tbody>
@@ -291,7 +292,7 @@ class BranchView {
                                             <td>${r.roomType || '标准'}</td>
                                             <td>${r.checkInDate || r.startDate || '未指定'}</td>
                                             <td>${r.checkOutDate || r.endDate || '未指定'}</td>
-                                            <td><span class="status ${this.getReservationStatusClass(r.state)}">${this.getReservationStatusText(r.state)}</span></td>
+                                            <td><span class="status ${getReservationStatusClass(r.state)}">${getReservationStatusText(r.state)}</span></td>
                                             <td>
                                                 ${r.state === 'PENDING' || r.state === 0 ?
                                                     `<button class="btn" style="width: auto; padding: 5px 10px;" onclick="window.branchView.confirmReservation('${r.id}')">确认</button>
@@ -395,40 +396,6 @@ class BranchView {
             layout += '标准间';
         }
         return layout.trim();
-    }
-
-    getReservationStatusClass(state) {
-        switch (state) {
-            case 'PENDING':
-            case 0:
-                return 'pending';
-            case 'CONFIRMED':
-            case 1:
-                return 'active';
-            case 'CANCELED':
-            case 'CANCELLED':
-            case 2:
-                return 'inactive';
-            default:
-                return '';
-        }
-    }
-
-    getReservationStatusText(state) {
-        switch (state) {
-            case 'PENDING':
-            case 0:
-                return '待确认';
-            case 'CONFIRMED':
-            case 1:
-                return '已确认';
-            case 'CANCELED':
-            case 'CANCELLED':
-            case 2:
-                return '已取消';
-            default:
-                return '未知';
-        }
     }
 
     showAddRoomModal() {

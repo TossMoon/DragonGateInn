@@ -1,5 +1,6 @@
 import { displayRoomAPI, reservationAPI, checkInAPI } from '../api/index.js';
 import { authManager } from '../auth/index.js';
+import { getReservationStatusClass, getReservationStatusText, canCancelReservation } from '../utils/reservationUtils.js';
 
 class CustomerView {
     constructor(container) {
@@ -137,8 +138,6 @@ class CustomerView {
                                     <th>预约ID</th>
                                     <th>分店</th>
                                     <th>房间户型</th>
-                                    <th>预约入住日期</th>
-                                    <th>预约退房日期</th>
                                     <th>状态</th>
                                     <th>操作</th>
                                 </tr>
@@ -146,15 +145,17 @@ class CustomerView {
                             <tbody>
                                 ${reservations.map(r => `
                                     <tr>
-                                        <td>${r.id}</td>
-                                        <td>${r.branchId}</td>
-                                        <td>${r.roomType || '标准'}</td>
-                                        <td>${r.checkInDate || r.startDate || '未指定'}</td>
-                                        <td>${r.checkOutDate || r.endDate || '未指定'}</td>
-                                        <td><span class="status ${this.getReservationStatusClass(r.state)}">${this.getReservationStatusText(r.state)}</span></td>
+                                        <td>${r.reservationIdString}</td>
+                                        <td>${r.branchName}</td>
                                         <td>
-                                            ${this.canCancelReservation(r.state) ?
-                                                `<button class="btn btn-danger" style="width: auto; padding: 5px 10px;" onclick="window.customerView.cancelReservation('${r.id}')">取消预约</button>`
+                                             <p><strong>面积:</strong> ${r.roomLayout?.areaReal || '-'} ㎡</p>
+                                             <p><strong>窗户:</strong> ${r.roomLayout?.windowBool ? '有窗' : '无窗'}</p>
+                                             <p><strong>床铺:</strong> ${r.roomLayout?.bedType ? (r.roomLayout.bedType.typeString || r.roomLayout.bedType) + ' x ' + (r.roomLayout.bedType.numInt || 1) : '-'}</p>
+                                        </td>
+                                        <td><span class="status ${getReservationStatusClass(r.state.state)}">${getReservationStatusText(r.state.state)}</span></td>
+                                        <td>
+                                            ${canCancelReservation(r.state.state) ?
+                                                `<button class="btn btn-danger" style="width: auto; padding: 5px 10px;" onclick="window.customerView.cancelReservation('${r.reservationIdString}')">取消预约</button>`
                                                 : ''}
                                         </td>
                                     </tr>
@@ -167,44 +168,6 @@ class CustomerView {
         } catch (error) {
             container.innerHTML = `<div class="message error">加载预约记录失败: ${error.message}</div>`;
         }
-    }
-
-    getReservationStatusClass(state) {
-        switch (state) {
-            case 'PENDING':
-            case 0:
-                return 'pending';
-            case 'CONFIRMED':
-            case 1:
-                return 'active';
-            case 'CANCELED':
-            case 'CANCELLED':
-            case 2:
-                return 'inactive';
-            default:
-                return '';
-        }
-    }
-
-    getReservationStatusText(state) {
-        switch (state) {
-            case 'PENDING':
-            case 0:
-                return '待确认';
-            case 'CONFIRMED':
-            case 1:
-                return '已确认';
-            case 'CANCELED':
-            case 'CANCELLED':
-            case 2:
-                return '已取消';
-            default:
-                return '未知';
-        }
-    }
-
-    canCancelReservation(state) {
-        return state === 'PENDING' || state === 0;
     }
 
     async renderCheckIns(container) {
@@ -251,23 +214,15 @@ class CustomerView {
     }
 
     async reserveDisplayRoom(displayRoomId, branchId) {
-        const checkInDate = prompt('请输入预计入住日期 (YYYY-MM-DD):');
-        if (!checkInDate) return;
-
-        const checkOutDate = prompt('请输入预计退房日期 (YYYY-MM-DD):');
-        if (!checkOutDate) return;
-
         try {
             const response = await reservationAPI.createReservation({
                 customerId: authManager.getUserId(),
                 branchId: branchId,
                 displayRoomId: displayRoomId,
-                checkInDate: checkInDate,
-                checkOutDate: checkOutDate
             });
 
-            if (response.success) {
-                alert('预约成功！');
+            if (response.successBool) {
+                this.showReservationSuccessModal(response.resultContent);
                 await this.loadContent();
             } else {
                 alert('预约失败: ' + (response.error || '未知错误'));
@@ -277,13 +232,58 @@ class CustomerView {
         }
     }
 
+    showReservationSuccessModal(reservation) {
+        const modal = document.createElement('div');
+        modal.className = 'modal-overlay';
+        modal.innerHTML = `
+            <div class="modal">
+                <div class="modal-header">
+                    <h3>预约成功</h3>
+                    <button class="close-btn" onclick="this.closest('.modal-overlay').remove()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div style="padding: 20px; text-align: left;">
+                        <div style="margin-bottom: 15px;">
+                            <span style="color: #666;">预约ID:</span>
+                            <span style="font-weight: bold; margin-left: 10px;">${reservation.reservationIdString || 'N/A'}</span>
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <span style="color: #666;">分店ID:</span>
+                            <span style="font-weight: bold; margin-left: 10px;">${reservation.branchIdString || 'N/A'}</span>
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <span style="color: #666;">展示房间ID:</span>
+                            <span style="font-weight: bold; margin-left: 10px;">
+                                <p><strong>面积:</strong> ${reservation.roomLayout?.areaReal || '-'} ㎡</p>
+                                             <p><strong>窗户:</strong> ${reservation.roomLayout?.windowBool ? '有窗' : '无窗'}</p>
+                                             <p><strong>床铺:</strong> ${reservation.roomLayout?.bedType ? (reservation.roomLayout.bedType.typeString || reservation.roomLayout.bedType) + ' x ' + (reservation.roomLayout.bedType.numInt || 1) : '-'}</p>
+                            </span>
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <span style="color: #666;">状态:</span>
+                            <span style="font-weight: bold; margin-left: 10px; color: #28a745;">待确认</span>
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <span style="color: #666;">预约时间:</span>
+                            <span style="font-weight: bold; margin-left: 10px;">${reservation.createTime || new Date().toLocaleString()}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn" onclick="this.closest('.modal-overlay').remove()">确定</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+
     async cancelReservation(reservationId) {
         if (!confirm('确定要取消此预约吗？')) return;
 
         try {
-            const response = await reservationAPI.cancelReservation(reservationId);
+            const response = await reservationAPI.cancelReservation({reservationId});
 
-            if (response.success) {
+            if (response.successBool) {
                 alert('取消预约成功！');
                 await this.loadContent();
             } else {

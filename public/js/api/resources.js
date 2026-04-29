@@ -74,11 +74,11 @@ class ReservationAPI {
     }
 
     async cancelReservation(reservationId) {
-        return apiClient.post('/reservations/cancel', { reservationId });
+        return apiClient.post('/reservations/cancel', reservationId );
     }
 
     async confirmReservation(reservationId) {
-        return apiClient.post('/reservations/confirm', { reservationId });
+        return apiClient.post('/reservations/confirm',  reservationId );
     }
 }
 
