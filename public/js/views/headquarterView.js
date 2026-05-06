@@ -95,7 +95,8 @@ class HeadquarterView {
             const checkins = await checkInAPI.getAllCheckIns();
 
             const totalRevenue = checkins.reduce((sum, c) => sum + (c.consumeNumber || c.consumeAmount || 0), 0);
-            const emptyRooms = rooms.filter(r => r.roomState === 'EMPTY' || r.roomState === 0);
+            const emptyRooms = rooms.filter(r => r.isEmptyBool==true);
+
 
             container.innerHTML = `
                 <div class="stats">
@@ -132,9 +133,9 @@ class HeadquarterView {
                                 <tbody>
                                     ${reservations.slice(0, 5).map(r => `
                                         <tr>
-                                            <td>${r.id}</td>
-                                            <td>${r.branchId}</td>
-                                            <td>${getReservationStatusText(r.state)}</td>
+                                            <td>${r.reservationIdString}</td>
+                                            <td>${r.branchIdString}</td>
+                                            <td>${getReservationStatusText(r.state.state)}</td>
                                         </tr>
                                     `).join('')}
                                 </tbody>
@@ -156,7 +157,7 @@ class HeadquarterView {
                                 <tbody>
                                     ${checkins.slice(0, 5).map(c => `
                                         <tr>
-                                            <td>${c.id}</td>
+                                            <td>${c.Id}</td>
                                             <td>${c.branchId}</td>
                                             <td>¥${c.consumeNumber || c.consumeAmount || 0}</td>
                                         </tr>
@@ -286,7 +287,8 @@ class HeadquarterView {
                                         <th>分店</th>
                                         <th>户型</th>
                                         <th>价格</th>
-                                        <th>状态</th>
+                                        <th>出租状态</th>
+                                        <th>占用状态</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -294,9 +296,15 @@ class HeadquarterView {
                                         <tr>
                                             <td>${r.id}</td>
                                             <td>${r.branchId}</td>
-                                            <td>${r.roomLayout || '标准'}</td>
-                                            <td>¥${r.price || 0}</td>
-                                            <td><span class="status ${r.roomState === 'EMPTY' || r.roomState === 0 ? 'active' : 'inactive'}">${this.getRoomStatusText(r.roomState)}</span></td>
+                                            <td>
+                                                <p><strong>面积:</strong> ${r.roomType?.areaReal || '-'} ㎡</p>
+                                                <p><strong>窗户:</strong> ${r.roomType?.windowBool ? '有窗' : '无窗'}</p>
+                                                <p><strong>床铺:</strong> ${r.roomType?.bedType ? (r.roomType.bedType.typeString || r.roomType.bedType) + ' x ' + (r.roomType.bedType.numInt || 1) : '-'}</p>
+                                            </td>
+                                            </td>
+                                            <td>¥${r.priceReal || 0}</td>
+                                            <td><span class="status ${r.roomState === 'EMPTY' || r.roomState === 0 ? 'active' : 'inactive'}">${this.getRoomStatusText(r.activeState?.activeBool)}</span></td>
+                                            <td><span class="status ${r.isEmptyBool ? 'active' : 'inactive'}">${r.isEmptyBool ? '空闲' : '已入住'}</span></td>
                                         </tr>
                                     `).join('')}
                                 </tbody>
@@ -325,20 +333,18 @@ class HeadquarterView {
                                         <th>预约ID</th>
                                         <th>分店</th>
                                         <th>顾客ID</th>
-                                        <th>入住日期</th>
-                                        <th>退房日期</th>
+                                        <th>创建预约订单日期</th>
                                         <th>状态</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     ${reservations.map(r => `
                                         <tr>
-                                            <td>${r.id}</td>
-                                            <td>${r.branchId}</td>
-                                            <td>${r.customerId}</td>
-                                            <td>${r.checkInDate || r.startDate || '未指定'}</td>
-                                            <td>${r.checkOutDate || r.endDate || '未指定'}</td>
-                                            <td><span class="status ${getReservationStatusClass(r.state)}">${getReservationStatusText(r.state)}</span></td>
+                                            <td>${r.reservationIdString}</td>
+                                            <td>${r.branchIdString}</td>
+                                            <td>${r.customerIdString}</td>
+                                            <td>${r.createReservationDate || '未指定'}</td>
+                                            <td><span class="status ${getReservationStatusClass(r.state.state)}">${getReservationStatusText(r.state.state)}</span></td>
                                         </tr>
                                     `).join('')}
                                 </tbody>
@@ -384,8 +390,7 @@ class HeadquarterView {
                                     <tr>
                                         <th>入住ID</th>
                                         <th>分店</th>
-                                        <th>房间ID</th>
-                                        <th>顾客ID</th>
+                                        <th>房间ID</th>                                
                                         <th>入住日期</th>
                                         <th>退房日期</th>
                                         <th>消费</th>
@@ -394,10 +399,9 @@ class HeadquarterView {
                                 <tbody>
                                     ${checkins.map(c => `
                                         <tr>
-                                            <td>${c.id}</td>
+                                            <td>${c.Id}</td>
                                             <td>${c.branchId}</td>
                                             <td>${c.roomId}</td>
-                                            <td>${c.customerId}</td>
                                             <td>${c.checkInDate || c.startDate || '未指定'}</td>
                                             <td>${c.checkOutDate || c.endDate || '未退房'}</td>
                                             <td>¥${c.consumeNumber || c.consumeAmount || 0}</td>

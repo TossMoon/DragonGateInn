@@ -21,7 +21,6 @@ class CustomerView {
                 <ul>
                     <li><a href="#" data-section="rooms" class="${this.currentSection === 'rooms' ? 'active' : ''}">浏览房间</a></li>
                     <li><a href="#" data-section="reservations" class="${this.currentSection === 'reservations' ? 'active' : ''}">我的预约</a></li>
-                    <li><a href="#" data-section="checkins" class="${this.currentSection === 'checkins' ? 'active' : ''}">入住记录</a></li>
                 </ul>
             </div>
 
@@ -61,9 +60,6 @@ class CustomerView {
                     break;
                 case 'reservations':
                     await this.renderReservations(contentArea);
-                    break;
-                case 'checkins':
-                    await this.renderCheckIns(contentArea);
                     break;
             }
         } catch (error) {
@@ -170,49 +166,7 @@ class CustomerView {
         }
     }
 
-    async renderCheckIns(container) {
-        const user = authManager.getCurrentUser();
-        try {
-            const checkins = await checkInAPI.getCheckInsByCustomer(user.id);
-
-            container.innerHTML = `
-                <h2 style="margin-bottom: 20px;">入住记录</h2>
-                <div class="table-container">
-                    ${checkins.length === 0 ? '<p>暂无入住记录</p>' : `
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>入住ID</th>
-                                    <th>分店</th>
-                                    <th>房间ID</th>
-                                    <th>入住日期</th>
-                                    <th>退房日期</th>
-                                    <th>消费金额</th>
-                                    <th>状态</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${checkins.map(c => `
-                                    <tr>
-                                        <td>${c.id}</td>
-                                        <td>${c.branchId}</td>
-                                        <td>${c.roomId}</td>
-                                        <td>${c.checkInDate || c.startDate || '未指定'}</td>
-                                        <td>${c.checkOutDate || c.endDate || '未退房'}</td>
-                                        <td>¥${c.consumeNumber || c.consumeAmount || 0}</td>
-                                        <td><span class="status ${c.checkOutDate || c.endDate ? 'inactive' : 'active'}">${c.checkOutDate || c.endDate ? '已退房' : '入住中'}</span></td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-                    `}
-                </div>
-            `;
-        } catch (error) {
-            container.innerHTML = `<div class="message error">加载入住记录失败: ${error.message}</div>`;
-        }
-    }
-
+    
     async reserveDisplayRoom(displayRoomId, branchId) {
         try {
             const response = await reservationAPI.createReservation({

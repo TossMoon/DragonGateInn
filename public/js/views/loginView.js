@@ -16,7 +16,7 @@ class LoginView {
         this.container.innerHTML = `
             <div class="login-container">
                 <div class="header" style="margin-bottom: 30px;">
-                    <h1>龙门客栈</h1>
+                    <h1 style="color: #ffffff; font-size: 42px; font-weight: 800; text-shadow: 3px 3px 6px rgba(0,0,0,0.3); letter-spacing: 8px;">龙门客栈</h1>
                     <p>酒店预定管理系统</p>
                 </div>
 
