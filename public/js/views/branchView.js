@@ -14,7 +14,7 @@ class BranchView {
             <div class="header">
                 <h1>分店端 - 龙门客栈</h1>
                 <p>分店ID: ${user.branchId || user.id}</p>
-                <button class="btn btn-secondary" style="margin-top: 10px; width: auto;" onclick="window.branchView.logout()">退出登录</button>
+                <button id="branch-logout-btn" class="btn btn-secondary" style="margin-top: 10px; width: auto;">退出登录</button>
             </div>
 
             <div class="navigation">
@@ -50,6 +50,11 @@ class BranchView {
                 await this.loadContent();
             });
         });
+
+        const logoutBtn = this.container.querySelector('#branch-logout-btn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', () => this.logout());
+        }
     }
 
     async loadContent() {
@@ -960,6 +965,4 @@ class BranchView {
         }
     }
 }
-
-window.branchView = null;
 export default BranchView;

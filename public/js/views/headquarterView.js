@@ -223,9 +223,9 @@ class HeadquarterView {
                                         <th>房间总数</th>
                                         <th>空闲房间</th>
                                         <th>待处理预约</th>
-                                        <th>入住率</th>
-                                        <th>状态</th>
-                                        <th>操作</th>
+                                        <th>账号状态</th>
+                                        <th>房间占用率</th>
+                                        
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -241,9 +241,6 @@ class HeadquarterView {
                                                 <td>${stats.reservations}</td>
                                                 <td>${stats.activeState ? '已启用' : '已禁用'}</td>
                                                 <td>${occupancyRate}</td>
-                                                <td>
-                                                    <button class="btn btn-secondary btn-branch-detail" style="width: auto; padding: 5px 10px;" data-branch-id="${branchId}">详情</button>
-                                                </td>
                                             </tr>
                                         `;
                                     }).join('')}

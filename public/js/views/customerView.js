@@ -14,7 +14,7 @@ class CustomerView {
             <div class="header">
                 <h1>顾客端 - 龙门客栈</h1>
                 <p>欢迎, ${user.phone || user.id}</p>
-                <button class="btn btn-secondary" style="margin-top: 10px; width: auto;" onclick="window.customerView.logout()">退出登录</button>
+                <button id="customer-logout-btn" class="btn btn-secondary" style="margin-top: 10px; width: auto;">退出登录</button>
             </div>
 
             <div class="navigation">
@@ -47,6 +47,11 @@ class CustomerView {
                 await this.loadContent();
             });
         });
+
+        const logoutBtn = this.container.querySelector('#customer-logout-btn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', () => this.logout());
+        }
     }
 
     async loadContent() {
